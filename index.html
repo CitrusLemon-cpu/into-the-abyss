@@ -278,6 +278,118 @@
     .depth-ruler__readout--visible {
       opacity: 1;
     }
+
+    .fact-marker {
+      position: absolute;
+      display: grid;
+      justify-items: center;
+      gap: 9px;
+      padding: 0;
+      border: 0;
+      color: #e5f8ff;
+      background: transparent;
+      cursor: pointer;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      text-align: center;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+      transform: translate(-50%, -50%) rotate(var(--marker-tilt));
+      transition: transform 150ms ease-out;
+      z-index: 3;
+    }
+
+    .fact-marker:hover,
+    .fact-marker:focus-visible {
+      transform: translate(-50%, calc(-50% - 5px)) rotate(var(--marker-tilt));
+    }
+
+    .fact-marker:focus-visible {
+      outline: 2px solid #ffffff;
+      outline-offset: 8px;
+    }
+
+    .fact-marker__image {
+      display: grid;
+      width: 82px;
+      height: 82px;
+      border: 1px dashed rgba(229, 248, 255, 0.76);
+      border-radius: 50%;
+      place-items: center;
+      background: rgba(0, 17, 26, 0.26);
+      box-shadow: 0 0 0 7px rgba(229, 248, 255, 0.08);
+      font-size: 36px;
+      line-height: 1;
+    }
+
+    .fact-marker__label {
+      padding: 3px 6px;
+      background: rgba(0, 17, 26, 0.58);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .fact-dialog {
+      width: min(460px, calc(100vw - 48px));
+      padding: 0;
+      border: 1px solid rgba(169, 227, 255, 0.56);
+      border-radius: 8px;
+      color: #e5f8ff;
+      background: #022b43;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.56);
+    }
+
+    .fact-dialog::backdrop {
+      background: rgba(0, 6, 10, 0.68);
+    }
+
+    .fact-dialog__content {
+      position: relative;
+      padding: 40px;
+    }
+
+    .fact-dialog__close {
+      position: absolute;
+      top: 13px;
+      right: 13px;
+      display: grid;
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border: 1px solid rgba(229, 248, 255, 0.4);
+      border-radius: 50%;
+      color: #e5f8ff;
+      background: transparent;
+      cursor: pointer;
+      font-size: 22px;
+      line-height: 1;
+      place-items: center;
+    }
+
+    .fact-dialog__depth {
+      margin: 0 0 12px;
+      color: #8edfff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .fact-dialog__title {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 38px;
+      font-weight: 400;
+    }
+
+    .fact-dialog__text {
+      margin: 20px 0 0;
+      color: rgba(229, 248, 255, 0.86);
+      font-size: 17px;
+      line-height: 1.58;
+    }
   </style>
 </head>
 
@@ -314,10 +426,23 @@
     </aside>
   </main>
 
+  <dialog class="fact-dialog" id="fact-dialog" aria-labelledby="fact-dialog-title">
+    <div class="fact-dialog__content">
+      <button class="fact-dialog__close" type="button" aria-label="Close fact">×</button>
+      <p class="fact-dialog__depth" id="fact-dialog-depth"></p>
+      <h2 class="fact-dialog__title" id="fact-dialog-title"></h2>
+      <p class="fact-dialog__text" id="fact-dialog-text"></p>
+    </div>
+  </dialog>
+
   <script>
     const ocean = document.getElementById("ocean");
     const ruler = ocean.querySelector(".depth-ruler");
     const rulerReadout = ruler.querySelector(".depth-ruler__readout");
+    const factDialog = document.getElementById("fact-dialog");
+    const factDialogDepth = document.getElementById("fact-dialog-depth");
+    const factDialogTitle = document.getElementById("fact-dialog-title");
+    const factDialogText = document.getElementById("fact-dialog-text");
     const pixelsPerMeter = 4;
     const depthAtBottom = ocean.offsetHeight / pixelsPerMeter;
     const oceanZones = [
@@ -326,6 +451,40 @@
       [1000, "Bathypelagic"],
       [4000, "Abyssopelagic"],
       [6000, "Hadalpelagic"],
+    ];
+    const oceanFacts = [
+      {
+        depth: 120,
+        left: "62%",
+        tilt: "-7deg",
+        icon: "✦",
+        label: "Phytoplankton",
+        text: "Phytoplankton carry out roughly 40% of the planet’s photosynthesis. They need sunlight, so this work is confined to the ocean’s top 200 metres—the photic zone.",
+      },
+      {
+        depth: 40,
+        left: "78%",
+        tilt: "5deg",
+        icon: "🦦",
+        label: "Sea otter",
+        text: "Sea otters usually forage in coastal water shallower than 40 metres. Exceptional dives can reach 100 metres, but most of their lives unfold much closer to the surface.",
+      },
+      {
+        depth: 253.2,
+        left: "43%",
+        tilt: "-4deg",
+        icon: "🤿",
+        label: "Freediver",
+        text: "In 2012, Austrian freediver Herbert Nitsch descended to 253.2 metres on a single breath—a world record for the deepest free dive.",
+      },
+      {
+        depth: 644,
+        left: "72%",
+        tilt: "6deg",
+        icon: "🐟",
+        label: "Mola mola",
+        text: "Ocean sunfish, or Mola mola, regularly dive below 200 metres to hunt jellyfish. Near the Galápagos, one was documented at a remarkable 644 metres.",
+      },
     ];
 
     for (const [depth, zone] of oceanZones) {
@@ -337,6 +496,34 @@
       label.className = "zone-marker__label";
       label.textContent = `${zone} · ${depth.toLocaleString()} m`;
       marker.append(label);
+      ocean.append(marker);
+    }
+
+    for (const fact of oceanFacts) {
+      const marker = document.createElement("button");
+      marker.className = "fact-marker";
+      marker.type = "button";
+      marker.style.top = `${fact.depth * pixelsPerMeter}px`;
+      marker.style.left = fact.left;
+      marker.style.setProperty("--marker-tilt", fact.tilt);
+      marker.setAttribute("aria-label", `Open fact about ${fact.label}`);
+
+      const image = document.createElement("span");
+      image.className = "fact-marker__image";
+      image.setAttribute("aria-hidden", "true");
+      image.textContent = fact.icon;
+
+      const label = document.createElement("span");
+      label.className = "fact-marker__label";
+      label.textContent = fact.label;
+
+      marker.append(image, label);
+      marker.addEventListener("click", () => {
+        factDialogDepth.textContent = `${fact.depth.toLocaleString()} m`;
+        factDialogTitle.textContent = fact.label;
+        factDialogText.textContent = fact.text;
+        factDialog.showModal();
+      });
       ocean.append(marker);
     }
 
@@ -367,6 +554,16 @@
 
     ruler.addEventListener("pointerleave", () => {
       rulerReadout.classList.remove("depth-ruler__readout--visible");
+    });
+
+    factDialog.querySelector(".fact-dialog__close").addEventListener("click", () => {
+      factDialog.close();
+    });
+
+    factDialog.addEventListener("click", (event) => {
+      if (event.target === factDialog) {
+        factDialog.close();
+      }
     });
 
     console.log("Ocean dimensions:");
