@@ -1,0 +1,31 @@
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background: #00111a;
+}
+
+/* Our 1920 × 35,876 pixel ocean */
+#ocean {
+    position: relative;
+
+    width: 1920px;
+    height: 54675px;
+
+    overflow: hidden;
+
+    background: linear-gradient(
+        to bottom,
+        #168dcc 0px,
+        #07527a 500px,
+        #022b43 2000px,
+        #00131f 5000px,
+        #00060a 15000px,
+        #000000 35876px
+    );
+}
+

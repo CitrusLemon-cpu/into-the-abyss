@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ocean Depth</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #00111a;
+    }
+
+    /* The actual 1:1 ocean coordinate system */
+    #ocean {
+      position: relative;
+
+      width: 1920px;
+      height: 43740px;
+
+      overflow: hidden;
+
+      background: linear-gradient(
+        to bottom,
+        #168dcc 0px,
+        #07527a 500px,
+        #022b43 2000px,
+        #00131f 5000px,
+        #00060a 15000px,
+        #000000 43740px
+      );
+    }
+  </style>
+</head>
+
+<body>
+
+  <main id="ocean">
+    <!-- Everything inside here uses the 1:1 coordinate system -->
+
+  </main>
+
+  <script>
+    const ocean = document.getElementById("ocean");
+
+    console.log("Ocean dimensions:");
+    console.log(ocean.offsetWidth + " × " + ocean.offsetHeight);
+  </script>
+
+</body>
+</html>
