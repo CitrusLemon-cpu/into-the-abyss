@@ -14,6 +14,122 @@
       margin: 0;
       padding: 0;
       background: #00111a;
+      scroll-behavior: smooth;
+    }
+
+    #intro {
+      position: relative;
+      display: grid;
+      width: 1920px;
+      height: 1080px;
+      place-items: center;
+      overflow: hidden;
+      color: #e5f8ff;
+      background:
+        radial-gradient(circle at 77% 18%, rgba(96, 214, 255, 0.34), transparent 27%),
+        linear-gradient(145deg, #36aee6 0%, #117eaf 46%, #07527a 100%);
+    }
+
+    #intro::before,
+    #intro::after {
+      position: absolute;
+      border: 1px solid rgba(229, 248, 255, 0.16);
+      border-radius: 50%;
+      content: "";
+    }
+
+    #intro::before {
+      width: 1050px;
+      height: 1050px;
+      right: -350px;
+      bottom: -540px;
+    }
+
+    #intro::after {
+      width: 700px;
+      height: 700px;
+      right: -175px;
+      bottom: -365px;
+    }
+
+    .intro__content {
+      position: relative;
+      width: 860px;
+      margin-right: 380px;
+      z-index: 1;
+    }
+
+    .intro__eyebrow {
+      margin: 0 0 26px;
+      color: rgba(229, 248, 255, 0.76);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .intro__title {
+      max-width: 720px;
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 104px;
+      font-weight: 400;
+      letter-spacing: -0.06em;
+      line-height: 0.92;
+    }
+
+    .intro__description {
+      max-width: 610px;
+      margin: 42px 0 0;
+      color: rgba(229, 248, 255, 0.88);
+      font-size: 24px;
+      line-height: 1.55;
+    }
+
+    .intro__scale {
+      display: flex;
+      gap: 38px;
+      margin: 48px 0 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .intro__stat {
+      display: grid;
+      gap: 6px;
+    }
+
+    .intro__stat-value {
+      font-size: 25px;
+      font-weight: 700;
+    }
+
+    .intro__stat-label {
+      color: rgba(229, 248, 255, 0.7);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .intro__start {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 62px;
+      color: #e5f8ff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .intro__start::after {
+      width: 54px;
+      height: 1px;
+      background: currentColor;
+      content: "";
     }
 
     /* The actual 1:1 ocean coordinate system */
@@ -146,6 +262,25 @@
 </head>
 
 <body>
+
+  <header id="intro">
+    <div class="intro__content">
+      <p class="intro__eyebrow">A one-to-one descent</p>
+      <h1 class="intro__title">Into the Abyss</h1>
+      <p class="intro__description">Scroll from the ocean surface to Challenger Deep on a true vertical scale. Every four pixels represent one metre of depth.</p>
+      <div class="intro__scale" aria-label="Scale and total depth">
+        <div class="intro__stat">
+          <span class="intro__stat-value">4 px</span>
+          <span class="intro__stat-label">equals 1 metre</span>
+        </div>
+        <div class="intro__stat">
+          <span class="intro__stat-value">10,935 m</span>
+          <span class="intro__stat-label">total descent</span>
+        </div>
+      </div>
+      <a class="intro__start" href="#ocean">Begin the descent</a>
+    </div>
+  </header>
 
   <main id="ocean">
     <!-- Everything inside here uses the 1:1 coordinate system -->
