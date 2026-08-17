@@ -35,6 +35,84 @@
         #000000 43740px
       );
     }
+
+    .depth-ruler {
+      --meter: 4px;
+      --ten-meters: 40px;
+      --hundred-meters: 400px;
+      position: absolute;
+      inset: 0 auto 0 32px;
+      width: 190px;
+      color: rgba(226, 247, 255, 0.9);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      letter-spacing: 0.02em;
+      pointer-events: none;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    }
+
+    .depth-ruler::before {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 132px;
+      width: 1px;
+      background: rgba(226, 247, 255, 0.72);
+      content: "";
+    }
+
+    .depth-ruler__ticks {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 57px;
+      width: 14px;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0 calc(var(--meter) - 1px),
+        rgba(226, 247, 255, 0.46) calc(var(--meter) - 1px) var(--meter)
+      );
+    }
+
+    .depth-ruler__ticks--ten {
+      width: 25px;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0 calc(var(--ten-meters) - 1px),
+        rgba(226, 247, 255, 0.65) calc(var(--ten-meters) - 1px) var(--ten-meters)
+      );
+    }
+
+    .depth-ruler__ticks--hundred {
+      width: 37px;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0 calc(var(--hundred-meters) - 2px),
+        rgba(226, 247, 255, 0.9) calc(var(--hundred-meters) - 2px) var(--hundred-meters)
+      );
+    }
+
+    .depth-ruler__label {
+      position: absolute;
+      right: 69px;
+      padding: 2px 5px;
+      border-radius: 2px;
+      background: rgba(0, 17, 26, 0.56);
+      white-space: nowrap;
+    }
+
+    .depth-ruler__label--surface {
+      top: 8px;
+      font-weight: 700;
+    }
+
+    .depth-ruler__label--bottom {
+      bottom: 0;
+      right: auto;
+      left: 144px;
+      font-weight: 700;
+      color: #fff2c2;
+    }
   </style>
 </head>
 
@@ -42,14 +120,32 @@
 
   <main id="ocean">
     <!-- Everything inside here uses the 1:1 coordinate system -->
-
+    <aside class="depth-ruler" aria-label="Depth ruler: one metre equals four pixels">
+      <div class="depth-ruler__ticks" aria-hidden="true"></div>
+      <div class="depth-ruler__ticks depth-ruler__ticks--ten" aria-hidden="true"></div>
+      <div class="depth-ruler__ticks depth-ruler__ticks--hundred" aria-hidden="true"></div>
+      <span class="depth-ruler__label depth-ruler__label--surface">0 m · surface</span>
+      <span class="depth-ruler__label depth-ruler__label--bottom">10,935 m · Challenger Deep</span>
+    </aside>
   </main>
 
   <script>
     const ocean = document.getElementById("ocean");
+    const ruler = ocean.querySelector(".depth-ruler");
+    const pixelsPerMeter = 4;
+    const depthAtBottom = ocean.offsetHeight / pixelsPerMeter;
+
+    for (let depth = 1000; depth < depthAtBottom; depth += 1000) {
+      const label = document.createElement("span");
+      label.className = "depth-ruler__label";
+      label.style.top = `${depth * pixelsPerMeter}px`;
+      label.textContent = `${depth.toLocaleString()} m`;
+      ruler.append(label);
+    }
 
     console.log("Ocean dimensions:");
     console.log(ocean.offsetWidth + " × " + ocean.offsetHeight);
+    console.log(`Depth at bottom: ${depthAtBottom.toLocaleString()} m`);
   </script>
 
 </body>
