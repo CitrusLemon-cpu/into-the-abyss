@@ -613,10 +613,38 @@
       resurfaceButton.hidden = window.scrollY <= ocean.offsetTop + 200;
     };
 
+    let isResurfacing = false;
+
     resurfaceButton.addEventListener("click", () => {
+      if (isResurfacing) {
+        return;
+      }
+
+      isResurfacing = true;
+      const startingPosition = window.scrollY;
+      const surfacePosition = ocean.offsetTop;
+      const animationDuration = 700;
+      const startedAt = performance.now();
+
       document.documentElement.style.scrollBehavior = "auto";
-      window.scrollTo({ top: ocean.offsetTop });
-      document.documentElement.style.scrollBehavior = "";
+
+      const resurface = (now) => {
+        const progress = Math.min(1, (now - startedAt) / animationDuration);
+        const easedProgress = 1 - Math.pow(1 - progress, 4);
+        const currentPosition = startingPosition + (surfacePosition - startingPosition) * easedProgress;
+
+        window.scrollTo({ top: currentPosition });
+
+        if (progress < 1) {
+          requestAnimationFrame(resurface);
+          return;
+        }
+
+        document.documentElement.style.scrollBehavior = "";
+        isResurfacing = false;
+      };
+
+      requestAnimationFrame(resurface);
     });
 
     window.addEventListener("scroll", updateResurfaceButton, { passive: true });
