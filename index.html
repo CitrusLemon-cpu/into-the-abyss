@@ -390,6 +390,44 @@
       font-size: 17px;
       line-height: 1.58;
     }
+
+    .resurface-button {
+      position: fixed;
+      right: 32px;
+      bottom: 32px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 17px;
+      border: 1px solid rgba(229, 248, 255, 0.62);
+      border-radius: 999px;
+      color: #e5f8ff;
+      background: rgba(0, 17, 26, 0.88);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+      cursor: pointer;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: background 150ms ease-out, transform 150ms ease-out;
+      z-index: 10;
+    }
+
+    .resurface-button:hover,
+    .resurface-button:focus-visible {
+      background: #07527a;
+      transform: translateY(-3px);
+    }
+
+    .resurface-button:focus-visible {
+      outline: 2px solid #ffffff;
+      outline-offset: 3px;
+    }
+
+    .resurface-button[hidden] {
+      display: none;
+    }
   </style>
 </head>
 
@@ -435,6 +473,10 @@
     </div>
   </dialog>
 
+  <button class="resurface-button" id="resurface-button" type="button" hidden>
+    ↑ Resurface · 0 m
+  </button>
+
   <script>
     const ocean = document.getElementById("ocean");
     const ruler = ocean.querySelector(".depth-ruler");
@@ -443,6 +485,7 @@
     const factDialogDepth = document.getElementById("fact-dialog-depth");
     const factDialogTitle = document.getElementById("fact-dialog-title");
     const factDialogText = document.getElementById("fact-dialog-text");
+    const resurfaceButton = document.getElementById("resurface-button");
     const pixelsPerMeter = 4;
     const depthAtBottom = ocean.offsetHeight / pixelsPerMeter;
     const oceanZones = [
@@ -565,6 +608,19 @@
         factDialog.close();
       }
     });
+
+    const updateResurfaceButton = () => {
+      resurfaceButton.hidden = window.scrollY <= ocean.offsetTop + 200;
+    };
+
+    resurfaceButton.addEventListener("click", () => {
+      document.documentElement.style.scrollBehavior = "auto";
+      window.scrollTo({ top: ocean.offsetTop });
+      document.documentElement.style.scrollBehavior = "";
+    });
+
+    window.addEventListener("scroll", updateResurfaceButton, { passive: true });
+    updateResurfaceButton();
 
     console.log("Ocean dimensions:");
     console.log(ocean.offsetWidth + " × " + ocean.offsetHeight);
