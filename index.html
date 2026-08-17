@@ -191,7 +191,7 @@
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       font-size: 13px;
       letter-spacing: 0.02em;
-      pointer-events: none;
+      cursor: crosshair;
       text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
       z-index: 2;
     }
@@ -258,6 +258,26 @@
       font-weight: 700;
       color: #fff2c2;
     }
+
+    .depth-ruler__readout {
+      position: absolute;
+      left: 144px;
+      padding: 4px 7px;
+      border: 1px solid rgba(226, 247, 255, 0.58);
+      border-radius: 3px;
+      color: #ffffff;
+      background: rgba(0, 17, 26, 0.9);
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-50%);
+      transition: opacity 100ms ease-out;
+      white-space: nowrap;
+    }
+
+    .depth-ruler__readout--visible {
+      opacity: 1;
+    }
   </style>
 </head>
 
@@ -288,6 +308,7 @@
       <div class="depth-ruler__ticks" aria-hidden="true"></div>
       <div class="depth-ruler__ticks depth-ruler__ticks--ten" aria-hidden="true"></div>
       <div class="depth-ruler__ticks depth-ruler__ticks--hundred" aria-hidden="true"></div>
+      <output class="depth-ruler__readout" aria-live="polite"></output>
       <span class="depth-ruler__label depth-ruler__label--surface">0 m · surface</span>
       <span class="depth-ruler__label depth-ruler__label--bottom">10,935 m · Challenger Deep</span>
     </aside>
@@ -296,6 +317,7 @@
   <script>
     const ocean = document.getElementById("ocean");
     const ruler = ocean.querySelector(".depth-ruler");
+    const rulerReadout = ruler.querySelector(".depth-ruler__readout");
     const pixelsPerMeter = 4;
     const depthAtBottom = ocean.offsetHeight / pixelsPerMeter;
     const oceanZones = [
@@ -325,6 +347,27 @@
       label.textContent = `${depth.toLocaleString()} m`;
       ruler.append(label);
     }
+
+    ruler.addEventListener("pointermove", (event) => {
+      const rulerBounds = ruler.getBoundingClientRect();
+      const cursorPosition = event.clientY - rulerBounds.top;
+      const depth = Math.min(
+        depthAtBottom,
+        Math.max(0, Math.round((cursorPosition / pixelsPerMeter) * 100) / 100)
+      );
+      const readoutPosition = Math.min(
+        rulerBounds.height - 18,
+        Math.max(18, cursorPosition)
+      );
+
+      rulerReadout.style.top = `${readoutPosition}px`;
+      rulerReadout.textContent = `${depth.toLocaleString(undefined, { maximumFractionDigits: 2 })} m`;
+      rulerReadout.classList.add("depth-ruler__readout--visible");
+    });
+
+    ruler.addEventListener("pointerleave", () => {
+      rulerReadout.classList.remove("depth-ruler__readout--visible");
+    });
 
     console.log("Ocean dimensions:");
     console.log(ocean.offsetWidth + " × " + ocean.offsetHeight);
