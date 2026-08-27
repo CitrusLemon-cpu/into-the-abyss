@@ -321,6 +321,14 @@
       line-height: 1;
     }
 
+    .fact-marker__image--asset {
+      border-style: solid;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      font-size: 0;
+    }
+
     .fact-marker__label {
       padding: 3px 6px;
       background: rgba(0, 17, 26, 0.58);
@@ -502,6 +510,7 @@
         left: "62%",
         tilt: "-7deg",
         icon: "✦",
+        image: "ocean-assets/png place holders/epipelagic/phytoplankton.png",
         label: "Phytoplankton",
         text: "Phytoplankton carry out roughly 40% of the planet’s photosynthesis. They need sunlight, so this work is confined to the ocean’s top 200 metres—the photic zone.",
       },
@@ -510,6 +519,7 @@
         left: "78%",
         tilt: "5deg",
         icon: "🦦",
+        image: "ocean-assets/png place holders/epipelagic/seaotter.jpg",
         label: "Sea otter",
         text: "Sea otters usually forage in coastal water shallower than 40 metres. Exceptional dives can reach 100 metres, but most of their lives unfold much closer to the surface.",
       },
@@ -518,6 +528,7 @@
         left: "43%",
         tilt: "-4deg",
         icon: "🤿",
+        image: "ocean-assets/png place holders/mesopelagic/Herbert_Nitsch.jpg",
         label: "Freediver",
         text: "In 2012, Austrian freediver Herbert Nitsch descended to 253.2 metres on a single breath—a world record for the deepest free dive.",
       },
@@ -526,9 +537,28 @@
         left: "72%",
         tilt: "6deg",
         icon: "🐟",
+        image: "ocean-assets/png place holders/epipelagic/Molamola.jpg",
         label: "Mola mola",
         text: "Ocean sunfish, or Mola mola, regularly dive below 200 metres to hunt jellyfish. Near the Galápagos, one was documented at a remarkable 644 metres.",
       },
+      { depth: 0, left: "24%", tilt: "-4deg", icon: "🪼", image: "ocean-assets/png place holders/epipelagic/manowar.jpg", label: "Man-o-war", text: "The Portuguese man-o-war floats at the surface, using its sail to drift with wind and currents." },
+      { depth: 10, left: "14%", tilt: "4deg", icon: "🦭", image: "ocean-assets/png place holders/epipelagic/manatee.png", label: "Manatee", text: "Manatees feed on aquatic plants in shallow coastal and freshwater environments." },
+      { depth: 5, left: "38%", tilt: "5deg", icon: "🌿", image: "ocean-assets/png place holders/epipelagic/Sargassum.jpg", label: "Sargassum", text: "Sargassum is a floating seaweed that shelters fish and other small ocean animals near the surface." },
+      { depth: 5, left: "56%", tilt: "-6deg", icon: "🐠", image: "ocean-assets/png place holders/epipelagic/sargassumfish.jpg", label: "Sargassum fish", text: "Sargassum fish camouflage themselves among floating seaweed." },
+      { depth: 10, left: "75%", tilt: "4deg", icon: "🦆", image: "ocean-assets/png place holders/epipelagic/Dugong.jpg", label: "Dugong", text: "Dugongs graze on seagrass and usually feed in shallow coastal water." },
+      { depth: 10, left: "88%", tilt: "-5deg", icon: "🐋", image: "ocean-assets/png place holders/epipelagic/whale shark.jpg", label: "Whale shark", text: "Whale sharks spend much of their time in the epipelagic zone, although they can dive far deeper." },
+      { depth: 15, left: "30%", tilt: "6deg", icon: "🌱", image: "ocean-assets/png place holders/epipelagic/seagrass.jpg", label: "Seagrass", text: "Seagrass meadows provide food and shelter for many coastal sea creatures." },
+      { depth: 30, left: "68%", tilt: "-3deg", icon: "🪸", image: "ocean-assets/png place holders/epipelagic/coral.jpg", label: "Coral reef", text: "Tropical coral reefs generally do not grow deeper than about 50 metres because they need sunlight." },
+      { depth: 180, left: "20%", tilt: "5deg", icon: "🐋", image: "ocean-assets/png place holders/epipelagic/greenseaturtle.jpg", label: "Green sea turtle", text: "Green sea turtles forage in shallow water, where seagrass and algae are plentiful." },
+      { depth: 300, left: "34%", tilt: "-6deg", icon: "🐬", image: "ocean-assets/png place holders/mesopelagic/dolphin.jpg", label: "Dolphin dive", text: "Dolphins can make repeated dives below the surface while hunting and traveling." },
+      { depth: 332, left: "58%", tilt: "5deg", icon: "🤿", image: "ocean-assets/png place holders/mesopelagic/AhmedGabr.jpg", label: "Ahmed Gabr", text: "Ahmed Gabr set the deepest scuba dive record at 332 metres in 2014." },
+      { depth: 400, left: "88%", tilt: "-4deg", icon: "✨", image: "ocean-assets/png place holders/mesopelagic/zooaplankton.jpg", label: "Zooplankton", text: "Zooplankton drift with currents and form an important link between microscopic plants and larger ocean animals." },
+      { depth: 530, left: "52%", tilt: "4deg", icon: "🐧", image: "ocean-assets/png place holders/mesopelagic/emperorpenguin.jpg", label: "Emperor penguin", text: "Emperor penguins can dive hundreds of metres below the surface in search of prey." },
+      { depth: 650, left: "82%", tilt: "-4deg", icon: "🦑", image: "ocean-assets/png place holders/mesopelagic/giantsquid.jpg", label: "Giant squid", text: "Giant squid live in the deep ocean and are rarely seen alive at the surface." },
+      { depth: 800, left: "26%", tilt: "5deg", icon: "🐟", image: "ocean-assets/png place holders/mesopelagic/lanternfish.jpg", label: "Lanternfish", text: "Lanternfish are among the most abundant deep-sea fish and use bioluminescence to communicate and hunt." },
+      { depth: 900, left: "66%", tilt: "-5deg", icon: "🐋", image: "ocean-assets/png place holders/mesopelagic/spermwhale.jpg", label: "Sperm whale dive", text: "Sperm whales can dive deep into the twilight zone to hunt squid." },
+      { depth: 1000, left: "42%", tilt: "3deg", icon: "🪽", image: "ocean-assets/png place holders/mesopelagic/Seaangel.jpg", label: "Sea angel", text: "Sea angels are small swimming sea slugs that use wing-like appendages to move through the water." },
+      { depth: 1100, left: "74%", tilt: "-3deg", icon: "🦭", image: "ocean-assets/png place holders/mesopelagic/Leatherbackseaturtle.jpg", label: "Leatherback turtle", text: "Leatherback sea turtles can travel through deep water while searching for jellyfish." },
     ];
 
     for (const [depth, zone] of oceanZones) {
@@ -556,6 +586,10 @@
       image.className = "fact-marker__image";
       image.setAttribute("aria-hidden", "true");
       image.textContent = fact.icon;
+      if (fact.image) {
+        image.classList.add("fact-marker__image--asset");
+        image.style.backgroundImage = `url("${fact.image}")`;
+      }
 
       const label = document.createElement("span");
       label.className = "fact-marker__label";
