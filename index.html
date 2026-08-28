@@ -133,23 +133,23 @@
       content: "";
     }
 
-    /* The ocean coordinate system uses 5 pixels for every metre. */
+    /* The ocean coordinate system uses 20 pixels for every metre. */
     #ocean {
       position: relative;
 
       width: 100%;
-      height: 54675px;
+      height: 218700px;
 
       overflow: hidden;
 
       background: linear-gradient(
         to bottom,
         #168dcc 0px,
-        #07527a 2500px,
-        #022b43 10000px,
-        #00131f 25000px,
-        #00060a 50000px,
-        #000000 54675px
+        #07527a 10000px,
+        #022b43 40000px,
+        #00131f 100000px,
+        #00060a 200000px,
+        #000000 218700px
       );
     }
 
@@ -182,9 +182,9 @@
     }
 
     .depth-ruler {
-      --meter: 5px;
-      --ten-meters: 50px;
-      --hundred-meters: 500px;
+      --meter: 20px;
+      --ten-meters: 200px;
+      --hundred-meters: 2000px;
       position: absolute;
       inset: 0 auto 0 32px;
       width: 190px;
@@ -446,10 +446,10 @@
     <div class="intro__content">
       <p class="intro__eyebrow">A one-to-one descent</p>
       <h1 class="intro__title">Into the Abyss</h1>
-      <p class="intro__description">Scroll from the ocean surface to Challenger Deep on a true vertical scale. Every 5 pixels represent one metre of depth.</p>
+      <p class="intro__description">Scroll from the ocean surface to Challenger Deep on a true vertical scale. Every 20 pixels represent one metre of depth.</p>
       <div class="intro__scale" aria-label="Scale and total depth">
         <div class="intro__stat">
-          <span class="intro__stat-value">5 px</span>
+          <span class="intro__stat-value">20 px</span>
           <span class="intro__stat-label">equals 1 metre</span>
         </div>
         <div class="intro__stat">
@@ -463,7 +463,7 @@
 
   <main id="ocean">
     <!-- Depth positions inside this section use the same linear scale. -->
-    <aside class="depth-ruler" aria-label="Depth ruler: 5 pixels equals 1 metre">
+    <aside class="depth-ruler" aria-label="Depth ruler: 20 pixels equals 1 metre">
       <div class="depth-ruler__ticks" aria-hidden="true"></div>
       <div class="depth-ruler__ticks depth-ruler__ticks--ten" aria-hidden="true"></div>
       <div class="depth-ruler__ticks depth-ruler__ticks--hundred" aria-hidden="true"></div>
@@ -495,7 +495,7 @@
     const factDialogTitle = document.getElementById("fact-dialog-title");
     const factDialogText = document.getElementById("fact-dialog-text");
     const resurfaceButton = document.getElementById("resurface-button");
-    const pixelsPerMeter = 5;
+    const pixelsPerMeter = 20;
     const depthAtBottom = ocean.offsetHeight / pixelsPerMeter;
     const oceanZones = [
       [0, "Epipelagic"],
