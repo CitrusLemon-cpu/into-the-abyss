@@ -103,12 +103,14 @@
     .depth-ruler__tick-label { position: absolute; top: var(--tick-position); left: 25px; color: var(--muted); font: 10px ui-monospace, monospace; transform: translateY(-50%); }
     .depth-ruler__reference { position: absolute; top: var(--reference-position); right: 0; left: -1px; z-index: 1; border-top: 2px solid var(--warning); filter: drop-shadow(0 0 5px rgba(255, 211, 123, .8)); pointer-events: none; }
     .depth-ruler__reference::after { position: absolute; top: -5px; right: 0; border-top: 4px solid transparent; border-right: 6px solid var(--warning); border-bottom: 4px solid transparent; content: ""; }
+    .depth-ruler__reference-value { position: absolute; top: 0; left: 24px; padding: 3px 5px; color: var(--warning); background: #061720; font: 700 10px/1 ui-monospace, monospace; transform: translateY(-50%); white-space: nowrap; }
     .depth-ruler--third-person { width: 122px; border-color: rgba(98,224,255,.38); background: linear-gradient(90deg, rgba(10, 55, 70, .92), rgba(3, 19, 29, .8)); box-shadow: inset 3px 0 rgba(98,224,255,.2), 0 14px 50px rgba(0, 0, 0, .24); }
     .depth-ruler--third-person .depth-ruler__title { color: var(--accent); }
     .depth-ruler--third-person .depth-ruler__track { height: calc(100% - 41px); border-left: 3px double rgba(98,224,255,.72); }
     .depth-ruler--third-person .depth-ruler__tick { width: 17px; border-color: rgba(98,224,255,.52); }
     .depth-ruler--third-person .depth-ruler__tick--major { width: 29px; border-width: 2px; border-color: var(--accent); }
     .depth-ruler--third-person .depth-ruler__tick-label { left: 34px; color: rgba(223,247,255,.86); }
+    .depth-ruler--first-person { width: 132px; }
     .depth-ruler--first-person .depth-ruler__track { height: calc(100% - 41px); }
 
     .map-stop { display: flex; width: 100%; justify-content: space-between; padding: 8px 9px; border: 1px solid transparent; color: var(--muted); background: transparent; text-align: left; }
@@ -140,6 +142,7 @@
       .mission-status { top: 90px; }
       .depth-panel { top: auto; right: 12px; bottom: 88px; width: 180px; }
       .depth-ruler { top: 105px; bottom: 155px; left: 12px; width: 112px; }
+      .depth-ruler--first-person { width: 132px; }
       .depth-track { height: 120px; }
       .controls { right: 12px; bottom: 155px; left: 12px; flex-wrap: wrap; gap: 10px; }
       .save-state { margin-left: 0; }
@@ -199,7 +202,7 @@
     <aside class="depth-ruler depth-ruler--first-person" id="first-person-ruler" aria-label="Physical depth ruler with ten centimetre markers" aria-hidden="true">
       <div class="depth-ruler__title label">Physical ruler<span class="depth-ruler__scale">3,779.53 px / m</span></div>
       <div class="depth-ruler__track" id="first-person-ruler-track">
-        <div class="depth-ruler__reference" id="first-person-ruler-reference" aria-hidden="true"></div>
+        <div class="depth-ruler__reference" id="first-person-ruler-reference" aria-hidden="true"><span class="depth-ruler__reference-value" id="first-person-ruler-value">0.00 m</span></div>
       </div>
     </aside>
 
@@ -249,6 +252,7 @@
     const firstPersonRuler = document.getElementById("first-person-ruler");
     const firstPersonRulerTrack = document.getElementById("first-person-ruler-track");
     const firstPersonRulerReference = document.getElementById("first-person-ruler-reference");
+    const firstPersonRulerValue = document.getElementById("first-person-ruler-value");
     const travelArrow = document.getElementById("travel-arrow");
     const travelLabel = document.getElementById("travel-label");
     let saved = Number(localStorage.getItem(STORAGE_KEY));
@@ -289,7 +293,7 @@
 
     const updateActiveRuler = () => {
       if (cameraView === "first-person") {
-        updateRuler(firstPersonRulerTrack, firstPersonRulerReference, PIXELS_PER_METRE, 10, 5);
+        updateRuler(firstPersonRulerTrack, firstPersonRulerReference, PIXELS_PER_METRE, 10, 1);
         return;
       }
 
@@ -312,6 +316,7 @@
       depthArrow.style.top = `${(depth / BOTTOM) * 100}%`;
       etaValue.textContent = depth >= BOTTOM ? "Arrived" : formatTime((BOTTOM - depth) / Number(speed.value));
       speedOutput.textContent = `${Number(speed.value).toFixed(2)} m/s`;
+      firstPersonRulerValue.textContent = `${depth.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
       pauseButton.textContent = paused ? "Resume" : "Pause";
       travelArrow.textContent = paused ? "Ⅱ" : direction > 0 ? "↓" : "↑";
       travelLabel.textContent = paused ? "Paused" : direction > 0 ? "Descending" : "Ascending";
