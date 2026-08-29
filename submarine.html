@@ -37,7 +37,7 @@
     .mission[data-zone="deep"] { background: radial-gradient(circle at 50% 48%, rgba(17, 57, 71, 0.25), transparent 44%), linear-gradient(#073a50 0%, #02121d 56%, #000204 100%); }
     .mission[data-zone="hadal"] { background: radial-gradient(circle at 50% 48%, rgba(38, 28, 57, 0.18), transparent 40%), linear-gradient(#062633 0%, #01080e 58%, #000 100%); }
 
-    .topbar, .controls, .depth-panel, .map-panel, .mission-status {
+    .topbar, .controls, .depth-panel, .map-panel, .depth-ruler, .mission-status {
       position: fixed;
       z-index: 5;
       border: 1px solid var(--line);
@@ -81,6 +81,15 @@
     .eta { margin-top: 13px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
     .eta strong { display: block; margin-top: 3px; color: var(--ink); font: 700 14px ui-monospace, monospace; }
 
+    .depth-ruler { top: 105px; bottom: 24px; left: 24px; width: 104px; padding: 15px 12px; }
+    .depth-ruler__title { margin-bottom: 10px; }
+    .depth-ruler__track { position: relative; height: calc(100% - 28px); margin-left: 8px; border-left: 1px solid rgba(204,241,255,.72); }
+    .depth-ruler__tick { position: absolute; top: var(--tick-position); left: -1px; width: 10px; border-top: 1px solid rgba(204,241,255,.38); pointer-events: none; }
+    .depth-ruler__tick--major { width: 19px; border-color: rgba(204,241,255,.8); }
+    .depth-ruler__tick-label { position: absolute; top: var(--tick-position); left: 25px; color: var(--muted); font: 10px ui-monospace, monospace; transform: translateY(-50%); }
+    .depth-ruler__readout { position: absolute; top: 0; left: 27px; padding: 4px 6px; border: 1px solid rgba(255,211,123,.65); color: var(--warning); background: #061720; font: 700 11px ui-monospace, monospace; opacity: 0; pointer-events: none; transform: translateY(-50%); white-space: nowrap; }
+    .depth-ruler__readout[data-visible="true"] { opacity: 1; }
+
     .map-panel { bottom: 24px; left: 24px; width: 250px; padding: 15px; }
     .map-list { display: grid; gap: 7px; margin-top: 13px; }
     .map-stop { display: flex; width: 100%; justify-content: space-between; padding: 8px 9px; border: 1px solid transparent; color: var(--muted); background: transparent; text-align: left; cursor: pointer; }
@@ -108,6 +117,7 @@
       .topbar { right: 12px; left: 12px; }
       .mission-status { top: 90px; }
       .depth-panel { top: auto; right: 12px; bottom: 88px; width: 180px; }
+      .depth-ruler { top: 105px; bottom: 155px; left: 12px; width: 92px; }
       .depth-track { height: 120px; }
       .map-panel { top: auto; right: 12px; bottom: 12px; left: 12px; width: auto; padding: 10px; }
       .map-list { display: flex; overflow-x: auto; }
@@ -144,6 +154,12 @@
       <div class="depth-track"><div class="depth-arrow" id="depth-arrow"></div></div>
       <div class="depth-marker"><span>surface</span><span>10,971 m</span></div>
       <div class="eta">Estimated time to bottom<strong id="eta-value">1 h 59 min</strong></div>
+    </aside>
+
+    <aside class="depth-ruler" id="depth-ruler" aria-label="Interactive depth ruler with ten metre markers">
+      <div class="depth-ruler__title label">Depth ruler</div>
+      <div class="depth-ruler__track" id="depth-ruler-track"></div>
+      <output class="depth-ruler__readout" id="depth-ruler-readout" aria-live="polite">0 m</output>
     </aside>
 
     <aside class="map-panel" aria-label="Depth map">
@@ -190,6 +206,9 @@
     const speedOutput = document.getElementById("speed-output");
     const pauseButton = document.getElementById("pause-button");
     const saveState = document.getElementById("save-state");
+    const depthRuler = document.getElementById("depth-ruler");
+    const depthRulerTrack = document.getElementById("depth-ruler-track");
+    const depthRulerReadout = document.getElementById("depth-ruler-readout");
     let saved = Number(localStorage.getItem(STORAGE_KEY));
     let depth = Number.isFinite(saved) ? Math.min(BOTTOM, Math.max(0, saved)) : 0;
     let direction = 1;
@@ -198,6 +217,22 @@
     let missionDepth = depth;
     let lastFrame = performance.now();
     let lastSaved = depth;
+
+    const buildRuler = () => {
+      for (let markerDepth = 0; markerDepth <= BOTTOM; markerDepth += 10) {
+        const tick = document.createElement("span");
+        tick.className = `depth-ruler__tick${markerDepth % 100 === 0 ? " depth-ruler__tick--major" : ""}`;
+        tick.style.setProperty("--tick-position", `${(markerDepth / BOTTOM) * 100}%`);
+        depthRulerTrack.append(tick);
+        if (markerDepth % 1000 === 0 || markerDepth === BOTTOM) {
+          const label = document.createElement("span");
+          label.className = "depth-ruler__tick-label";
+          label.style.setProperty("--tick-position", `${(markerDepth / BOTTOM) * 100}%`);
+          label.textContent = `${markerDepth.toLocaleString()} m`;
+          depthRulerTrack.append(label);
+        }
+      }
+    };
 
     const formatTime = (seconds) => {
       const minutes = Math.max(0, Math.ceil(seconds / 60));
@@ -256,11 +291,21 @@
     };
 
     speed.addEventListener("input", render);
+    depthRuler.addEventListener("pointermove", (event) => {
+      const bounds = depthRulerTrack.getBoundingClientRect();
+      const position = Math.min(bounds.height, Math.max(0, event.clientY - bounds.top));
+      const hoveredDepth = Math.round((position / bounds.height) * BOTTOM / 10) * 10;
+      depthRulerReadout.style.top = `${event.clientY - depthRuler.getBoundingClientRect().top}px`;
+      depthRulerReadout.textContent = `${Math.min(BOTTOM, hoveredDepth).toLocaleString()} m`;
+      depthRulerReadout.dataset.visible = "true";
+    });
+    depthRuler.addEventListener("pointerleave", () => { depthRulerReadout.dataset.visible = "false"; });
     pauseButton.addEventListener("click", () => { paused = !paused; pauseButton.textContent = paused ? "Resume" : "Pause"; });
     window.addEventListener("wheel", (event) => { direction = event.deltaY >= 0 ? 1 : -1; paused = false; pauseButton.textContent = "Pause"; }, { passive: true });
     window.addEventListener("keydown", (event) => { if (event.key === "ArrowDown" || event.key === "ArrowUp") { direction = event.key === "ArrowDown" ? 1 : -1; paused = false; pauseButton.textContent = "Pause"; } });
     document.getElementById("sandbox-button").addEventListener("click", () => { missionDepth = depth; document.getElementById("sandbox").hidden = false; });
     document.getElementById("close-sandbox").addEventListener("click", () => { depth = missionDepth; sandboxMode = false; document.getElementById("sandbox").hidden = true; render(); });
+    buildRuler();
     buildMilestones();
     render();
     requestAnimationFrame(frame);
