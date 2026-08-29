@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Into the Abyss · Submarine Mission</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #dff7ff;
+      --muted: #8db8c7;
+      --line: rgba(181, 231, 246, 0.2);
+      --panel: rgba(3, 19, 29, 0.78);
+      --accent: #62e0ff;
+      --warning: #ffd37b;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { margin: 0; min-height: 100%; }
+
+    body {
+      overflow: hidden;
+      color: var(--ink);
+      background: #020c13;
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    }
+
+    button, input { font: inherit; }
+
+    .mission {
+      min-height: 100vh;
+      background: radial-gradient(circle at 50% 45%, rgba(7, 86, 119, 0.3), transparent 46%), linear-gradient(#075b7c 0%, #031d2c 56%, #010508 100%);
+      transition: filter 600ms ease, background 600ms ease;
+    }
+
+    .mission[data-zone="deep"] { background: radial-gradient(circle at 50% 48%, rgba(17, 57, 71, 0.25), transparent 44%), linear-gradient(#073a50 0%, #02121d 56%, #000204 100%); }
+    .mission[data-zone="hadal"] { background: radial-gradient(circle at 50% 48%, rgba(38, 28, 57, 0.18), transparent 40%), linear-gradient(#062633 0%, #01080e 58%, #000 100%); }
+
+    .topbar, .controls, .depth-panel, .map-panel, .mission-status {
+      position: fixed;
+      z-index: 5;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      box-shadow: 0 14px 50px rgba(0, 0, 0, 0.24);
+      backdrop-filter: blur(14px);
+    }
+
+    .topbar { top: 22px; right: 24px; left: 24px; display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; }
+    .eyebrow, .label { color: var(--muted); font: 700 11px/1.2 ui-monospace, monospace; letter-spacing: .16em; text-transform: uppercase; }
+    .topbar h1 { margin: 4px 0 0; font: 400 25px/1 Georgia, serif; }
+    .mission-status { top: 22px; left: 50%; padding: 11px 16px; transform: translateX(-50%); text-align: center; }
+    .mission-status strong { display: block; color: var(--accent); font: 700 16px ui-monospace, monospace; }
+
+    .scene { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; }
+    .scene::before { position: absolute; inset: -30%; background: repeating-linear-gradient(115deg, transparent 0 120px, rgba(137, 222, 244, .04) 121px 122px); content: ""; transform: translateY(calc(var(--motion, 0) * 1px)); }
+    .sonar { position: absolute; width: min(75vw, 720px); aspect-ratio: 1; border: 1px solid rgba(123, 220, 243, .12); border-radius: 50%; box-shadow: 0 0 0 90px rgba(123,220,243,.025), 0 0 0 180px rgba(123,220,243,.018); }
+    .sonar::after { position: absolute; top: 50%; left: 50%; width: 50%; height: 1px; background: linear-gradient(90deg, rgba(98,224,255,.8), transparent); content: ""; transform-origin: left; animation: sweep 5s linear infinite; }
+    @keyframes sweep { to { transform: rotate(360deg); } }
+
+    .submarine { position: relative; z-index: 2; display: grid; width: 230px; height: 92px; place-items: center; border: 2px solid #b9f2ff; border-radius: 52% 48% 45% 55%; background: linear-gradient(#4a9ab0, #12485e); box-shadow: 0 0 0 10px rgba(98,224,255,.08), 0 18px 45px rgba(0,0,0,.35); transition: transform 180ms ease; }
+    .submarine::before { position: absolute; top: -26px; left: 78px; width: 56px; height: 32px; border: 2px solid #b9f2ff; border-bottom: 0; border-radius: 28px 28px 0 0; background: #164c60; content: ""; }
+    .submarine::after { position: absolute; right: -70px; width: 95px; height: 2px; background: linear-gradient(90deg, rgba(98,224,255,.8), transparent); content: ""; }
+    .submarine__window { width: 34px; height: 34px; border: 4px solid #c9f5ff; border-radius: 50%; background: #06212f; box-shadow: inset 0 0 14px #62e0ff; }
+    .wake { position: absolute; z-index: 1; width: 440px; height: 3px; background: linear-gradient(90deg, transparent, rgba(98,224,255,.25), transparent); transform: translateX(-80px); }
+
+    .discovery { position: absolute; z-index: 3; display: grid; width: min(300px, 28vw); padding: 18px; border: 1px solid rgba(255,255,255,.2); background: rgba(2, 15, 23, .84); transform: translateY(130px); opacity: 0; transition: opacity 500ms ease, transform 500ms ease; pointer-events: none; }
+    .discovery[data-visible="true"] { transform: translateY(130px) translateX(calc(var(--discovery-direction, 1) * 300px)); opacity: 1; pointer-events: auto; }
+    .discovery__icon { display: grid; width: 58px; height: 58px; margin-bottom: 12px; place-items: center; border: 1px solid var(--accent); border-radius: 50%; color: var(--accent); font-size: 28px; }
+    .discovery h2 { margin: 0 0 7px; font: 400 23px Georgia, serif; }
+    .discovery p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+    .depth-panel { top: 105px; right: 24px; width: 190px; padding: 15px; }
+    .depth-value { margin: 7px 0 2px; font: 700 25px ui-monospace, monospace; }
+    .depth-value span { color: var(--muted); font-size: 12px; font-weight: 400; }
+    .depth-track { position: relative; height: 260px; margin: 14px 22px 10px; border-left: 2px solid rgba(204,241,255,.65); background: repeating-linear-gradient(to bottom, transparent 0 24px, rgba(204,241,255,.3) 25px 26px); }
+    .depth-track::before { position: absolute; top: 0; bottom: 0; left: -6px; width: 10px; background: linear-gradient(to bottom, #4dc9f0, #122f3d 45%, #020508); content: ""; opacity: .45; }
+    .depth-arrow { position: absolute; left: -13px; width: 26px; height: 3px; background: var(--warning); box-shadow: 0 0 12px var(--warning); transition: top 180ms linear; }
+    .depth-arrow::after { position: absolute; right: -1px; top: -4px; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-right: 7px solid var(--warning); content: ""; }
+    .depth-marker { display: flex; justify-content: space-between; margin: 0 -9px 0 14px; color: var(--muted); font: 11px ui-monospace, monospace; }
+    .eta { margin-top: 13px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+    .eta strong { display: block; margin-top: 3px; color: var(--ink); font: 700 14px ui-monospace, monospace; }
+
+    .map-panel { bottom: 24px; left: 24px; width: 250px; padding: 15px; }
+    .map-list { display: grid; gap: 7px; margin-top: 13px; }
+    .map-stop { display: flex; width: 100%; justify-content: space-between; padding: 8px 9px; border: 1px solid transparent; color: var(--muted); background: transparent; text-align: left; cursor: pointer; }
+    .map-stop:hover, .map-stop:focus-visible { border-color: var(--line); color: var(--ink); }
+    .map-stop[aria-current="true"] { border-color: rgba(98,224,255,.45); color: var(--accent); background: rgba(98,224,255,.08); }
+    .map-stop span:last-child { font: 11px ui-monospace, monospace; }
+
+    .controls { right: 24px; bottom: 24px; left: 298px; display: flex; align-items: center; gap: 20px; padding: 14px 18px; }
+    .control-button { padding: 9px 13px; border: 1px solid rgba(98,224,255,.5); color: var(--ink); background: rgba(98,224,255,.08); cursor: pointer; }
+    .control-button:hover, .control-button:focus-visible { background: rgba(98,224,255,.2); }
+    .speed-control { display: grid; flex: 1; gap: 5px; }
+    .speed-control output { color: var(--accent); font: 700 13px ui-monospace, monospace; }
+    input[type="range"] { width: 100%; accent-color: var(--accent); }
+    .scroll-hint { color: var(--muted); font-size: 12px; }
+    .save-state { margin-left: auto; color: var(--muted); font: 11px ui-monospace, monospace; }
+
+    .sandbox { position: fixed; inset: 0; z-index: 10; display: grid; padding: 24px; place-items: center; background: rgba(0, 5, 9, .86); }
+    .sandbox[hidden] { display: none; }
+    .sandbox__card { width: min(560px, 100%); padding: 28px; border: 1px solid var(--line); background: #061720; }
+    .sandbox h2 { margin: 8px 0; font: 400 34px Georgia, serif; }
+    .sandbox p { color: var(--muted); line-height: 1.6; }
+    .sandbox__grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 20px 0; }
+
+    @media (max-width: 760px) {
+      .topbar { right: 12px; left: 12px; }
+      .mission-status { top: 90px; }
+      .depth-panel { top: auto; right: 12px; bottom: 88px; width: 180px; }
+      .depth-track { height: 120px; }
+      .map-panel { top: auto; right: 12px; bottom: 12px; left: 12px; width: auto; padding: 10px; }
+      .map-list { display: flex; overflow-x: auto; }
+      .map-stop { min-width: 142px; }
+      .controls { right: 12px; bottom: 155px; left: 12px; flex-wrap: wrap; gap: 10px; }
+      .save-state { margin-left: 0; }
+      .discovery[data-visible="true"] { transform: translateY(130px); }
+    }
+  </style>
+</head>
+<body>
+  <main class="mission" id="mission" data-zone="surface">
+    <header class="topbar">
+      <div><div class="eyebrow">Submersible mission</div><h1>Into the Abyss</h1></div>
+      <button class="control-button" id="sandbox-button" type="button">Open sandbox</button>
+    </header>
+
+    <div class="mission-status"><div class="label">Current zone</div><strong id="zone-name">Surface</strong></div>
+
+    <section class="scene" aria-label="Submarine descent scene">
+      <div class="sonar" aria-hidden="true"></div>
+      <div class="wake" aria-hidden="true"></div>
+      <div class="submarine" id="submarine" aria-label="Submarine"><div class="submarine__window"></div></div>
+      <article class="discovery" id="discovery" aria-live="polite">
+        <div class="discovery__icon" id="discovery-icon">✦</div>
+        <h2 id="discovery-title">Surface</h2>
+        <p id="discovery-copy"></p>
+      </article>
+    </section>
+
+    <aside class="depth-panel" aria-label="Depth gauge and estimated time">
+      <div class="label">Depth gauge</div>
+      <div class="depth-value"><span id="depth-value">0</span> <span>m</span></div>
+      <div class="depth-track"><div class="depth-arrow" id="depth-arrow"></div></div>
+      <div class="depth-marker"><span>surface</span><span>10,971 m</span></div>
+      <div class="eta">Estimated time to bottom<strong id="eta-value">1 h 59 min</strong></div>
+    </aside>
+
+    <aside class="map-panel" aria-label="Depth map">
+      <div class="label">Depth map · 10,971 m</div>
+      <div class="map-list" id="map-list"></div>
+    </aside>
+
+    <section class="controls" aria-label="Mission controls">
+      <button class="control-button" id="pause-button" type="button">Pause</button>
+      <div class="speed-control"><label class="label" for="speed">Descent speed <output id="speed-output">1.52 m/s</output></label><input id="speed" type="range" min="0.2" max="3" step="0.01" value="1.52"></div>
+      <div class="scroll-hint">Scroll to change direction</div>
+      <div class="save-state" id="save-state">Progress saved</div>
+    </section>
+  </main>
+
+  <section class="sandbox" id="sandbox" hidden aria-labelledby="sandbox-title">
+    <div class="sandbox__card">
+      <div class="label">Free navigation</div><h2 id="sandbox-title">Jump anywhere on the map</h2>
+      <p>Sandbox mode lets you inspect milestones without waiting for the full descent. Your main mission progress stays safe.</p>
+      <div class="sandbox__grid" id="sandbox-grid"></div>
+      <button class="control-button" id="close-sandbox" type="button">Return to mission</button>
+    </div>
+  </section>
+
+  <script>
+    const BOTTOM = 10971;
+    const STORAGE_KEY = "abyss-submarine-progress";
+    const milestones = [
+      { depth: 0, zone: "Surface", icon: "✦", copy: "The descent begins in the sunlit surface waters." },
+      { depth: 200, zone: "Twilight zone", icon: "◌", copy: "Light fades quickly here. Many animals migrate through this daily frontier." },
+      { depth: 1000, zone: "Midnight zone", icon: "◈", copy: "No sunlight reaches this depth. Bioluminescence becomes the dominant language." },
+      { depth: 4000, zone: "Abyssal plain", icon: "⌁", copy: "Cold, dark and quiet: the abyssal plain stretches across much of the seafloor." },
+      { depth: 6000, zone: "Hadal zone", icon: "◇", copy: "The hadal zone begins in trenches where pressure is hundreds of times greater than at the surface." },
+      { depth: 10971, zone: "Challenger Deep", icon: "⬡", copy: "The deepest known point in the ocean. The mission reaches its final waypoint." }
+    ];
+
+    const mission = document.getElementById("mission");
+    const depthValue = document.getElementById("depth-value");
+    const depthArrow = document.getElementById("depth-arrow");
+    const etaValue = document.getElementById("eta-value");
+    const zoneName = document.getElementById("zone-name");
+    const discovery = document.getElementById("discovery");
+    const speed = document.getElementById("speed");
+    const speedOutput = document.getElementById("speed-output");
+    const pauseButton = document.getElementById("pause-button");
+    const saveState = document.getElementById("save-state");
+    let saved = Number(localStorage.getItem(STORAGE_KEY));
+    let depth = Number.isFinite(saved) ? Math.min(BOTTOM, Math.max(0, saved)) : 0;
+    let direction = 1;
+    let paused = false;
+    let sandboxMode = false;
+    let missionDepth = depth;
+    let lastFrame = performance.now();
+    let lastSaved = depth;
+
+    const formatTime = (seconds) => {
+      const minutes = Math.max(0, Math.ceil(seconds / 60));
+      return `${Math.floor(minutes / 60)} h ${String(minutes % 60).padStart(2, "0")} min`;
+    };
+
+    const nearestMilestone = () => milestones.reduce((nearest, item) => Math.abs(item.depth - depth) < Math.abs(nearest.depth - depth) ? item : nearest);
+
+    const render = () => {
+      const current = nearestMilestone();
+      const visible = Math.abs(current.depth - depth) < Math.max(35, BOTTOM / 260);
+      depthValue.textContent = Math.round(depth).toLocaleString();
+      zoneName.textContent = current.zone;
+      mission.dataset.zone = depth >= 6000 ? "hadal" : depth >= 4000 ? "deep" : "surface";
+      depthArrow.style.top = `${(depth / BOTTOM) * 100}%`;
+      etaValue.textContent = depth >= BOTTOM ? "Arrived" : formatTime((BOTTOM - depth) / Number(speed.value));
+      speedOutput.textContent = `${Number(speed.value).toFixed(2)} m/s`;
+      pauseButton.textContent = paused ? "Resume" : "Pause";
+      discovery.dataset.visible = visible;
+      discovery.style.setProperty("--discovery-direction", direction);
+      discovery.style.transitionDuration = `${Math.max(180, 900 / Number(speed.value))}ms`;
+      document.getElementById("discovery-icon").textContent = current.icon;
+      document.getElementById("discovery-title").textContent = current.zone;
+      document.getElementById("discovery-copy").textContent = current.copy;
+      document.querySelectorAll(".map-stop").forEach((button) => button.setAttribute("aria-current", button.dataset.depth === String(current.depth) ? "true" : "false"));
+      if (!sandboxMode && Math.abs(depth - lastSaved) > 2) {
+        localStorage.setItem(STORAGE_KEY, String(Math.round(depth * 10) / 10));
+        lastSaved = depth;
+        missionDepth = depth;
+        saveState.textContent = "Progress saved";
+      }
+    };
+
+    const frame = (now) => {
+      const elapsed = Math.min(0.1, (now - lastFrame) / 1000);
+      lastFrame = now;
+      if (!paused) {
+        depth = Math.min(BOTTOM, Math.max(0, depth + direction * Number(speed.value) * elapsed));
+        if (depth === BOTTOM || depth === 0) paused = true;
+      }
+      render();
+      requestAnimationFrame(frame);
+    };
+
+    const buildMilestones = () => {
+      const lists = [document.getElementById("map-list"), document.getElementById("sandbox-grid")];
+      lists.forEach((list) => milestones.forEach((item) => {
+        const button = document.createElement("button");
+        button.className = "map-stop";
+        button.type = "button";
+        button.dataset.depth = item.depth;
+        button.innerHTML = `<span>${item.zone}</span><span>${item.depth.toLocaleString()} m</span>`;
+        button.addEventListener("click", () => { depth = item.depth; paused = true; if (list.id === "sandbox-grid") { sandboxMode = true; } document.getElementById("sandbox").hidden = true; render(); });
+        list.append(button);
+      }));
+    };
+
+    speed.addEventListener("input", render);
+    pauseButton.addEventListener("click", () => { paused = !paused; pauseButton.textContent = paused ? "Resume" : "Pause"; });
+    window.addEventListener("wheel", (event) => { direction = event.deltaY >= 0 ? 1 : -1; paused = false; pauseButton.textContent = "Pause"; }, { passive: true });
+    window.addEventListener("keydown", (event) => { if (event.key === "ArrowDown" || event.key === "ArrowUp") { direction = event.key === "ArrowDown" ? 1 : -1; paused = false; pauseButton.textContent = "Pause"; } });
+    document.getElementById("sandbox-button").addEventListener("click", () => { missionDepth = depth; document.getElementById("sandbox").hidden = false; });
+    document.getElementById("close-sandbox").addEventListener("click", () => { depth = missionDepth; sandboxMode = false; document.getElementById("sandbox").hidden = true; render(); });
+    buildMilestones();
+    render();
+    requestAnimationFrame(frame);
+  </script>
+</body>
+</html>
