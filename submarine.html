@@ -47,6 +47,11 @@
     }
 
     .topbar { top: 22px; right: 24px; left: 24px; display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; }
+    .topbar__actions { display: flex; align-items: center; gap: 12px; }
+    .view-switch { display: flex; padding: 3px; border: 1px solid var(--line); background: rgba(0, 10, 16, .45); }
+    .view-switch__button { padding: 6px 10px; border: 0; color: var(--muted); background: transparent; font: 700 10px/1.2 ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+    .view-switch__button[aria-pressed="true"] { color: #03131c; background: var(--accent); }
+    .view-switch__button:focus-visible { outline: 2px solid var(--warning); outline-offset: 2px; }
     .eyebrow, .label { color: var(--muted); font: 700 11px/1.2 ui-monospace, monospace; letter-spacing: .16em; text-transform: uppercase; }
     .topbar h1 { margin: 4px 0 0; font: 400 25px/1 Georgia, serif; }
     .mission-status { top: 22px; left: 50%; padding: 11px 16px; transform: translateX(-50%); text-align: center; }
@@ -63,6 +68,9 @@
     .submarine::after { position: absolute; right: -70px; width: 95px; height: 2px; background: linear-gradient(90deg, rgba(98,224,255,.8), transparent); content: ""; }
     .submarine__window { width: 34px; height: 34px; border: 4px solid #c9f5ff; border-radius: 50%; background: #06212f; box-shadow: inset 0 0 14px #62e0ff; }
     .wake { position: absolute; z-index: 1; width: 440px; height: 3px; background: linear-gradient(90deg, transparent, rgba(98,224,255,.25), transparent); transform: translateX(-80px); }
+    .mission[data-view="first-person"] .submarine,
+    .mission[data-view="first-person"] .sonar,
+    .mission[data-view="first-person"] .wake { display: none; }
     .travel-indicator { position: absolute; top: 50%; left: calc(50% + 170px); z-index: 4; display: grid; gap: 2px; color: var(--warning); text-shadow: 0 0 12px rgba(255, 211, 123, .7); text-align: center; transform: translateY(-50%); }
     .travel-indicator__arrow { font: 700 28px/1 ui-monospace, monospace; }
     .travel-indicator__label { color: var(--muted); font: 700 10px/1.2 ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; }
@@ -85,13 +93,23 @@
     .eta strong { display: block; margin-top: 3px; color: var(--ink); font: 700 14px ui-monospace, monospace; }
 
     .depth-ruler { top: 105px; bottom: 105px; left: 24px; width: 104px; padding: 15px 12px; overflow: hidden; }
+    .mission[data-view="third-person"] .depth-ruler--first-person,
+    .mission[data-view="first-person"] .depth-ruler--third-person { display: none; }
     .depth-ruler__title { margin-bottom: 10px; }
+    .depth-ruler__scale { display: block; margin-top: 4px; color: rgba(98,224,255,.72); font: 700 9px/1.2 ui-monospace, monospace; letter-spacing: .08em; }
     .depth-ruler__track { position: relative; height: calc(100% - 28px); margin-left: 8px; overflow: hidden; border-left: 1px solid rgba(204,241,255,.72); }
     .depth-ruler__tick { position: absolute; top: var(--tick-position); left: -1px; width: 10px; border-top: 1px solid rgba(204,241,255,.38); pointer-events: none; }
     .depth-ruler__tick--major { width: 19px; border-color: rgba(204,241,255,.8); }
     .depth-ruler__tick-label { position: absolute; top: var(--tick-position); left: 25px; color: var(--muted); font: 10px ui-monospace, monospace; transform: translateY(-50%); }
     .depth-ruler__reference { position: absolute; top: var(--reference-position); right: 0; left: -1px; z-index: 1; border-top: 2px solid var(--warning); filter: drop-shadow(0 0 5px rgba(255, 211, 123, .8)); pointer-events: none; }
     .depth-ruler__reference::after { position: absolute; top: -5px; right: 0; border-top: 4px solid transparent; border-right: 6px solid var(--warning); border-bottom: 4px solid transparent; content: ""; }
+    .depth-ruler--third-person { width: 122px; border-color: rgba(98,224,255,.38); background: linear-gradient(90deg, rgba(10, 55, 70, .92), rgba(3, 19, 29, .8)); box-shadow: inset 3px 0 rgba(98,224,255,.2), 0 14px 50px rgba(0, 0, 0, .24); }
+    .depth-ruler--third-person .depth-ruler__title { color: var(--accent); }
+    .depth-ruler--third-person .depth-ruler__track { height: calc(100% - 41px); border-left: 3px double rgba(98,224,255,.72); }
+    .depth-ruler--third-person .depth-ruler__tick { width: 17px; border-color: rgba(98,224,255,.52); }
+    .depth-ruler--third-person .depth-ruler__tick--major { width: 29px; border-width: 2px; border-color: var(--accent); }
+    .depth-ruler--third-person .depth-ruler__tick-label { left: 34px; color: rgba(223,247,255,.86); }
+    .depth-ruler--first-person .depth-ruler__track { height: calc(100% - 41px); }
 
     .map-stop { display: flex; width: 100%; justify-content: space-between; padding: 8px 9px; border: 1px solid transparent; color: var(--muted); background: transparent; text-align: left; }
     button.map-stop { cursor: pointer; }
@@ -117,26 +135,41 @@
 
     @media (max-width: 760px) {
       .topbar { right: 12px; left: 12px; }
+      .topbar__actions { gap: 6px; }
+      .view-switch__button { padding: 6px; font-size: 8px; }
       .mission-status { top: 90px; }
       .depth-panel { top: auto; right: 12px; bottom: 88px; width: 180px; }
-      .depth-ruler { top: 105px; bottom: 155px; left: 12px; width: 92px; }
+      .depth-ruler { top: 105px; bottom: 155px; left: 12px; width: 112px; }
       .depth-track { height: 120px; }
       .controls { right: 12px; bottom: 155px; left: 12px; flex-wrap: wrap; gap: 10px; }
       .save-state { margin-left: 0; }
       .discovery[data-visible="true"] { transform: translateY(130px); }
     }
+
+    @media (max-width: 520px) {
+      .topbar { flex-wrap: wrap; gap: 10px; }
+      .topbar__actions { width: 100%; justify-content: space-between; }
+      .mission-status { top: 145px; }
+      .depth-ruler { top: 160px; }
+    }
   </style>
 </head>
 <body>
-  <main class="mission" id="mission" data-zone="surface">
+  <main class="mission" id="mission" data-zone="surface" data-view="third-person">
     <header class="topbar">
       <div><div class="eyebrow">Submersible mission</div><h1>Into the Abyss</h1></div>
-      <button class="control-button" id="sandbox-button" type="button">Open sandbox</button>
+      <div class="topbar__actions">
+        <div class="view-switch" role="group" aria-label="Camera view">
+          <button class="view-switch__button" type="button" data-view="third-person" aria-pressed="true">Third person</button>
+          <button class="view-switch__button" type="button" data-view="first-person" aria-pressed="false">First person</button>
+        </div>
+        <button class="control-button" id="sandbox-button" type="button">Open sandbox</button>
+      </div>
     </header>
 
     <div class="mission-status"><div class="label">Current zone</div><strong id="zone-name">Surface</strong></div>
 
-    <section class="scene" aria-label="Submarine descent scene">
+    <section class="scene" id="scene" aria-label="Third-person submarine descent scene">
       <div class="sonar" aria-hidden="true"></div>
       <div class="wake" aria-hidden="true"></div>
       <div class="submarine" id="submarine" aria-label="Submarine"><div class="submarine__window"></div></div>
@@ -156,10 +189,17 @@
       <div class="eta">Estimated time to bottom<strong id="eta-value">1 h 59 min</strong></div>
     </aside>
 
-    <aside class="depth-ruler" id="depth-ruler" aria-label="Depth ruler with ten centimetre markers">
-      <div class="depth-ruler__title label">Depth ruler</div>
-      <div class="depth-ruler__track" id="depth-ruler-track">
-        <div class="depth-ruler__reference" id="depth-ruler-reference" aria-hidden="true"></div>
+    <aside class="depth-ruler depth-ruler--third-person" id="third-person-ruler" aria-label="Five metre navigation scale with half metre markers">
+      <div class="depth-ruler__title label">Navigation scale<span class="depth-ruler__scale">5 m view</span></div>
+      <div class="depth-ruler__track" id="third-person-ruler-track">
+        <div class="depth-ruler__reference" id="third-person-ruler-reference" aria-hidden="true"></div>
+      </div>
+    </aside>
+
+    <aside class="depth-ruler depth-ruler--first-person" id="first-person-ruler" aria-label="Physical depth ruler with ten centimetre markers" aria-hidden="true">
+      <div class="depth-ruler__title label">Physical ruler<span class="depth-ruler__scale">3,779.53 px / m</span></div>
+      <div class="depth-ruler__track" id="first-person-ruler-track">
+        <div class="depth-ruler__reference" id="first-person-ruler-reference" aria-hidden="true"></div>
       </div>
     </aside>
 
@@ -202,8 +242,13 @@
     const speedOutput = document.getElementById("speed-output");
     const pauseButton = document.getElementById("pause-button");
     const saveState = document.getElementById("save-state");
-    const depthRulerTrack = document.getElementById("depth-ruler-track");
-    const depthRulerReference = document.getElementById("depth-ruler-reference");
+    const scene = document.getElementById("scene");
+    const thirdPersonRuler = document.getElementById("third-person-ruler");
+    const thirdPersonRulerTrack = document.getElementById("third-person-ruler-track");
+    const thirdPersonRulerReference = document.getElementById("third-person-ruler-reference");
+    const firstPersonRuler = document.getElementById("first-person-ruler");
+    const firstPersonRulerTrack = document.getElementById("first-person-ruler-track");
+    const firstPersonRulerReference = document.getElementById("first-person-ruler-reference");
     const travelArrow = document.getElementById("travel-arrow");
     const travelLabel = document.getElementById("travel-label");
     let saved = Number(localStorage.getItem(STORAGE_KEY));
@@ -214,31 +259,41 @@
     let missionDepth = depth;
     let lastFrame = performance.now();
     let lastSaved = depth;
+    let cameraView = "third-person";
     const PIXELS_PER_METRE = 96 / 0.0254;
 
-    const updateRuler = () => {
-      const bounds = depthRulerTrack.getBoundingClientRect();
+    const updateRuler = (track, reference, pixelsPerMetre, unitsPerMetre, labelInterval) => {
+      const bounds = track.getBoundingClientRect();
       const referencePosition = window.innerHeight / 2 - bounds.top;
-      const firstTick = Math.max(0, Math.ceil((depth - referencePosition / PIXELS_PER_METRE) * 10));
-      const lastTick = Math.min(BOTTOM * 10, Math.floor((depth + (bounds.height - referencePosition) / PIXELS_PER_METRE) * 10));
+      const firstTick = Math.max(0, Math.ceil((depth - referencePosition / pixelsPerMetre) * unitsPerMetre));
+      const lastTick = Math.min(BOTTOM * unitsPerMetre, Math.floor((depth + (bounds.height - referencePosition) / pixelsPerMetre) * unitsPerMetre));
 
-      depthRulerTrack.replaceChildren(depthRulerReference);
-      depthRulerTrack.style.setProperty("--reference-position", `${referencePosition}px`);
+      track.replaceChildren(reference);
+      track.style.setProperty("--reference-position", `${referencePosition}px`);
       for (let tickDepth = firstTick; tickDepth <= lastTick; tickDepth += 1) {
-        const markerDepth = tickDepth / 10;
-        const tickPosition = referencePosition + (markerDepth - depth) * PIXELS_PER_METRE;
+        const markerDepth = tickDepth / unitsPerMetre;
+        const tickPosition = referencePosition + (markerDepth - depth) * pixelsPerMetre;
         const tick = document.createElement("span");
-        tick.className = `depth-ruler__tick${tickDepth % 5 === 0 ? " depth-ruler__tick--major" : ""}`;
+        tick.className = `depth-ruler__tick${tickDepth % labelInterval === 0 ? " depth-ruler__tick--major" : ""}`;
         tick.style.setProperty("--tick-position", `${tickPosition}px`);
-        depthRulerTrack.append(tick);
-        if (tickDepth % 5 === 0) {
+        track.append(tick);
+        if (tickDepth % labelInterval === 0) {
           const label = document.createElement("span");
           label.className = "depth-ruler__tick-label";
           label.style.setProperty("--tick-position", `${tickPosition}px`);
-          label.textContent = `${markerDepth.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} m`;
-          depthRulerTrack.append(label);
+          label.textContent = `${markerDepth.toLocaleString(undefined, { minimumFractionDigits: unitsPerMetre === 10 ? 1 : 0, maximumFractionDigits: 1 })} m`;
+          track.append(label);
         }
       }
+    };
+
+    const updateActiveRuler = () => {
+      if (cameraView === "first-person") {
+        updateRuler(firstPersonRulerTrack, firstPersonRulerReference, PIXELS_PER_METRE, 10, 5);
+        return;
+      }
+
+      updateRuler(thirdPersonRulerTrack, thirdPersonRulerReference, thirdPersonRulerTrack.clientHeight / 5, 2, 2);
     };
 
     const formatTime = (seconds) => {
@@ -260,7 +315,7 @@
       pauseButton.textContent = paused ? "Resume" : "Pause";
       travelArrow.textContent = paused ? "Ⅱ" : direction > 0 ? "↓" : "↑";
       travelLabel.textContent = paused ? "Paused" : direction > 0 ? "Descending" : "Ascending";
-      updateRuler();
+      updateActiveRuler();
       discovery.dataset.visible = visible;
       discovery.style.setProperty("--discovery-direction", direction);
       discovery.style.transitionDuration = `${Math.max(180, 900 / Number(speed.value))}ms`;
@@ -302,6 +357,15 @@
 
     speed.addEventListener("input", render);
     window.addEventListener("resize", render);
+    document.querySelectorAll(".view-switch__button").forEach((button) => button.addEventListener("click", () => {
+      cameraView = button.dataset.view;
+      mission.dataset.view = cameraView;
+      scene.setAttribute("aria-label", cameraView === "first-person" ? "First-person ocean descent view" : "Third-person submarine descent scene");
+      thirdPersonRuler.setAttribute("aria-hidden", cameraView !== "third-person");
+      firstPersonRuler.setAttribute("aria-hidden", cameraView !== "first-person");
+      document.querySelectorAll(".view-switch__button").forEach((viewButton) => viewButton.setAttribute("aria-pressed", viewButton === button));
+      render();
+    }));
     pauseButton.addEventListener("click", () => { paused = !paused; pauseButton.textContent = paused ? "Resume" : "Pause"; });
     window.addEventListener("wheel", (event) => { direction = event.deltaY >= 0 ? 1 : -1; paused = false; pauseButton.textContent = "Pause"; }, { passive: true });
     window.addEventListener("keydown", (event) => { if (event.key === "ArrowDown" || event.key === "ArrowUp") { direction = event.key === "ArrowDown" ? 1 : -1; paused = false; pauseButton.textContent = "Pause"; } });
