@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ocean Depth</title>
 
+  <script>
+    // Keep this page available at /index.html, but make the site root open
+    // the submarine mission by default.
+    if (window.location.pathname.endsWith('/')) {
+      window.location.replace('submarine.html');
+    }
+  </script>
+
   <style>
     * {
       box-sizing: border-box;
