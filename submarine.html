@@ -77,7 +77,7 @@
     .submarine { position: relative; z-index: 2; width: min(180px, 42vw); aspect-ratio: 1; }
     .submarine__visual { position: absolute; inset: 0; transform: translateY(var(--bob-y, 0px)) rotate(var(--bob-rotation, 0deg)); transform-origin: 50% 82%; will-change: transform; }
     .submarine__image { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; }
-    .submarine__water-tint { position: absolute; inset: 0; background: rgba(7, 104, 184, .48); clip-path: inset(82% 0 0); -webkit-mask: url("ocean-assets/submarine.svg") center / contain no-repeat; mask: url("ocean-assets/submarine.svg") center / contain no-repeat; will-change: clip-path; }
+    .submarine__water-tint { position: absolute; inset: 0; background: rgba(7, 104, 184, .15); clip-path: inset(82% 0 0); -webkit-mask: url("ocean-assets/submarine.svg") center / contain no-repeat; mask: url("ocean-assets/submarine.svg") center / contain no-repeat; will-change: clip-path; }
     .mission[data-view="first-person"] .submarine,
     .mission[data-view="first-person"] .sonar { display: none; }
     .travel-indicator { position: absolute; top: 50%; left: calc(50% + 170px); z-index: 4; display: grid; gap: 2px; color: var(--warning); text-shadow: 0 0 12px rgba(255, 211, 123, .7); text-align: center; transform: translateY(-50%); }
