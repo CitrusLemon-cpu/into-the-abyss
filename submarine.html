@@ -59,18 +59,27 @@
 
     .scene { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; }
     .scene::before { position: absolute; inset: -30%; background: repeating-linear-gradient(115deg, transparent 0 120px, rgba(137, 222, 244, .04) 121px 122px); content: ""; transform: translateY(calc(var(--motion, 0) * 1px)); }
+    .surface-sky { position: absolute; top: 0; right: 0; left: 0; z-index: 1; height: calc(50vh + 70px); overflow: hidden; background: linear-gradient(180deg, #74cff3 0%, #9bdcf5 64%, #c2ebfa 100%); transform: translateY(calc(var(--surface-offset, 0) * -1px)); will-change: clip-path, transform; }
+    .cloud { position: absolute; width: 150px; height: 34px; border-radius: 999px; background: rgba(255, 255, 255, .8); box-shadow: 0 8px 24px rgba(48, 139, 174, .12); }
+    .cloud::before, .cloud::after { position: absolute; bottom: 0; border-radius: 50%; background: inherit; content: ""; }
+    .cloud::before { left: 25px; width: 62px; height: 62px; }
+    .cloud::after { right: 22px; width: 78px; height: 78px; }
+    .cloud--one { top: 21%; left: 13%; transform: scale(.82); }
+    .cloud--two { top: 13%; right: 16%; transform: scale(1.08); opacity: .78; }
+    .cloud--three { top: 39%; right: 35%; transform: scale(.58); opacity: .55; }
+    .surface-wave { position: absolute; inset: 0; z-index: 3; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+    .surface-wave__depth { fill: none; stroke: rgba(29, 143, 181, .64); stroke-width: 7; }
+    .surface-wave__highlight { fill: none; stroke: rgba(231, 252, 255, .92); stroke-width: 2; }
     .sonar { position: absolute; width: min(75vw, 720px); aspect-ratio: 1; border: 1px solid rgba(123, 220, 243, .12); border-radius: 50%; box-shadow: 0 0 0 90px rgba(123,220,243,.025), 0 0 0 180px rgba(123,220,243,.018); }
     .sonar::after { position: absolute; top: 50%; left: 50%; width: 50%; height: 1px; background: linear-gradient(90deg, rgba(98,224,255,.8), transparent); content: ""; transform-origin: left; animation: sweep 5s linear infinite; }
     @keyframes sweep { to { transform: rotate(360deg); } }
 
-    .submarine { position: relative; z-index: 2; display: grid; width: 230px; height: 92px; place-items: center; border: 2px solid #b9f2ff; border-radius: 52% 48% 45% 55%; background: linear-gradient(#4a9ab0, #12485e); box-shadow: 0 0 0 10px rgba(98,224,255,.08), 0 18px 45px rgba(0,0,0,.35); transition: transform 180ms ease; }
-    .submarine::before { position: absolute; top: -26px; left: 78px; width: 56px; height: 32px; border: 2px solid #b9f2ff; border-bottom: 0; border-radius: 28px 28px 0 0; background: #164c60; content: ""; }
-    .submarine::after { position: absolute; right: -70px; width: 95px; height: 2px; background: linear-gradient(90deg, rgba(98,224,255,.8), transparent); content: ""; }
-    .submarine__window { width: 34px; height: 34px; border: 4px solid #c9f5ff; border-radius: 50%; background: #06212f; box-shadow: inset 0 0 14px #62e0ff; }
-    .wake { position: absolute; z-index: 1; width: 440px; height: 3px; background: linear-gradient(90deg, transparent, rgba(98,224,255,.25), transparent); transform: translateX(-80px); }
+    .submarine { position: relative; z-index: 2; width: min(180px, 42vw); aspect-ratio: 1; }
+    .submarine__visual { position: absolute; inset: 0; transform: translateY(var(--bob-y, 0px)) rotate(var(--bob-rotation, 0deg)); transform-origin: 50% 82%; will-change: transform; }
+    .submarine__image { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; }
+    .submarine__water-tint { position: absolute; inset: 0; background: rgba(7, 104, 184, .48); clip-path: inset(82% 0 0); -webkit-mask: url("ocean-assets/submarine.svg") center / contain no-repeat; mask: url("ocean-assets/submarine.svg") center / contain no-repeat; will-change: clip-path; }
     .mission[data-view="first-person"] .submarine,
-    .mission[data-view="first-person"] .sonar,
-    .mission[data-view="first-person"] .wake { display: none; }
+    .mission[data-view="first-person"] .sonar { display: none; }
     .travel-indicator { position: absolute; top: 50%; left: calc(50% + 170px); z-index: 4; display: grid; gap: 2px; color: var(--warning); text-shadow: 0 0 12px rgba(255, 211, 123, .7); text-align: center; transform: translateY(-50%); }
     .travel-indicator__arrow { font: 700 28px/1 ui-monospace, monospace; }
     .travel-indicator__label { color: var(--muted); font: 700 10px/1.2 ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; }
@@ -173,9 +182,22 @@
     <div class="mission-status"><div class="label">Current zone</div><strong id="zone-name">Surface</strong></div>
 
     <section class="scene" id="scene" aria-label="Third-person submarine descent scene">
+      <div class="surface-sky" id="surface-sky" aria-hidden="true">
+        <span class="cloud cloud--one"></span>
+        <span class="cloud cloud--two"></span>
+        <span class="cloud cloud--three"></span>
+      </div>
+      <svg class="surface-wave" id="surface-wave" aria-hidden="true" preserveAspectRatio="none">
+        <path class="surface-wave__depth" id="surface-wave-depth"></path>
+        <path class="surface-wave__highlight" id="surface-wave-highlight"></path>
+      </svg>
       <div class="sonar" aria-hidden="true"></div>
-      <div class="wake" aria-hidden="true"></div>
-      <div class="submarine" id="submarine" aria-label="Submarine"><div class="submarine__window"></div></div>
+      <div class="submarine" id="submarine">
+        <div class="submarine__visual" id="submarine-visual">
+          <img class="submarine__image" src="ocean-assets/submarine.svg" alt="Submarine">
+          <span class="submarine__water-tint" id="submarine-water-tint" aria-hidden="true"></span>
+        </div>
+      </div>
       <div class="travel-indicator" aria-live="polite"><div class="travel-indicator__arrow" id="travel-arrow">↓</div><div class="travel-indicator__label" id="travel-label">Descending</div></div>
       <article class="discovery" id="discovery" aria-live="polite">
         <div class="discovery__icon" id="discovery-icon">✦</div>
@@ -193,7 +215,7 @@
     </aside>
 
     <aside class="depth-ruler depth-ruler--third-person" id="third-person-ruler" aria-label="Five metre navigation scale with half metre markers">
-      <div class="depth-ruler__title label">Navigation scale<span class="depth-ruler__scale">5 m view</span></div>
+      <div class="depth-ruler__title label">Navigation scale<span class="depth-ruler__scale" id="third-person-scale">12.0 m view</span></div>
       <div class="depth-ruler__track" id="third-person-ruler-track">
         <div class="depth-ruler__reference" id="third-person-ruler-reference" aria-hidden="true"></div>
       </div>
@@ -255,28 +277,115 @@
     const firstPersonRulerValue = document.getElementById("first-person-ruler-value");
     const travelArrow = document.getElementById("travel-arrow");
     const travelLabel = document.getElementById("travel-label");
+    const surfaceSky = document.getElementById("surface-sky");
+    const surfaceWave = document.getElementById("surface-wave");
+    const surfaceWaveDepth = document.getElementById("surface-wave-depth");
+    const surfaceWaveHighlight = document.getElementById("surface-wave-highlight");
+    const submarine = document.getElementById("submarine");
+    const submarineVisual = document.getElementById("submarine-visual");
+    const submarineWaterTint = document.getElementById("submarine-water-tint");
+    const thirdPersonScale = document.getElementById("third-person-scale");
     let saved = Number(localStorage.getItem(STORAGE_KEY));
     let depth = Number.isFinite(saved) ? Math.min(BOTTOM, Math.max(0, saved)) : 0;
     let direction = 1;
-    let paused = false;
+    let paused = true;
     let sandboxMode = false;
     let missionDepth = depth;
     let lastFrame = performance.now();
     let lastSaved = depth;
     let cameraView = "third-person";
+    let visualTime = performance.now();
     const PIXELS_PER_METRE = 96 / 0.0254;
+    const SUBMARINE_METRES = 2;
+    const FLOAT_LINE_RATIO = 0.82;
+    const SURFACE_SKY_PADDING = 12;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-    const updateRuler = (track, reference, pixelsPerMetre, unitsPerMetre, labelInterval) => {
+    const getWorldPixelsPerMetre = () => {
+      const responsiveSubmarineSize = Math.min(180, window.innerWidth * 0.42);
+      return (submarine.offsetHeight || responsiveSubmarineSize) / SUBMARINE_METRES;
+    };
+
+    const waveHeightAt = (x, time) => (
+      Math.sin(x / 110 + time * 0.82) * 5 +
+      Math.sin(x / 47 - time * 1.14) * 2
+    );
+
+    const updateSurface = () => {
+      const width = scene.clientWidth;
+      const height = scene.clientHeight;
+      const pixelsPerMetre = getWorldPixelsPerMetre();
+      const submarineSize = submarine.offsetHeight || Math.min(180, window.innerWidth * 0.42);
+      const waterlineDrop = (FLOAT_LINE_RATIO - 0.5) * submarineSize;
+      const skyHeight = height / 2 + waterlineDrop + SURFACE_SKY_PADDING;
+      const surfaceOffset = depth * pixelsPerMetre;
+      const time = reducedMotion.matches ? 0 : visualTime / 1000;
+      const pointCount = Math.max(24, Math.ceil(width / 36));
+      const localPoints = [];
+      const globalPoints = [];
+
+      for (let point = 0; point <= pointCount; point += 1) {
+        const x = (point / pointCount) * width;
+        const localY = skyHeight - SURFACE_SKY_PADDING + waveHeightAt(x, time);
+        localPoints.push({ x, y: localY });
+        globalPoints.push({ x, y: localY - surfaceOffset });
+      }
+
+      const skyClip = ["0px 0px", `${width}px 0px`]
+        .concat(localPoints.slice().reverse().map(({ x, y }) => `${x.toFixed(1)}px ${y.toFixed(1)}px`))
+        .join(", ");
+      const wavePath = globalPoints
+        .map(({ x, y }, index) => `${index === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`)
+        .join(" ");
+
+      surfaceSky.style.height = `${skyHeight}px`;
+      surfaceSky.style.setProperty("--surface-offset", surfaceOffset);
+      surfaceSky.style.clipPath = `polygon(${skyClip})`;
+      surfaceSky.style.webkitClipPath = `polygon(${skyClip})`;
+      surfaceWave.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      surfaceWaveDepth.setAttribute("d", wavePath);
+      surfaceWaveHighlight.setAttribute("d", wavePath);
+
+      const fullySubmergedDepth = (FLOAT_LINE_RATIO * submarineSize + 7) / pixelsPerMetre;
+      const bobStrength = Math.max(0, Math.min(1, 1 - depth / fullySubmergedDepth));
+      const centreX = width / 2;
+      const centreWave = waveHeightAt(centreX, time);
+      const waveSlope = (waveHeightAt(centreX + 18, time) - waveHeightAt(centreX - 18, time)) / 36;
+      const bobY = centreWave * bobStrength;
+      const bobRotation = Math.max(-1.2, Math.min(1.2, Math.atan(waveSlope) * 180 / Math.PI * 0.32)) * bobStrength;
+
+      submarineVisual.style.setProperty("--bob-y", `${bobY.toFixed(2)}px`);
+      submarineVisual.style.setProperty("--bob-rotation", `${bobRotation.toFixed(2)}deg`);
+
+      const visualLeft = width / 2 - submarineSize / 2;
+      const visualTop = height / 2 - submarineSize / 2 + bobY;
+      const tintPoints = [];
+      const tintSamples = 10;
+      for (let sample = 0; sample <= tintSamples; sample += 1) {
+        const ratio = sample / tintSamples;
+        const x = visualLeft + ratio * submarineSize;
+        const surfaceY = height / 2 + waterlineDrop - surfaceOffset + waveHeightAt(x, time);
+        const tintY = Math.max(0, Math.min(submarineSize, surfaceY - visualTop));
+        tintPoints.push(`${(ratio * 100).toFixed(1)}% ${tintY.toFixed(1)}px`);
+      }
+      const tintClip = `polygon(${tintPoints.join(", ")}, 100% 100%, 0% 100%)`;
+      submarineWaterTint.style.clipPath = tintClip;
+      submarineWaterTint.style.webkitClipPath = tintClip;
+    };
+
+    const updateRuler = (track, reference, pixelsPerMetre, unitsPerMetre, labelInterval, tickOffset = 0, referenceOffset = tickOffset) => {
       const bounds = track.getBoundingClientRect();
-      const referencePosition = window.innerHeight / 2 - bounds.top;
-      const firstTick = Math.max(0, Math.ceil((depth - referencePosition / pixelsPerMetre) * unitsPerMetre));
-      const lastTick = Math.min(BOTTOM * unitsPerMetre, Math.floor((depth + (bounds.height - referencePosition) / pixelsPerMetre) * unitsPerMetre));
+      const centredPosition = window.innerHeight / 2 - bounds.top;
+      const tickReferencePosition = centredPosition + tickOffset;
+      const referencePosition = centredPosition + referenceOffset;
+      const firstTick = Math.max(0, Math.ceil((depth - tickReferencePosition / pixelsPerMetre) * unitsPerMetre));
+      const lastTick = Math.min(BOTTOM * unitsPerMetre, Math.floor((depth + (bounds.height - tickReferencePosition) / pixelsPerMetre) * unitsPerMetre));
 
       track.replaceChildren(reference);
       track.style.setProperty("--reference-position", `${referencePosition}px`);
       for (let tickDepth = firstTick; tickDepth <= lastTick; tickDepth += 1) {
         const markerDepth = tickDepth / unitsPerMetre;
-        const tickPosition = referencePosition + (markerDepth - depth) * pixelsPerMetre;
+        const tickPosition = tickReferencePosition + (markerDepth - depth) * pixelsPerMetre;
         const tick = document.createElement("span");
         tick.className = `depth-ruler__tick${tickDepth % labelInterval === 0 ? " depth-ruler__tick--major" : ""}`;
         tick.style.setProperty("--tick-position", `${tickPosition}px`);
@@ -297,7 +406,14 @@
         return;
       }
 
-      updateRuler(thirdPersonRulerTrack, thirdPersonRulerReference, thirdPersonRulerTrack.clientHeight / 5, 2, 2);
+      const pixelsPerMetre = getWorldPixelsPerMetre();
+      const viewportMetres = window.innerHeight / pixelsPerMetre;
+      const submarineSize = submarine.offsetHeight || Math.min(180, window.innerWidth * 0.42);
+      const waterlineDrop = (FLOAT_LINE_RATIO - 0.5) * submarineSize;
+      const referenceOffset = Math.max(0, waterlineDrop - depth * pixelsPerMetre);
+      thirdPersonScale.textContent = `${viewportMetres.toFixed(1)} m view`;
+      thirdPersonRuler.setAttribute("aria-label", `${viewportMetres.toFixed(1)} metre navigation view with half metre markers`);
+      updateRuler(thirdPersonRulerTrack, thirdPersonRulerReference, pixelsPerMetre, 2, 2, waterlineDrop, referenceOffset);
     };
 
     const formatTime = (seconds) => {
@@ -309,7 +425,7 @@
 
     const render = () => {
       const current = nearestMilestone();
-      const visible = Math.abs(current.depth - depth) < Math.max(35, BOTTOM / 260);
+      const visible = current.depth !== 0 && Math.abs(current.depth - depth) < Math.max(35, BOTTOM / 260);
       depthValue.textContent = Math.round(depth).toLocaleString();
       zoneName.textContent = current.zone;
       mission.dataset.zone = depth >= 6000 ? "hadal" : depth >= 4000 ? "deep" : "surface";
@@ -317,9 +433,10 @@
       etaValue.textContent = depth >= BOTTOM ? "Arrived" : formatTime((BOTTOM - depth) / Number(speed.value));
       speedOutput.textContent = `${Number(speed.value).toFixed(2)} m/s`;
       firstPersonRulerValue.textContent = `${depth.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m`;
-      pauseButton.textContent = paused ? "Resume" : "Pause";
+      pauseButton.textContent = paused ? depth === 0 ? "Begin Descent" : "Resume" : "Pause";
       travelArrow.textContent = paused ? "Ⅱ" : direction > 0 ? "↓" : "↑";
       travelLabel.textContent = paused ? "Paused" : direction > 0 ? "Descending" : "Ascending";
+      updateSurface();
       updateActiveRuler();
       discovery.dataset.visible = visible;
       discovery.style.setProperty("--discovery-direction", direction);
@@ -339,6 +456,7 @@
     const frame = (now) => {
       const elapsed = Math.min(0.1, (now - lastFrame) / 1000);
       lastFrame = now;
+      visualTime = now;
       if (!paused) {
         depth = Math.min(BOTTOM, Math.max(0, depth + direction * Number(speed.value) * elapsed));
         if (depth === BOTTOM || depth === 0) paused = true;
@@ -371,9 +489,25 @@
       document.querySelectorAll(".view-switch__button").forEach((viewButton) => viewButton.setAttribute("aria-pressed", viewButton === button));
       render();
     }));
-    pauseButton.addEventListener("click", () => { paused = !paused; pauseButton.textContent = paused ? "Resume" : "Pause"; });
-    window.addEventListener("wheel", (event) => { direction = event.deltaY >= 0 ? 1 : -1; paused = false; pauseButton.textContent = "Pause"; }, { passive: true });
-    window.addEventListener("keydown", (event) => { if (event.key === "ArrowDown" || event.key === "ArrowUp") { direction = event.key === "ArrowDown" ? 1 : -1; paused = false; pauseButton.textContent = "Pause"; } });
+    pauseButton.addEventListener("click", () => {
+      if (paused && depth === 0) direction = 1;
+      if (paused && depth === BOTTOM) direction = -1;
+      paused = !paused;
+      render();
+    });
+    window.addEventListener("wheel", (event) => {
+      if ((depth === 0 && event.deltaY < 0) || (depth === BOTTOM && event.deltaY >= 0)) return;
+      direction = event.deltaY >= 0 ? 1 : -1;
+      paused = false;
+      render();
+    }, { passive: true });
+    window.addEventListener("keydown", (event) => {
+      if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+      if ((depth === 0 && event.key === "ArrowUp") || (depth === BOTTOM && event.key === "ArrowDown")) return;
+      direction = event.key === "ArrowDown" ? 1 : -1;
+      paused = false;
+      render();
+    });
     document.getElementById("sandbox-button").addEventListener("click", () => { missionDepth = depth; document.getElementById("sandbox").hidden = false; });
     document.getElementById("close-sandbox").addEventListener("click", () => { depth = missionDepth; sandboxMode = false; document.getElementById("sandbox").hidden = true; render(); });
     buildMilestones();
