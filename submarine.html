@@ -58,7 +58,6 @@
     .mission-status strong { display: block; color: var(--accent); font: 700 16px ui-monospace, monospace; }
 
     .scene { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; }
-    .scene::before { position: absolute; inset: -30%; background: repeating-linear-gradient(115deg, transparent 0 120px, rgba(137, 222, 244, .04) 121px 122px); content: ""; transform: translateY(calc(var(--motion, 0) * 1px)); }
     .surface-sky { position: absolute; top: 0; right: 0; left: 0; z-index: 1; height: calc(50vh + 70px); overflow: hidden; background: linear-gradient(180deg, #74cff3 0%, #9bdcf5 64%, #c2ebfa 100%); transform: translateY(calc(var(--surface-offset, 0) * -1px)); will-change: clip-path, transform; }
     .cloud { position: absolute; width: 150px; height: 34px; border-radius: 999px; background: rgba(255, 255, 255, .8); box-shadow: 0 8px 24px rgba(48, 139, 174, .12); }
     .cloud::before, .cloud::after { position: absolute; bottom: 0; border-radius: 50%; background: inherit; content: ""; }
@@ -78,8 +77,13 @@
     .submarine__visual { position: absolute; inset: 0; transform: translateY(var(--bob-y, 0px)) rotate(var(--bob-rotation, 0deg)); transform-origin: 50% 82%; will-change: transform; }
     .submarine__image { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; }
     .submarine__water-tint { position: absolute; inset: 0; background: rgba(7, 104, 184, .15); clip-path: inset(82% 0 0); -webkit-mask: url("ocean-assets/submarine.svg") center / contain no-repeat; mask: url("ocean-assets/submarine.svg") center / contain no-repeat; will-change: clip-path; }
+    .surface-scale { position: absolute; top: 50%; left: calc(50% + min(90px, 21vw) + 6px); z-index: 4; width: 28px; height: var(--scale-size, min(159px, 37.1vw)); color: rgba(223, 247, 255, .9); filter: drop-shadow(0 0 7px rgba(98, 224, 255, .35)); opacity: 0; transform: translateY(calc(-50% + var(--scale-centre-offset, 0px) - var(--surface-offset, 0px))); transition: opacity 160ms ease; pointer-events: none; will-change: transform, opacity; }
+    .surface-scale[data-visible="true"] { opacity: 1; }
+    .surface-scale__bracket { position: absolute; inset: 0; border-top: 2px solid currentColor; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; }
+    .surface-scale__label { position: absolute; top: 50%; right: 0; padding: 4px 3px; color: var(--accent); background: rgba(3, 19, 29, .88); font: 700 11px/1 ui-monospace, monospace; letter-spacing: .05em; transform: translate(50%, -50%); white-space: nowrap; }
     .mission[data-view="first-person"] .submarine,
-    .mission[data-view="first-person"] .sonar { display: none; }
+    .mission[data-view="first-person"] .sonar,
+    .mission[data-view="first-person"] .surface-scale { display: none; }
     .travel-indicator { position: absolute; top: 50%; left: calc(50% + 170px); z-index: 4; display: grid; gap: 2px; color: var(--warning); text-shadow: 0 0 12px rgba(255, 211, 123, .7); text-align: center; transform: translateY(-50%); }
     .travel-indicator__arrow { font: 700 28px/1 ui-monospace, monospace; }
     .travel-indicator__label { color: var(--muted); font: 700 10px/1.2 ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; }
@@ -113,9 +117,9 @@
     .depth-ruler__reference { position: absolute; top: var(--reference-position); right: 0; left: -1px; z-index: 1; border-top: 2px solid var(--warning); filter: drop-shadow(0 0 5px rgba(255, 211, 123, .8)); pointer-events: none; }
     .depth-ruler__reference::after { position: absolute; top: -5px; right: 0; border-top: 4px solid transparent; border-right: 6px solid var(--warning); border-bottom: 4px solid transparent; content: ""; }
     .depth-ruler__reference-value { position: absolute; top: 0; left: 24px; padding: 3px 5px; color: var(--warning); background: #061720; font: 700 10px/1 ui-monospace, monospace; transform: translateY(-50%); white-space: nowrap; }
-    .depth-ruler--third-person { width: 122px; border-color: rgba(98,224,255,.38); background: linear-gradient(90deg, rgba(10, 55, 70, .92), rgba(3, 19, 29, .8)); box-shadow: inset 3px 0 rgba(98,224,255,.2), 0 14px 50px rgba(0, 0, 0, .24); }
-    .depth-ruler--third-person .depth-ruler__title { color: var(--accent); }
-    .depth-ruler--third-person .depth-ruler__track { height: calc(100% - 41px); border-left: 3px double rgba(98,224,255,.72); }
+    .depth-ruler--third-person { top: 0; bottom: 0; left: clamp(12px, 2vw, 24px); z-index: 4; width: 122px; padding: 0; overflow: visible; border: 0; background: transparent; box-shadow: none; backdrop-filter: none; pointer-events: none; }
+    .depth-ruler--third-person .depth-ruler__title { position: absolute; bottom: 32px; left: 88px; width: 118px; margin: 0; color: var(--accent); text-shadow: 0 1px 8px rgba(0, 8, 13, .9); }
+    .depth-ruler--third-person .depth-ruler__track { position: absolute; inset: 0 auto 0 0; width: 122px; height: 100%; margin: 0; border-left: 3px double rgba(98,224,255,.72); }
     .depth-ruler--third-person .depth-ruler__tick { width: 17px; border-color: rgba(98,224,255,.52); }
     .depth-ruler--third-person .depth-ruler__tick--major { width: 29px; border-width: 2px; border-color: var(--accent); }
     .depth-ruler--third-person .depth-ruler__tick-label { left: 34px; color: rgba(223,247,255,.86); }
@@ -151,6 +155,8 @@
       .mission-status { top: 90px; }
       .depth-panel { top: auto; right: 12px; bottom: 88px; width: 180px; }
       .depth-ruler { top: 105px; bottom: 155px; left: 12px; width: 112px; }
+      .depth-ruler--third-person { top: 0; bottom: 0; left: 12px; width: 108px; }
+      .depth-ruler--third-person .depth-ruler__track { width: 108px; }
       .depth-ruler--first-person { width: 132px; }
       .depth-track { height: 120px; }
       .controls { right: 12px; bottom: 155px; left: 12px; flex-wrap: wrap; gap: 10px; }
@@ -163,6 +169,10 @@
       .topbar__actions { width: 100%; justify-content: space-between; }
       .mission-status { top: 145px; }
       .depth-ruler { top: 160px; }
+      .depth-ruler--third-person { top: 0; bottom: 0; left: 7px; width: 94px; }
+      .depth-ruler--third-person .depth-ruler__title { bottom: 22px; left: 76px; width: 105px; font-size: 9px; }
+      .depth-ruler--third-person .depth-ruler__track { width: 94px; }
+      .depth-ruler--third-person .depth-ruler__tick-label { left: 31px; font-size: 9px; }
     }
   </style>
 </head>
@@ -197,6 +207,10 @@
           <img class="submarine__image" src="ocean-assets/submarine.svg" alt="Submarine">
           <span class="submarine__water-tint" id="submarine-water-tint" aria-hidden="true"></span>
         </div>
+      </div>
+      <div class="surface-scale" id="surface-scale" data-visible="true" role="img" aria-label="The submarine represents two metres in height">
+        <span class="surface-scale__bracket" aria-hidden="true"></span>
+        <span class="surface-scale__label" aria-hidden="true">2 m</span>
       </div>
       <div class="travel-indicator" aria-live="polite"><div class="travel-indicator__arrow" id="travel-arrow">↓</div><div class="travel-indicator__label" id="travel-label">Descending</div></div>
       <article class="discovery" id="discovery" aria-live="polite">
@@ -284,6 +298,7 @@
     const submarine = document.getElementById("submarine");
     const submarineVisual = document.getElementById("submarine-visual");
     const submarineWaterTint = document.getElementById("submarine-water-tint");
+    const surfaceScale = document.getElementById("surface-scale");
     const thirdPersonScale = document.getElementById("third-person-scale");
     let saved = Number(localStorage.getItem(STORAGE_KEY));
     let depth = Number.isFinite(saved) ? Math.min(BOTTOM, Math.max(0, saved)) : 0;
@@ -297,13 +312,19 @@
     let visualTime = performance.now();
     const PIXELS_PER_METRE = 96 / 0.0254;
     const SUBMARINE_METRES = 2;
+    const SUBMARINE_SVG_SIZE = 700;
+    const SUBMARINE_ART_TOP = 37.5 / SUBMARINE_SVG_SIZE;
+    const SUBMARINE_ART_BOTTOM = 656.5 / SUBMARINE_SVG_SIZE;
+    const SUBMARINE_ART_HEIGHT = SUBMARINE_ART_BOTTOM - SUBMARINE_ART_TOP;
+    const SUBMARINE_ART_CENTRE = (SUBMARINE_ART_TOP + SUBMARINE_ART_BOTTOM) / 2;
     const FLOAT_LINE_RATIO = 0.82;
     const SURFACE_SKY_PADDING = 12;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const getWorldPixelsPerMetre = () => {
       const responsiveSubmarineSize = Math.min(180, window.innerWidth * 0.42);
-      return (submarine.offsetHeight || responsiveSubmarineSize) / SUBMARINE_METRES;
+      const submarineCanvasSize = submarine.offsetHeight || responsiveSubmarineSize;
+      return (submarineCanvasSize * SUBMARINE_ART_HEIGHT) / SUBMARINE_METRES;
     };
 
     const waveHeightAt = (x, time) => (
@@ -346,7 +367,16 @@
       surfaceWaveDepth.setAttribute("d", wavePath);
       surfaceWaveHighlight.setAttribute("d", wavePath);
 
-      const fullySubmergedDepth = (FLOAT_LINE_RATIO * submarineSize + 7) / pixelsPerMetre;
+      const scaleX = width / 2 + submarineSize / 2 + 32;
+      const scaleWaterlineY = height / 2 + waterlineDrop - surfaceOffset + waveHeightAt(scaleX, time);
+      const surfaceIsVisible = scaleWaterlineY >= 0 && scaleWaterlineY <= height;
+      surfaceScale.style.setProperty("--scale-size", `${submarineSize * SUBMARINE_ART_HEIGHT}px`);
+      surfaceScale.style.setProperty("--scale-centre-offset", `${submarineSize * (SUBMARINE_ART_CENTRE - 0.5)}px`);
+      surfaceScale.style.setProperty("--surface-offset", `${surfaceOffset}px`);
+      surfaceScale.dataset.visible = String(surfaceIsVisible);
+      surfaceScale.setAttribute("aria-hidden", String(cameraView !== "third-person" || !surfaceIsVisible));
+
+      const fullySubmergedDepth = ((FLOAT_LINE_RATIO - SUBMARINE_ART_TOP) * submarineSize + 7) / pixelsPerMetre;
       const bobStrength = Math.max(0, Math.min(1, 1 - depth / fullySubmergedDepth));
       const centreX = width / 2;
       const centreWave = waveHeightAt(centreX, time);
