@@ -79,18 +79,22 @@
     @keyframes sweep { to { transform: rotate(360deg); } }
 
     .creature-field { position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
-    .sea-creature { position: absolute; top: 50%; left: var(--creature-x); width: var(--creature-width); opacity: 0; transform: translate(-50%, calc(-50% + var(--creature-depth-y))) rotate(var(--creature-tilt)); transition: opacity 320ms ease; pointer-events: auto; cursor: pointer; will-change: transform, opacity; }
+    .sea-creature { position: absolute; top: 50%; left: var(--creature-x); width: var(--creature-width); padding: 0; border: 0; opacity: 0; background: transparent; transform: translate(-50%, calc(-50% + var(--creature-depth-y))) rotate(var(--creature-tilt)); transition: opacity 320ms ease; pointer-events: auto; cursor: pointer; will-change: transform, opacity; }
     .sea-creature[data-visible="true"] { opacity: var(--creature-opacity, 1); }
+    .sea-creature[data-visible="false"], .surface-creature[data-visible="false"] { pointer-events: none; }
     .sea-creature__image { display: block; width: 100%; height: auto; scale: 1; filter: drop-shadow(0 10px 16px rgba(0, 8, 14, .3)); transition: scale 170ms ease; animation: creature-drift var(--creature-drift-speed) ease-in-out var(--creature-drift-delay) infinite alternate; transform-origin: center; }
     .sea-creature--phytoplankton { --creature-opacity: .68; }
     .sea-creature--phytoplankton .sea-creature__image { border-radius: 48%; mix-blend-mode: screen; -webkit-mask-image: radial-gradient(ellipse, #000 48%, transparent 74%); mask-image: radial-gradient(ellipse, #000 48%, transparent 74%); }
     @keyframes creature-drift { to { transform: translate(var(--creature-drift-x), var(--creature-drift-y)) rotate(var(--creature-drift-rotation)); } }
 
-    .surface-creature { position: absolute; z-index: 4; opacity: 0; transform: translateX(-50%) rotate(var(--surface-creature-rotation, 0deg)); transform-origin: 50% 18%; transition: opacity 180ms ease; pointer-events: auto; cursor: pointer; will-change: top, left, transform, opacity; }
+    .surface-creature { position: absolute; z-index: 4; padding: 0; border: 0; opacity: 0; background: transparent; transform: translateX(-50%) rotate(var(--surface-creature-rotation, 0deg)); transform-origin: 50% 18%; transition: opacity 180ms ease; pointer-events: auto; cursor: pointer; will-change: top, left, transform, opacity; }
     .surface-creature[data-visible="true"] { opacity: 1; }
     .surface-creature__image { display: block; width: 100%; height: auto; scale: 1; filter: drop-shadow(0 7px 9px rgba(0, 13, 22, .32)); transition: scale 170ms ease; transform-origin: center; }
     .sea-creature:hover .sea-creature__image,
-    .surface-creature:hover .surface-creature__image { scale: 1.07; filter: url("#creature-outline"); }
+    .sea-creature:focus-visible .sea-creature__image,
+    .surface-creature:hover .surface-creature__image,
+    .surface-creature:focus-visible .surface-creature__image { scale: 1.07; filter: url("#creature-outline"); }
+    .sea-creature:focus-visible, .surface-creature:focus-visible { outline: none; }
 
     .visual-filters { position: absolute; width: 0; height: 0; overflow: hidden; }
 
@@ -170,6 +174,30 @@
     .sandbox__jump input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(98, 224, 255, .12); }
     .sandbox__grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 12px 0 20px; }
 
+    .creature-dialog { width: min(1120px, calc(100vw - 64px)); height: min(760px, calc(100vh - 64px)); max-width: none; max-height: none; padding: 0; overflow: visible; border: 1px solid rgba(153, 226, 247, .32); color: var(--ink); background: #03131d; box-shadow: 0 32px 100px rgba(0, 0, 0, .68); }
+    .creature-dialog::backdrop { background: rgba(0, 5, 9, .82); backdrop-filter: blur(7px); }
+    .creature-dialog__shell { position: relative; display: grid; height: 100%; grid-template-columns: minmax(0, 1.05fr) minmax(340px, .95fr); overflow: visible; }
+    .creature-dialog__close { position: absolute; top: 18px; right: 18px; z-index: 4; display: grid; width: 42px; height: 42px; padding: 0; place-items: center; border: 1px solid rgba(223, 247, 255, .52); border-radius: 50%; color: var(--ink); background: rgba(1, 11, 17, .82); font: 300 28px/1 sans-serif; cursor: pointer; }
+    .creature-dialog__close:hover, .creature-dialog__close:focus-visible { color: #03131c; background: #fff; outline: none; }
+    .creature-dialog__visual { position: relative; min-width: 0; overflow: visible; background: radial-gradient(circle at 52% 48%, rgba(25, 121, 153, .34), transparent 55%), linear-gradient(145deg, #07506a, #02131e 72%); }
+    .creature-dialog__visual::after { position: absolute; inset: 9%; border: 1px solid rgba(162, 230, 248, .12); border-radius: 50%; content: ""; }
+    .creature-dialog__image { position: absolute; top: 50%; left: 50%; z-index: 2; width: var(--popup-image-width, 82%); max-width: none; max-height: 118%; object-fit: contain; filter: drop-shadow(0 28px 35px rgba(0, 0, 0, .42)); transform: translate(-50%, -50%) translate(var(--popup-image-x, 0), var(--popup-image-y, 0)); }
+    .creature-dialog[data-bleed="true"] .creature-dialog__image { width: var(--popup-image-width, 108%); }
+    .creature-dialog__info { position: relative; z-index: 3; min-width: 0; padding: clamp(56px, 7vh, 82px) clamp(28px, 4vw, 58px) 42px; overflow: auto; border-left: 1px solid var(--line); background: linear-gradient(155deg, rgba(6, 30, 43, .98), rgba(2, 13, 21, .99)); }
+    .creature-dialog__title { margin: 10px 0 5px; font: 400 clamp(36px, 4.2vw, 64px)/.96 Georgia, serif; }
+    .creature-dialog__scientific { margin: 0 0 24px; color: var(--accent); font: 400 17px/1.4 Georgia, serif; font-style: italic; }
+    .creature-dialog__status { display: inline-flex; gap: 8px; align-items: center; margin-bottom: 30px; padding: 8px 11px; border: 1px solid rgba(98, 224, 255, .28); color: var(--ink); background: rgba(98, 224, 255, .08); font: 700 11px/1.2 ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; }
+    .creature-dialog__section { margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--line); }
+    .creature-dialog__section h3 { margin: 0 0 9px; color: var(--muted); font: 700 11px/1.2 ui-monospace, monospace; letter-spacing: .15em; text-transform: uppercase; }
+    .creature-dialog__section p { margin: 0; color: #bad9e4; font-size: 15px; line-height: 1.65; }
+    .depth-range__heading { display: flex; gap: 16px; align-items: baseline; justify-content: space-between; }
+    .depth-range__value { color: var(--warning); font: 700 13px ui-monospace, monospace; white-space: nowrap; }
+    .depth-range__track { position: relative; height: 12px; margin-top: 19px; border: 1px solid rgba(181, 231, 246, .36); background: linear-gradient(90deg, #1c92ba, #0b526f 48%, #05283a); }
+    .depth-range__placeholder { position: absolute; inset: -5px 20%; border: 1px dashed rgba(255, 211, 123, .9); background: repeating-linear-gradient(135deg, rgba(255,211,123,.2) 0 5px, transparent 5px 10px); }
+    .depth-range__ticks { display: grid; grid-template-columns: repeat(5, 1fr); margin-top: 9px; color: var(--muted); font: 10px ui-monospace, monospace; }
+    .depth-range__ticks span:nth-child(n+2):nth-child(-n+4) { text-align: center; }
+    .depth-range__ticks span:last-child { text-align: right; }
+
     @media (max-width: 760px) {
       .mission-status { top: 16px; }
       .depth-console { top: 12px; right: 12px; bottom: 12px; width: 150px; }
@@ -178,6 +206,13 @@
       .depth-ruler--third-person { top: 0; bottom: 0; left: 12px; width: 108px; }
       .depth-ruler--third-person .depth-ruler__track { width: 108px; }
       .discovery[data-visible="true"] { transform: translateY(130px); }
+      .creature-dialog { width: calc(100vw - 24px); height: calc(100vh - 24px); overflow: hidden; }
+      .creature-dialog__shell { grid-template-columns: 1fr; grid-template-rows: minmax(220px, 42%) minmax(0, 1fr); overflow: hidden; }
+      .creature-dialog__visual { overflow: hidden; }
+      .creature-dialog__image, .creature-dialog[data-bleed="true"] .creature-dialog__image { width: min(var(--popup-image-width, 82%), 105%); max-height: 115%; }
+      .creature-dialog__info { padding: 34px 24px 30px; border-top: 1px solid var(--line); border-left: 0; }
+      .creature-dialog__close { top: 12px; right: 12px; }
+      .creature-dialog__title { font-size: clamp(32px, 11vw, 48px); }
     }
 
     @media (max-width: 520px) {
@@ -221,7 +256,7 @@
         <path class="surface-wave__depth" id="surface-wave-depth"></path>
         <path class="surface-wave__highlight" id="surface-wave-highlight"></path>
       </svg>
-      <div class="creature-field" id="creature-field" aria-hidden="true"></div>
+      <div class="creature-field" id="creature-field"></div>
       <div class="sonar" aria-hidden="true"></div>
       <div class="submarine" id="submarine">
         <div class="submarine__visual" id="submarine-visual">
@@ -229,9 +264,9 @@
           <span class="submarine__water-tint" id="submarine-water-tint" aria-hidden="true"></span>
         </div>
       </div>
-      <div class="surface-creature" id="man-o-war" data-visible="true" aria-hidden="true">
+      <button class="surface-creature" id="man-o-war" data-visible="true" type="button" aria-label="Learn about the Portuguese man-o'-war">
         <img class="surface-creature__image" src="Submarine pngs Placeholders/Epipelagic/man o war.png" alt="">
-      </div>
+      </button>
       <div class="surface-scale" id="surface-scale" data-visible="true" role="img" aria-label="The submarine represents two metres in height">
         <span class="surface-scale__bracket" aria-hidden="true"></span>
         <span class="surface-scale__label" aria-hidden="true">2 m</span>
@@ -287,6 +322,32 @@
     </div>
   </section>
 
+  <dialog class="creature-dialog" id="creature-dialog" aria-labelledby="creature-dialog-title">
+    <div class="creature-dialog__shell">
+      <button class="creature-dialog__close" id="creature-dialog-close" type="button" aria-label="Close creature details" autofocus>×</button>
+      <div class="creature-dialog__visual">
+        <img class="creature-dialog__image" id="creature-dialog-image" src="" alt="">
+      </div>
+      <article class="creature-dialog__info">
+        <div class="label">Epipelagic encounter</div>
+        <h2 class="creature-dialog__title" id="creature-dialog-title"></h2>
+        <p class="creature-dialog__scientific" id="creature-dialog-scientific"></p>
+        <div class="creature-dialog__status"><span>Conservation</span><strong id="creature-dialog-status"></strong></div>
+
+        <section class="creature-dialog__section">
+          <h3>About this animal</h3>
+          <p id="creature-dialog-facts"></p>
+        </section>
+
+        <section class="creature-dialog__section depth-range">
+          <div class="depth-range__heading"><h3>Depth range</h3><span class="depth-range__value">— m to — m</span></div>
+          <div class="depth-range__track" role="img" aria-label="Placeholder depth range within the Epipelagic zone from 0 to 200 metres"><span class="depth-range__placeholder"></span></div>
+          <div class="depth-range__ticks" aria-hidden="true"><span>0 m</span><span>50 m</span><span>100 m</span><span>150 m</span><span>200 m</span></div>
+        </section>
+      </article>
+    </div>
+  </dialog>
+
   <script>
     const BOTTOM = 10971;
     const STORAGE_KEY = "abyss-submarine-progress";
@@ -298,13 +359,14 @@
       { depth: 6000, zone: "Hadal zone", icon: "◇", copy: "The hadal zone begins in trenches where pressure is hundreds of times greater than at the surface." },
       { depth: 10971, zone: "Challenger Deep", icon: "⬡", copy: "The deepest known point in the ocean. The mission reaches its final waypoint." }
     ];
+    const manOWarInfo = { name: "Portuguese man-o'-war", scientificName: "Physalia physalis", status: "Not evaluated", image: "Submarine pngs Placeholders/Epipelagic/man o war.png", popupWidth: "72%", popupX: "-5%", popupY: "8%" };
     const creatures = [
-      { name: "Manatee", depth: 10, x: "24%", tilt: -3, sourceWidth: 800, sourceHeight: 550, image: "Submarine pngs Placeholders/Epipelagic/Manatee.png", driftX: 7, driftY: -3, driftRotation: 1.2, driftSpeed: 5.8, driftDelay: -1.7 },
-      { name: "Sea otters", depth: 40, x: "76%", tilt: 4, sourceWidth: 400, sourceHeight: 250, image: "Submarine pngs Placeholders/Epipelagic/sea otters.png", driftX: -8, driftY: 4, driftRotation: -1.5, driftSpeed: 4.9, driftDelay: -3.1 },
-      { name: "Puffin", depth: 60, x: "32%", tilt: -5, sourceWidth: 100, sourceHeight: 100, image: "Submarine pngs Placeholders/Epipelagic/puffin.png", driftX: 10, driftY: -5, driftRotation: 2, driftSpeed: 4.2, driftDelay: -2.3 },
-      { name: "Mahi-mahi", depth: 85, x: "70%", tilt: 2, sourceWidth: 450, sourceHeight: 175, image: "Submarine pngs Placeholders/Epipelagic/mahi-mahi.png", driftX: -12, driftY: 3, driftRotation: -1, driftSpeed: 5.2, driftDelay: -.8 },
-      { name: "Phytoplankton", depth: 100, x: "27%", tilt: 5, sourceWidth: 500, sourceHeight: 375, image: "Submarine pngs Placeholders/Epipelagic/phytoplankton.png", driftX: 5, driftY: 6, driftRotation: 1.4, driftSpeed: 7.1, driftDelay: -4.4, className: "sea-creature--phytoplankton" },
-      { name: "Green sea turtle", depth: 175, x: "73%", tilt: -4, sourceWidth: 400, sourceHeight: 300, image: "Submarine pngs Placeholders/Epipelagic/green sea turtle.png", driftX: -9, driftY: -4, driftRotation: -1.2, driftSpeed: 6.4, driftDelay: -2.6 }
+      { name: "Manatee", scientificName: "Trichechus manatus", status: "Vulnerable", depth: 10, x: "24%", tilt: -3, sourceWidth: 800, sourceHeight: 550, image: "Submarine pngs Placeholders/Epipelagic/Manatee.png", driftX: 7, driftY: -3, driftRotation: 1.2, driftSpeed: 5.8, driftDelay: -1.7, bleed: true, popupWidth: "116%", popupX: "-12%", popupY: "7%" },
+      { name: "Sea otter", scientificName: "Enhydra lutris", status: "Endangered", depth: 40, x: "76%", tilt: 4, sourceWidth: 400, sourceHeight: 250, image: "Submarine pngs Placeholders/Epipelagic/sea otters.png", driftX: -8, driftY: 4, driftRotation: -1.5, driftSpeed: 4.9, driftDelay: -3.1, bleed: true, popupWidth: "108%", popupX: "-8%", popupY: "6%" },
+      { name: "Atlantic puffin", scientificName: "Fratercula arctica", status: "Vulnerable", depth: 60, x: "32%", tilt: -5, sourceWidth: 100, sourceHeight: 100, image: "Submarine pngs Placeholders/Epipelagic/puffin.png", driftX: 10, driftY: -5, driftRotation: 2, driftSpeed: 4.2, driftDelay: -2.3, popupWidth: "78%", popupY: "3%" },
+      { name: "Mahi-mahi", scientificName: "Coryphaena hippurus", status: "Least concern", depth: 85, x: "70%", tilt: 2, sourceWidth: 450, sourceHeight: 175, image: "Submarine pngs Placeholders/Epipelagic/mahi-mahi.png", driftX: -12, driftY: 3, driftRotation: -1, driftSpeed: 5.2, driftDelay: -.8, popupWidth: "98%", popupX: "-3%" },
+      { name: "Phytoplankton", scientificName: "Not applicable", status: "Not applicable", depth: 100, x: "27%", tilt: 5, sourceWidth: 500, sourceHeight: 375, image: "Submarine pngs Placeholders/Epipelagic/phytoplankton.png", driftX: 5, driftY: 6, driftRotation: 1.4, driftSpeed: 7.1, driftDelay: -4.4, className: "sea-creature--phytoplankton", popupWidth: "88%" },
+      { name: "Green sea turtle", scientificName: "Chelonia mydas", status: "Least concern", depth: 175, x: "73%", tilt: -4, sourceWidth: 400, sourceHeight: 300, image: "Submarine pngs Placeholders/Epipelagic/green sea turtle.png", driftX: -9, driftY: -4, driftRotation: -1.2, driftSpeed: 6.4, driftDelay: -2.6, bleed: true, popupWidth: "108%", popupX: "-8%", popupY: "4%" }
     ];
 
     const mission = document.getElementById("mission");
@@ -338,6 +400,12 @@
     const sandbox = document.getElementById("sandbox");
     const specificDepthForm = document.getElementById("specific-depth-form");
     const specificDepthInput = document.getElementById("specific-depth");
+    const creatureDialog = document.getElementById("creature-dialog");
+    const creatureDialogImage = document.getElementById("creature-dialog-image");
+    const creatureDialogTitle = document.getElementById("creature-dialog-title");
+    const creatureDialogScientific = document.getElementById("creature-dialog-scientific");
+    const creatureDialogStatus = document.getElementById("creature-dialog-status");
+    const creatureDialogFacts = document.getElementById("creature-dialog-facts");
     let saved = Number(localStorage.getItem(STORAGE_KEY));
     let depth = Number.isFinite(saved) ? Math.min(BOTTOM, Math.max(0, saved)) : 0;
     let direction = 1;
@@ -351,6 +419,7 @@
     let speedRepeatTimer;
     let uiVisible = true;
     let uiChoiceMade = false;
+    let resumeAfterCreatureDialog = false;
     let visualTime = performance.now();
     const MIN_SPEED = 0.2;
     const MAX_SPEED = 3;
@@ -371,8 +440,10 @@
     const mobileUi = window.matchMedia("(max-width: 760px)");
 
     creatures.forEach((creature) => {
-      const element = document.createElement("div");
+      const element = document.createElement("button");
       element.className = `sea-creature${creature.className ? ` ${creature.className}` : ""}`;
+      element.type = "button";
+      element.setAttribute("aria-label", `Learn about ${creature.name}`);
       element.style.setProperty("--creature-x", creature.x);
       element.style.setProperty("--creature-tilt", `${creature.tilt}deg`);
       element.style.setProperty("--creature-drift-x", `${creature.driftX}px`);
@@ -400,6 +471,34 @@
     };
 
     setUiVisibility(!mobileUi.matches);
+
+    const togglePause = () => {
+      if (paused && depth === 0) direction = 1;
+      if (paused && depth === BOTTOM) direction = -1;
+      paused = !paused;
+      render();
+    };
+
+    const openCreatureDialog = (creature) => {
+      if (creatureDialog.open) return;
+      resumeAfterCreatureDialog = !paused;
+      paused = true;
+      creatureDialogTitle.textContent = creature.name;
+      creatureDialogScientific.textContent = creature.scientificName;
+      creatureDialogStatus.textContent = creature.status;
+      creatureDialogFacts.textContent = `Placeholder: Add a short paragraph with general facts about ${creature.name}.`;
+      creatureDialogImage.src = creature.image;
+      creatureDialogImage.alt = creature.name;
+      creatureDialog.dataset.bleed = String(Boolean(creature.bleed));
+      creatureDialog.style.setProperty("--popup-image-width", creature.popupWidth || "82%");
+      creatureDialog.style.setProperty("--popup-image-x", creature.popupX || "0%");
+      creatureDialog.style.setProperty("--popup-image-y", creature.popupY || "0%");
+      creatureDialog.showModal();
+      render();
+    };
+
+    creatures.forEach((creature) => creature.element.addEventListener("click", () => openCreatureDialog(creature)));
+    manOWar.addEventListener("click", () => openCreatureDialog(manOWarInfo));
 
     const getWorldPixelsPerMetre = () => {
       const responsiveSubmarineSize = Math.min(180, window.innerWidth * 0.42);
@@ -483,6 +582,7 @@
       manOWar.style.width = `${manOWarWidth.toFixed(2)}px`;
       manOWar.style.setProperty("--surface-creature-rotation", `${manOWarRotation.toFixed(2)}deg`);
       manOWar.dataset.visible = String(manOWarIsVisible);
+      manOWar.tabIndex = manOWarIsVisible ? 0 : -1;
 
       const visualLeft = width / 2 - submarineSize / 2;
       const visualTop = height / 2 - submarineSize / 2 + bobY;
@@ -515,6 +615,7 @@
         creature.element.style.setProperty("--creature-depth-y", `${depthY.toFixed(2)}px`);
         creature.element.style.setProperty("--creature-width", `${creatureWidth.toFixed(2)}px`);
         creature.element.dataset.visible = String(isVisible);
+        creature.element.tabIndex = isVisible ? 0 : -1;
       });
     };
 
@@ -665,19 +766,27 @@
     mobileUi.addEventListener("change", (event) => {
       if (!uiChoiceMade) setUiVisibility(!event.matches);
     });
-    pauseButton.addEventListener("click", () => {
-      if (paused && depth === 0) direction = 1;
-      if (paused && depth === BOTTOM) direction = -1;
-      paused = !paused;
-      render();
-    });
+    pauseButton.addEventListener("click", togglePause);
     window.addEventListener("wheel", (event) => {
+      if (creatureDialog.open) return;
       if ((depth === 0 && event.deltaY < 0) || (depth === BOTTOM && event.deltaY >= 0)) return;
       direction = event.deltaY >= 0 ? 1 : -1;
       paused = false;
       render();
     }, { passive: true });
     window.addEventListener("keydown", (event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      const isInteractive = target?.matches("button, input, textarea, select, a[href], [contenteditable='true']");
+
+      if (event.code === "Space") {
+        if (isInteractive) return;
+        event.preventDefault();
+        if (creatureDialog.open || !sandbox.hidden) return;
+        togglePause();
+        return;
+      }
+
+      if (creatureDialog.open) return;
       if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
         event.preventDefault();
         adjustSpeed(event.key === "ArrowLeft" ? -SPEED_STEP : SPEED_STEP);
@@ -702,6 +811,13 @@
       requestAnimationFrame(() => specificDepthInput.select());
     });
     document.getElementById("close-sandbox").addEventListener("click", () => { depth = missionDepth; sandboxMode = false; sandbox.hidden = true; render(); });
+    document.getElementById("creature-dialog-close").addEventListener("click", () => creatureDialog.close());
+    creatureDialog.addEventListener("close", () => {
+      if (resumeAfterCreatureDialog) paused = false;
+      resumeAfterCreatureDialog = false;
+      lastFrame = performance.now();
+      render();
+    });
     buildMilestones();
     render();
     requestAnimationFrame(frame);
