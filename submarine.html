@@ -86,6 +86,10 @@
     .sea-creature--phytoplankton .sea-creature__image { border-radius: 48%; mix-blend-mode: screen; -webkit-mask-image: radial-gradient(ellipse, #000 48%, transparent 74%); mask-image: radial-gradient(ellipse, #000 48%, transparent 74%); }
     @keyframes creature-drift { to { transform: translate(var(--creature-drift-x), var(--creature-drift-y)) rotate(var(--creature-drift-rotation)); } }
 
+    .surface-creature { position: absolute; z-index: 4; opacity: 0; transform: translateX(-50%) rotate(var(--surface-creature-rotation, 0deg)); transform-origin: 50% 18%; transition: opacity 180ms ease; pointer-events: none; will-change: top, left, transform, opacity; }
+    .surface-creature[data-visible="true"] { opacity: 1; }
+    .surface-creature__image { display: block; width: 100%; height: auto; filter: drop-shadow(0 7px 9px rgba(0, 13, 22, .32)); }
+
     .submarine { position: relative; z-index: 2; width: min(180px, 42vw); aspect-ratio: 1; }
     .submarine__visual { position: absolute; inset: 0; transform: translateY(var(--bob-y, 0px)) rotate(var(--bob-rotation, 0deg)); transform-origin: 50% 82%; will-change: transform; }
     .submarine__image { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; }
@@ -211,6 +215,9 @@
           <span class="submarine__water-tint" id="submarine-water-tint" aria-hidden="true"></span>
         </div>
       </div>
+      <div class="surface-creature" id="man-o-war" data-visible="true" aria-hidden="true">
+        <img class="surface-creature__image" src="Submarine pngs Placeholders/Epipelagic/man o war.png" alt="">
+      </div>
       <div class="surface-scale" id="surface-scale" data-visible="true" role="img" aria-label="The submarine represents two metres in height">
         <span class="surface-scale__bracket" aria-hidden="true"></span>
         <span class="surface-scale__label" aria-hidden="true">2 m</span>
@@ -310,6 +317,7 @@
     const submarine = document.getElementById("submarine");
     const submarineVisual = document.getElementById("submarine-visual");
     const submarineWaterTint = document.getElementById("submarine-water-tint");
+    const manOWar = document.getElementById("man-o-war");
     const surfaceScale = document.getElementById("surface-scale");
     const thirdPersonScale = document.getElementById("third-person-scale");
     const creatureField = document.getElementById("creature-field");
@@ -341,6 +349,10 @@
     const SUBMARINE_ART_CENTRE = (SUBMARINE_ART_TOP + SUBMARINE_ART_BOTTOM) / 2;
     const FLOAT_LINE_RATIO = 0.82;
     const SURFACE_SKY_PADDING = 12;
+    const MAN_O_WAR_X_RATIO = 0.67;
+    const MAN_O_WAR_SOURCE_WIDTH = 100;
+    const MAN_O_WAR_SOURCE_HEIGHT = 200;
+    const MAN_O_WAR_FLOAT_RATIO = 0.18;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const mobileUi = window.matchMedia("(max-width: 760px)");
 
@@ -379,6 +391,8 @@
       const submarineCanvasSize = submarine.offsetHeight || responsiveSubmarineSize;
       return (submarineCanvasSize * SUBMARINE_ART_HEIGHT) / SUBMARINE_METRES;
     };
+
+    const getCreatureCompression = () => window.innerWidth <= 520 ? .72 : window.innerWidth <= 760 ? .86 : 1;
 
     const waveHeightAt = (x, time) => (
       Math.sin(x / 110 + time * 0.82) * 5 +
@@ -440,6 +454,19 @@
       submarineVisual.style.setProperty("--bob-y", `${bobY.toFixed(2)}px`);
       submarineVisual.style.setProperty("--bob-rotation", `${bobRotation.toFixed(2)}deg`);
 
+      const manOWarX = width * MAN_O_WAR_X_RATIO;
+      const manOWarWidth = submarineSize * (MAN_O_WAR_SOURCE_WIDTH / SUBMARINE_SVG_SIZE) * getCreatureCompression();
+      const manOWarHeight = manOWarWidth * (MAN_O_WAR_SOURCE_HEIGHT / MAN_O_WAR_SOURCE_WIDTH);
+      const manOWarWaterline = height / 2 + waterlineDrop - surfaceOffset + waveHeightAt(manOWarX, time);
+      const manOWarSlope = (waveHeightAt(manOWarX + 12, time) - waveHeightAt(manOWarX - 12, time)) / 24;
+      const manOWarRotation = Math.max(-5, Math.min(5, Math.atan(manOWarSlope) * 180 / Math.PI * .72));
+      const manOWarIsVisible = manOWarWaterline >= -manOWarHeight * (1 - MAN_O_WAR_FLOAT_RATIO) && manOWarWaterline <= height + manOWarHeight * MAN_O_WAR_FLOAT_RATIO;
+      manOWar.style.left = `${manOWarX.toFixed(2)}px`;
+      manOWar.style.top = `${(manOWarWaterline - manOWarHeight * MAN_O_WAR_FLOAT_RATIO).toFixed(2)}px`;
+      manOWar.style.width = `${manOWarWidth.toFixed(2)}px`;
+      manOWar.style.setProperty("--surface-creature-rotation", `${manOWarRotation.toFixed(2)}deg`);
+      manOWar.dataset.visible = String(manOWarIsVisible);
+
       const visualLeft = width / 2 - submarineSize / 2;
       const visualTop = height / 2 - submarineSize / 2 + bobY;
       const tintPoints = [];
@@ -459,7 +486,7 @@
     const updateCreatures = () => {
       const pixelsPerMetre = getWorldPixelsPerMetre();
       const submarineSize = submarine.offsetHeight || Math.min(180, window.innerWidth * 0.42);
-      const mobileCompression = window.innerWidth <= 520 ? .72 : window.innerWidth <= 760 ? .86 : 1;
+      const mobileCompression = getCreatureCompression();
       const viewportBuffer = window.innerHeight * .62;
 
       creatures.forEach((creature) => {
