@@ -179,11 +179,11 @@
     .creature-dialog__shell { position: relative; display: grid; height: 100%; grid-template-columns: minmax(0, 1.05fr) 92px minmax(340px, .95fr); overflow: visible; }
     .creature-dialog__close { position: absolute; top: 18px; right: 18px; z-index: 4; display: grid; width: 42px; height: 42px; padding: 0; place-items: center; border: 1px solid rgba(223, 247, 255, .52); border-radius: 50%; color: var(--ink); background: rgba(1, 11, 17, .82); font: 300 28px/1 sans-serif; cursor: pointer; }
     .creature-dialog__close:hover, .creature-dialog__close:focus-visible { color: #03131c; background: #fff; outline: none; }
-    .creature-dialog__visual { position: relative; min-width: 0; overflow: visible; background: radial-gradient(circle at 52% 48%, rgba(25, 121, 153, .34), transparent 55%), linear-gradient(145deg, #07506a, #02131e 72%); }
+    .creature-dialog__visual { position: relative; z-index: 1; min-width: 0; overflow: visible; background: radial-gradient(circle at 52% 48%, rgba(25, 121, 153, .34), transparent 55%), linear-gradient(145deg, #07506a, #02131e 72%); }
     .creature-dialog__visual::after { position: absolute; inset: 9%; border: 1px solid rgba(162, 230, 248, .12); border-radius: 50%; content: ""; }
     .creature-dialog__image { position: absolute; top: 50%; left: 50%; z-index: 2; width: var(--popup-image-width, 82%); max-width: none; max-height: 118%; object-fit: contain; filter: drop-shadow(0 28px 35px rgba(0, 0, 0, .42)); transform: translate(-50%, -50%) translate(var(--popup-image-x, 0), var(--popup-image-y, 0)); }
     .creature-dialog[data-bleed="true"] .creature-dialog__image { width: var(--popup-image-width, 108%); }
-    .creature-dialog__info { position: relative; z-index: 3; min-width: 0; padding: clamp(56px, 7vh, 82px) clamp(28px, 4vw, 58px) 42px; overflow: auto; border-left: 1px solid var(--line); background: linear-gradient(155deg, rgba(6, 30, 43, .98), rgba(2, 13, 21, .99)); }
+    .creature-dialog__info { position: relative; z-index: 5; min-width: 0; padding: clamp(56px, 7vh, 82px) clamp(28px, 4vw, 58px) 42px; overflow: auto; border-left: 1px solid var(--line); background: linear-gradient(155deg, rgba(6, 30, 43, .98), rgba(2, 13, 21, .99)); }
     .creature-dialog__title { margin: 10px 0 5px; font: 400 clamp(36px, 4.2vw, 64px)/.96 Georgia, serif; }
     .creature-dialog__scientific { margin: 0 0 24px; color: var(--accent); font: 400 17px/1.4 Georgia, serif; font-style: italic; }
     .creature-dialog__status { display: inline-flex; gap: 8px; align-items: center; margin-bottom: 30px; padding: 8px 11px; border: 1px solid rgba(98, 224, 255, .28); color: var(--ink); background: rgba(98, 224, 255, .08); font: 700 11px/1.2 ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; }
@@ -191,7 +191,7 @@
     .creature-dialog__section h3 { margin: 0 0 9px; color: var(--muted); font: 700 11px/1.2 ui-monospace, monospace; letter-spacing: .15em; text-transform: uppercase; }
     .depth-range h3 { margin: 0; color: var(--muted); font: 700 11px/1.2 ui-monospace, monospace; letter-spacing: .15em; text-transform: uppercase; }
     .creature-dialog__section p { margin: 0; color: #bad9e4; font-size: 15px; line-height: 1.65; }
-    .depth-range { display: grid; min-width: 0; grid-template-columns: 16px 3px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; column-gap: 8px; padding: 18px 10px; border-left: 1px solid var(--line); background: transparent; }
+    .depth-range { position: relative; z-index: 4; display: grid; min-width: 0; grid-template-columns: 16px 3px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; column-gap: 8px; padding: 18px 10px; border-left: 1px solid var(--line); background: transparent; }
     .depth-range__heading { display: contents; }
     .depth-range__heading h3 { grid-column: 1; grid-row: 1 / 3; align-self: center; margin: 0; writing-mode: vertical-rl; transform: rotate(180deg); }
     .depth-range__value { color: var(--warning); font: 700 11px/1.35 ui-monospace, monospace; }
