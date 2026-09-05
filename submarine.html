@@ -571,8 +571,9 @@
       const centreX = width / 2;
       const centreWave = waveHeightAt(centreX, time);
       const waveSlope = (waveHeightAt(centreX + 18, time) - waveHeightAt(centreX - 18, time)) / 36;
-      const bobY = centreWave * bobStrength;
-      const bobRotation = Math.max(-1.2, Math.min(1.2, Math.atan(waveSlope) * 180 / Math.PI * 0.32)) * bobStrength;
+      const idleSway = paused && depth > fullySubmergedDepth && !reducedMotion.matches ? 1 : 0;
+      const bobY = centreWave * bobStrength + Math.sin(time * 0.9 + 0.6) * 1.5 * idleSway;
+      const bobRotation = Math.max(-1.2, Math.min(1.2, Math.atan(waveSlope) * 180 / Math.PI * 0.32)) * bobStrength + Math.sin(time * 0.72) * 0.7 * idleSway;
 
       submarineVisual.style.setProperty("--bob-y", `${bobY.toFixed(2)}px`);
       submarineVisual.style.setProperty("--bob-rotation", `${bobRotation.toFixed(2)}deg`);
