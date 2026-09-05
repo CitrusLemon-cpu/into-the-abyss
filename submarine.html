@@ -191,14 +191,14 @@
     .creature-dialog__section h3 { margin: 0 0 9px; color: var(--muted); font: 700 11px/1.2 ui-monospace, monospace; letter-spacing: .15em; text-transform: uppercase; }
     .depth-range h3 { margin: 0; color: var(--muted); font: 700 11px/1.2 ui-monospace, monospace; letter-spacing: .15em; text-transform: uppercase; }
     .creature-dialog__section p { margin: 0; color: #bad9e4; font-size: 15px; line-height: 1.65; }
-    .depth-range { display: grid; min-width: 0; grid-template-columns: 16px 3px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; column-gap: 8px; padding: clamp(56px, 7vh, 82px) 10px 42px; border-left: 1px solid var(--line); background: transparent; }
+    .depth-range { display: grid; min-width: 0; grid-template-columns: 16px 3px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; column-gap: 8px; padding: 18px 10px; border-left: 1px solid var(--line); background: transparent; }
     .depth-range__heading { display: contents; }
     .depth-range__heading h3 { grid-column: 1; grid-row: 1 / 3; align-self: center; margin: 0; writing-mode: vertical-rl; transform: rotate(180deg); }
     .depth-range__value { color: var(--warning); font: 700 11px/1.35 ui-monospace, monospace; }
     .depth-range__value { grid-column: 2 / 4; grid-row: 3; justify-self: center; margin-top: 8px; white-space: nowrap; }
-    .depth-range__track { position: relative; grid-column: 2; grid-row: 2; width: 3px; min-height: 0; margin: 18px 0 0; background: rgba(181, 231, 246, .6); }
+    .depth-range__track { position: relative; grid-column: 2; grid-row: 2; width: 3px; min-height: 0; margin: 0; background: rgba(181, 231, 246, .6); }
     .depth-range__placeholder { position: absolute; inset: 20% -5px; border: 1px dashed rgba(255, 211, 123, .9); background: repeating-linear-gradient(45deg, rgba(255,211,123,.2) 0 5px, transparent 5px 10px); }
-    .depth-range__ticks { display: grid; grid-column: 3; grid-row: 2; grid-template-rows: repeat(5, 1fr); min-height: 0; margin: 18px 0 0; color: var(--muted); font: 10px/1 ui-monospace, monospace; }
+    .depth-range__ticks { display: grid; grid-column: 3; grid-row: 2; grid-template-rows: repeat(5, 1fr); min-height: 0; margin: 0; color: var(--muted); font: 10px/1 ui-monospace, monospace; }
     .depth-range__ticks span { align-self: center; }
     .depth-range__ticks span:first-child { align-self: start; }
     .depth-range__ticks span:last-child { align-self: end; }
@@ -216,9 +216,9 @@
       .creature-dialog__visual { grid-column: 1; grid-row: 1; overflow: visible; }
       .creature-dialog__image, .creature-dialog[data-bleed="true"] .creature-dialog__image { width: min(var(--popup-image-width, 82%), calc(100% - 92px)); max-height: 115%; transform: translate(calc(-50% - 46px), -50%) translate(var(--popup-image-x, 0), var(--popup-image-y, 0)); }
       .creature-dialog[data-bleed="true"] .creature-dialog__image { width: min(var(--popup-image-width, 82%), 115%); max-height: 130%; transform: translate(-50%, -50%) translate(var(--popup-image-x, 0), var(--popup-image-y, 0)); }
-      .depth-range { position: absolute; top: 0; right: 0; bottom: 58%; display: grid; width: 92px; min-height: 0; grid-template-columns: 16px 3px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; padding: 72px 10px 18px; border-top: 0; border-left: 1px solid rgba(181, 231, 246, .24); background: transparent; }
-      .depth-range__track { width: 3px; min-width: 3px; height: auto; min-height: 0; margin: 18px 0 0; flex: none; }
-      .depth-range__ticks { width: auto; height: auto; min-height: 0; margin: 18px 0 0; }
+      .depth-range { position: absolute; top: 0; right: 0; bottom: 58%; display: grid; width: 92px; min-height: 0; grid-template-columns: 16px 3px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; padding: 12px 10px; border-top: 0; border-left: 1px solid rgba(181, 231, 246, .24); background: transparent; }
+      .depth-range__track { width: 3px; min-width: 3px; height: auto; min-height: 0; margin: 0; flex: none; }
+      .depth-range__ticks { width: auto; height: auto; min-height: 0; margin: 0; padding-top: 20px; }
       .creature-dialog__info { padding: 34px 24px 30px; border-top: 1px solid var(--line); border-left: 0; }
       .creature-dialog__close { top: 12px; right: 12px; }
       .creature-dialog__title { font-size: clamp(32px, 11vw, 48px); }
