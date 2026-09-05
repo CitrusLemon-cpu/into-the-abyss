@@ -211,13 +211,13 @@
       .depth-ruler--third-person .depth-ruler__track { width: 108px; }
       .discovery[data-visible="true"] { transform: translateY(130px); }
       .creature-dialog { width: calc(100vw - 24px); height: calc(100vh - 24px); overflow: hidden; }
-      .creature-dialog__shell { grid-template-columns: 1fr; grid-template-rows: minmax(220px, 42%) auto minmax(0, 1fr); overflow: hidden; }
-      .creature-dialog__visual { overflow: hidden; }
-      .creature-dialog__image, .creature-dialog[data-bleed="true"] .creature-dialog__image { width: min(var(--popup-image-width, 82%), 105%); max-height: 115%; }
-      .depth-range { display: grid; min-height: 190px; grid-template-columns: minmax(0, 1fr) 12px 42px; gap: 14px; align-items: center; padding: 18px 24px; border-top: 1px solid var(--line); border-left: 0; }
+      .creature-dialog__shell { grid-template-columns: 1fr; grid-template-rows: minmax(220px, 42%) minmax(0, 1fr); overflow: hidden; }
+      .creature-dialog__visual { grid-column: 1; grid-row: 1; overflow: hidden; }
+      .creature-dialog__image, .creature-dialog[data-bleed="true"] .creature-dialog__image { width: min(var(--popup-image-width, 82%), calc(100% - 92px)); max-height: 115%; transform: translate(calc(-50% - 46px), -50%) translate(var(--popup-image-x, 0), var(--popup-image-y, 0)); }
+      .depth-range { position: absolute; top: 0; right: 0; bottom: 58%; display: flex; width: 92px; min-height: 0; flex-direction: column; padding: 34px 14px 18px; border-top: 0; border-left: 1px solid var(--line); background: rgba(2, 15, 23, .72); }
       .depth-range__heading { width: auto; }
-      .depth-range__track { width: 12px; min-width: 12px; height: 154px; min-height: 154px; margin: 0; flex: none; justify-self: center; }
-      .depth-range__ticks { width: auto; height: 154px; margin: 0; }
+      .depth-range__track { width: 12px; min-width: 12px; height: auto; min-height: 0; margin: 18px auto 0; flex: 1; }
+      .depth-range__ticks { width: auto; height: auto; min-height: 154px; margin: 0 0 0 22px; }
       .creature-dialog__info { padding: 34px 24px 30px; border-top: 1px solid var(--line); border-left: 0; }
       .creature-dialog__close { top: 12px; right: 12px; }
       .creature-dialog__title { font-size: clamp(32px, 11vw, 48px); }
