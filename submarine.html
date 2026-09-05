@@ -176,7 +176,7 @@
 
     .creature-dialog { width: min(1120px, calc(100vw - 64px)); height: min(760px, calc(100vh - 64px)); max-width: none; max-height: none; padding: 0; overflow: visible; border: 1px solid rgba(153, 226, 247, .32); color: var(--ink); background: #03131d; box-shadow: 0 32px 100px rgba(0, 0, 0, .68); }
     .creature-dialog::backdrop { background: rgba(0, 5, 9, .82); backdrop-filter: blur(7px); }
-    .creature-dialog__shell { position: relative; display: grid; height: 100%; grid-template-columns: minmax(0, 1.05fr) minmax(340px, .95fr); overflow: visible; }
+    .creature-dialog__shell { position: relative; display: grid; height: 100%; grid-template-columns: minmax(0, 1.05fr) 116px minmax(340px, .95fr); overflow: visible; }
     .creature-dialog__close { position: absolute; top: 18px; right: 18px; z-index: 4; display: grid; width: 42px; height: 42px; padding: 0; place-items: center; border: 1px solid rgba(223, 247, 255, .52); border-radius: 50%; color: var(--ink); background: rgba(1, 11, 17, .82); font: 300 28px/1 sans-serif; cursor: pointer; }
     .creature-dialog__close:hover, .creature-dialog__close:focus-visible { color: #03131c; background: #fff; outline: none; }
     .creature-dialog__visual { position: relative; min-width: 0; overflow: visible; background: radial-gradient(circle at 52% 48%, rgba(25, 121, 153, .34), transparent 55%), linear-gradient(145deg, #07506a, #02131e 72%); }
@@ -189,14 +189,18 @@
     .creature-dialog__status { display: inline-flex; gap: 8px; align-items: center; margin-bottom: 30px; padding: 8px 11px; border: 1px solid rgba(98, 224, 255, .28); color: var(--ink); background: rgba(98, 224, 255, .08); font: 700 11px/1.2 ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; }
     .creature-dialog__section { margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--line); }
     .creature-dialog__section h3 { margin: 0 0 9px; color: var(--muted); font: 700 11px/1.2 ui-monospace, monospace; letter-spacing: .15em; text-transform: uppercase; }
+    .depth-range h3 { margin: 0; color: var(--muted); font: 700 11px/1.2 ui-monospace, monospace; letter-spacing: .15em; text-transform: uppercase; }
     .creature-dialog__section p { margin: 0; color: #bad9e4; font-size: 15px; line-height: 1.65; }
-    .depth-range__heading { display: flex; gap: 16px; align-items: baseline; justify-content: space-between; }
-    .depth-range__value { color: var(--warning); font: 700 13px ui-monospace, monospace; white-space: nowrap; }
-    .depth-range__track { position: relative; height: 12px; margin-top: 19px; border: 1px solid rgba(181, 231, 246, .36); background: linear-gradient(90deg, #1c92ba, #0b526f 48%, #05283a); }
-    .depth-range__placeholder { position: absolute; inset: -5px 20%; border: 1px dashed rgba(255, 211, 123, .9); background: repeating-linear-gradient(135deg, rgba(255,211,123,.2) 0 5px, transparent 5px 10px); }
-    .depth-range__ticks { display: grid; grid-template-columns: repeat(5, 1fr); margin-top: 9px; color: var(--muted); font: 10px ui-monospace, monospace; }
-    .depth-range__ticks span:nth-child(n+2):nth-child(-n+4) { text-align: center; }
-    .depth-range__ticks span:last-child { text-align: right; }
+    .depth-range { display: flex; min-width: 0; flex-direction: column; padding: clamp(56px, 7vh, 82px) 18px 42px; border-left: 1px solid var(--line); background: rgba(2, 15, 23, .48); }
+    .depth-range__heading { display: grid; gap: 8px; }
+    .depth-range__heading h3 { margin: 0; }
+    .depth-range__value { color: var(--warning); font: 700 11px/1.35 ui-monospace, monospace; }
+    .depth-range__track { position: relative; width: 14px; min-height: 220px; flex: 1; margin: 20px auto 0; border: 1px solid rgba(181, 231, 246, .36); background: linear-gradient(to bottom, #1c92ba, #0b526f 48%, #05283a); }
+    .depth-range__placeholder { position: absolute; inset: 20% -5px; border: 1px dashed rgba(255, 211, 123, .9); background: repeating-linear-gradient(45deg, rgba(255,211,123,.2) 0 5px, transparent 5px 10px); }
+    .depth-range__ticks { display: grid; grid-template-rows: repeat(5, 1fr); height: 220px; margin: 0 0 0 24px; color: var(--muted); font: 10px/1 ui-monospace, monospace; }
+    .depth-range__ticks span { align-self: center; }
+    .depth-range__ticks span:first-child { align-self: start; }
+    .depth-range__ticks span:last-child { align-self: end; }
 
     @media (max-width: 760px) {
       .mission-status { top: 16px; }
@@ -207,9 +211,13 @@
       .depth-ruler--third-person .depth-ruler__track { width: 108px; }
       .discovery[data-visible="true"] { transform: translateY(130px); }
       .creature-dialog { width: calc(100vw - 24px); height: calc(100vh - 24px); overflow: hidden; }
-      .creature-dialog__shell { grid-template-columns: 1fr; grid-template-rows: minmax(220px, 42%) minmax(0, 1fr); overflow: hidden; }
+      .creature-dialog__shell { grid-template-columns: 1fr; grid-template-rows: minmax(220px, 42%) auto minmax(0, 1fr); overflow: hidden; }
       .creature-dialog__visual { overflow: hidden; }
       .creature-dialog__image, .creature-dialog[data-bleed="true"] .creature-dialog__image { width: min(var(--popup-image-width, 82%), 105%); max-height: 115%; }
+      .depth-range { display: grid; min-height: 190px; grid-template-columns: minmax(0, 1fr) 12px 42px; gap: 14px; align-items: center; padding: 18px 24px; border-top: 1px solid var(--line); border-left: 0; }
+      .depth-range__heading { width: auto; }
+      .depth-range__track { width: 12px; min-width: 12px; height: 154px; min-height: 154px; margin: 0; flex: none; justify-self: center; }
+      .depth-range__ticks { width: auto; height: 154px; margin: 0; }
       .creature-dialog__info { padding: 34px 24px 30px; border-top: 1px solid var(--line); border-left: 0; }
       .creature-dialog__close { top: 12px; right: 12px; }
       .creature-dialog__title { font-size: clamp(32px, 11vw, 48px); }
@@ -328,6 +336,11 @@
       <div class="creature-dialog__visual">
         <img class="creature-dialog__image" id="creature-dialog-image" src="" alt="">
       </div>
+      <section class="depth-range" aria-labelledby="depth-range-title">
+        <div class="depth-range__heading"><h3 id="depth-range-title">Depth range</h3><span class="depth-range__value">— m to — m</span></div>
+        <div class="depth-range__track" role="img" aria-label="Placeholder depth range within the Epipelagic zone from 0 to 200 metres"><span class="depth-range__placeholder"></span></div>
+        <div class="depth-range__ticks" aria-hidden="true"><span>0 m</span><span>50 m</span><span>100 m</span><span>150 m</span><span>200 m</span></div>
+      </section>
       <article class="creature-dialog__info">
         <div class="label">Epipelagic encounter</div>
         <h2 class="creature-dialog__title" id="creature-dialog-title"></h2>
@@ -339,11 +352,6 @@
           <p id="creature-dialog-facts"></p>
         </section>
 
-        <section class="creature-dialog__section depth-range">
-          <div class="depth-range__heading"><h3>Depth range</h3><span class="depth-range__value">— m to — m</span></div>
-          <div class="depth-range__track" role="img" aria-label="Placeholder depth range within the Epipelagic zone from 0 to 200 metres"><span class="depth-range__placeholder"></span></div>
-          <div class="depth-range__ticks" aria-hidden="true"><span>0 m</span><span>50 m</span><span>100 m</span><span>150 m</span><span>200 m</span></div>
-        </section>
       </article>
     </div>
   </dialog>
