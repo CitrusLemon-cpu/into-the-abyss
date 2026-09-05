@@ -176,7 +176,7 @@
 
     .creature-dialog { width: min(1120px, calc(100vw - 64px)); height: min(760px, calc(100vh - 64px)); max-width: none; max-height: none; padding: 0; overflow: visible; border: 1px solid rgba(153, 226, 247, .32); color: var(--ink); background: #03131d; box-shadow: 0 32px 100px rgba(0, 0, 0, .68); }
     .creature-dialog::backdrop { background: rgba(0, 5, 9, .82); backdrop-filter: blur(7px); }
-    .creature-dialog__shell { position: relative; display: grid; height: 100%; grid-template-columns: minmax(0, 1.05fr) 116px minmax(340px, .95fr); overflow: visible; }
+    .creature-dialog__shell { position: relative; display: grid; height: 100%; grid-template-columns: minmax(0, 1.05fr) 92px minmax(340px, .95fr); overflow: visible; }
     .creature-dialog__close { position: absolute; top: 18px; right: 18px; z-index: 4; display: grid; width: 42px; height: 42px; padding: 0; place-items: center; border: 1px solid rgba(223, 247, 255, .52); border-radius: 50%; color: var(--ink); background: rgba(1, 11, 17, .82); font: 300 28px/1 sans-serif; cursor: pointer; }
     .creature-dialog__close:hover, .creature-dialog__close:focus-visible { color: #03131c; background: #fff; outline: none; }
     .creature-dialog__visual { position: relative; min-width: 0; overflow: visible; background: radial-gradient(circle at 52% 48%, rgba(25, 121, 153, .34), transparent 55%), linear-gradient(145deg, #07506a, #02131e 72%); }
@@ -191,13 +191,14 @@
     .creature-dialog__section h3 { margin: 0 0 9px; color: var(--muted); font: 700 11px/1.2 ui-monospace, monospace; letter-spacing: .15em; text-transform: uppercase; }
     .depth-range h3 { margin: 0; color: var(--muted); font: 700 11px/1.2 ui-monospace, monospace; letter-spacing: .15em; text-transform: uppercase; }
     .creature-dialog__section p { margin: 0; color: #bad9e4; font-size: 15px; line-height: 1.65; }
-    .depth-range { display: flex; min-width: 0; flex-direction: column; padding: clamp(56px, 7vh, 82px) 18px 42px; border-left: 1px solid var(--line); background: rgba(2, 15, 23, .48); }
-    .depth-range__heading { display: grid; gap: 8px; }
-    .depth-range__heading h3 { margin: 0; }
+    .depth-range { display: grid; min-width: 0; grid-template-columns: 16px 3px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); column-gap: 8px; padding: clamp(56px, 7vh, 82px) 10px 42px; border-left: 1px solid var(--line); background: transparent; }
+    .depth-range__heading { display: contents; }
+    .depth-range__heading h3 { grid-column: 1; grid-row: 1 / 3; align-self: center; margin: 0; writing-mode: vertical-rl; transform: rotate(180deg); }
     .depth-range__value { color: var(--warning); font: 700 11px/1.35 ui-monospace, monospace; }
-    .depth-range__track { position: relative; width: 14px; min-height: 220px; flex: 1; margin: 20px auto 0; border: 1px solid rgba(181, 231, 246, .36); background: linear-gradient(to bottom, #1c92ba, #0b526f 48%, #05283a); }
+    .depth-range__value { grid-column: 2 / 4; grid-row: 1; justify-self: center; }
+    .depth-range__track { position: relative; grid-column: 2; grid-row: 2; width: 3px; min-height: 0; margin: 18px 0 0; background: rgba(181, 231, 246, .6); }
     .depth-range__placeholder { position: absolute; inset: 20% -5px; border: 1px dashed rgba(255, 211, 123, .9); background: repeating-linear-gradient(45deg, rgba(255,211,123,.2) 0 5px, transparent 5px 10px); }
-    .depth-range__ticks { display: grid; grid-template-rows: repeat(5, 1fr); height: 220px; margin: 0 0 0 24px; color: var(--muted); font: 10px/1 ui-monospace, monospace; }
+    .depth-range__ticks { display: grid; grid-column: 3; grid-row: 2; grid-template-rows: repeat(5, 1fr); min-height: 0; margin: 18px 0 0; color: var(--muted); font: 10px/1 ui-monospace, monospace; }
     .depth-range__ticks span { align-self: center; }
     .depth-range__ticks span:first-child { align-self: start; }
     .depth-range__ticks span:last-child { align-self: end; }
@@ -210,14 +211,14 @@
       .depth-ruler--third-person { top: 0; bottom: 0; left: 12px; width: 108px; }
       .depth-ruler--third-person .depth-ruler__track { width: 108px; }
       .discovery[data-visible="true"] { transform: translateY(130px); }
-      .creature-dialog { width: calc(100vw - 24px); height: calc(100vh - 24px); overflow: hidden; }
-      .creature-dialog__shell { grid-template-columns: 1fr; grid-template-rows: minmax(220px, 42%) minmax(0, 1fr); overflow: hidden; }
-      .creature-dialog__visual { grid-column: 1; grid-row: 1; overflow: hidden; }
+      .creature-dialog { width: calc(100vw - 24px); height: calc(100vh - 24px); overflow: visible; }
+      .creature-dialog__shell { grid-template-columns: 1fr; grid-template-rows: minmax(220px, 42%) minmax(0, 1fr); overflow: visible; }
+      .creature-dialog__visual { grid-column: 1; grid-row: 1; overflow: visible; }
       .creature-dialog__image, .creature-dialog[data-bleed="true"] .creature-dialog__image { width: min(var(--popup-image-width, 82%), calc(100% - 92px)); max-height: 115%; transform: translate(calc(-50% - 46px), -50%) translate(var(--popup-image-x, 0), var(--popup-image-y, 0)); }
-      .depth-range { position: absolute; top: 0; right: 0; bottom: 58%; display: flex; width: 92px; min-height: 0; flex-direction: column; padding: 34px 14px 18px; border-top: 0; border-left: 1px solid var(--line); background: rgba(2, 15, 23, .72); }
-      .depth-range__heading { width: auto; }
-      .depth-range__track { width: 12px; min-width: 12px; height: auto; min-height: 0; margin: 18px auto 0; flex: 1; }
-      .depth-range__ticks { width: auto; height: auto; min-height: 154px; margin: 0 0 0 22px; }
+      .creature-dialog[data-bleed="true"] .creature-dialog__image { width: min(var(--popup-image-width, 82%), 115%); max-height: 130%; transform: translate(-50%, -50%) translate(var(--popup-image-x, 0), var(--popup-image-y, 0)); }
+      .depth-range { position: absolute; top: 0; right: 0; bottom: 58%; display: grid; width: 92px; min-height: 0; grid-template-columns: 16px 3px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); padding: 72px 10px 18px; border-top: 0; border-left: 1px solid rgba(181, 231, 246, .24); background: transparent; }
+      .depth-range__track { width: 3px; min-width: 3px; height: auto; min-height: 0; margin: 18px 0 0; flex: none; }
+      .depth-range__ticks { width: auto; height: auto; min-height: 0; margin: 18px 0 0; }
       .creature-dialog__info { padding: 34px 24px 30px; border-top: 1px solid var(--line); border-left: 0; }
       .creature-dialog__close { top: 12px; right: 12px; }
       .creature-dialog__title { font-size: clamp(32px, 11vw, 48px); }
@@ -367,13 +368,13 @@
       { depth: 6000, zone: "Hadal zone", icon: "◇", copy: "The hadal zone begins in trenches where pressure is hundreds of times greater than at the surface." },
       { depth: 10971, zone: "Challenger Deep", icon: "⬡", copy: "The deepest known point in the ocean. The mission reaches its final waypoint." }
     ];
-    const manOWarInfo = { name: "Portuguese man-o'-war", scientificName: "Physalia physalis", status: "Not evaluated", image: "Submarine pngs Placeholders/Epipelagic/man o war.png", popupWidth: "72%", popupX: "-5%", popupY: "8%" };
+    const manOWarInfo = { name: "Portuguese man-o'-war", scientificName: "Physalia physalis", status: "Not evaluated", image: "Submarine pngs Placeholders/Epipelagic/man o war.png", bleed: true, popupWidth: "72%", popupX: "-5%", popupY: "8%" };
     const creatures = [
       { name: "Manatee", scientificName: "Trichechus manatus", status: "Vulnerable", depth: 10, x: "24%", tilt: -3, sourceWidth: 800, sourceHeight: 550, image: "Submarine pngs Placeholders/Epipelagic/Manatee.png", driftX: 7, driftY: -3, driftRotation: 1.2, driftSpeed: 5.8, driftDelay: -1.7, bleed: true, popupWidth: "116%", popupX: "-12%", popupY: "7%" },
       { name: "Sea otter", scientificName: "Enhydra lutris", status: "Endangered", depth: 40, x: "76%", tilt: 4, sourceWidth: 400, sourceHeight: 250, image: "Submarine pngs Placeholders/Epipelagic/sea otters.png", driftX: -8, driftY: 4, driftRotation: -1.5, driftSpeed: 4.9, driftDelay: -3.1, bleed: true, popupWidth: "108%", popupX: "-8%", popupY: "6%" },
-      { name: "Atlantic puffin", scientificName: "Fratercula arctica", status: "Vulnerable", depth: 60, x: "32%", tilt: -5, sourceWidth: 100, sourceHeight: 100, image: "Submarine pngs Placeholders/Epipelagic/puffin.png", driftX: 10, driftY: -5, driftRotation: 2, driftSpeed: 4.2, driftDelay: -2.3, popupWidth: "78%", popupY: "3%" },
-      { name: "Mahi-mahi", scientificName: "Coryphaena hippurus", status: "Least concern", depth: 85, x: "70%", tilt: 2, sourceWidth: 450, sourceHeight: 175, image: "Submarine pngs Placeholders/Epipelagic/mahi-mahi.png", driftX: -12, driftY: 3, driftRotation: -1, driftSpeed: 5.2, driftDelay: -.8, popupWidth: "98%", popupX: "-3%" },
-      { name: "Phytoplankton", scientificName: "Not applicable", status: "Not applicable", depth: 100, x: "27%", tilt: 5, sourceWidth: 500, sourceHeight: 375, image: "Submarine pngs Placeholders/Epipelagic/phytoplankton.png", driftX: 5, driftY: 6, driftRotation: 1.4, driftSpeed: 7.1, driftDelay: -4.4, className: "sea-creature--phytoplankton", popupWidth: "88%" },
+      { name: "Atlantic puffin", scientificName: "Fratercula arctica", status: "Vulnerable", depth: 60, x: "32%", tilt: -5, sourceWidth: 100, sourceHeight: 100, image: "Submarine pngs Placeholders/Epipelagic/puffin.png", driftX: 10, driftY: -5, driftRotation: 2, driftSpeed: 4.2, driftDelay: -2.3, popupWidth: "78%", popupX: "0%", popupY: "3%" },
+      { name: "Mahi-mahi", scientificName: "Coryphaena hippurus", status: "Least concern", depth: 85, x: "70%", tilt: 2, sourceWidth: 450, sourceHeight: 175, image: "Submarine pngs Placeholders/Epipelagic/mahi-mahi.png", driftX: -12, driftY: 3, driftRotation: -1, driftSpeed: 5.2, driftDelay: -.8, popupWidth: "98%", popupX: "-3%", popupY: "0%" },
+      { name: "Phytoplankton", scientificName: "Not applicable", status: "Not applicable", depth: 100, x: "27%", tilt: 5, sourceWidth: 500, sourceHeight: 375, image: "Submarine pngs Placeholders/Epipelagic/phytoplankton.png", driftX: 5, driftY: 6, driftRotation: 1.4, driftSpeed: 7.1, driftDelay: -4.4, className: "sea-creature--phytoplankton", popupWidth: "88%", popupX: "0%", popupY: "0%" },
       { name: "Green sea turtle", scientificName: "Chelonia mydas", status: "Least concern", depth: 175, x: "73%", tilt: -4, sourceWidth: 400, sourceHeight: 300, image: "Submarine pngs Placeholders/Epipelagic/green sea turtle.png", driftX: -9, driftY: -4, driftRotation: -1.2, driftSpeed: 6.4, driftDelay: -2.6, bleed: true, popupWidth: "108%", popupX: "-8%", popupY: "4%" }
     ];
 
