@@ -177,7 +177,7 @@
     .creature-dialog { width: min(1120px, calc(100vw - 64px)); height: min(760px, calc(100vh - 64px)); height: min(760px, calc(100svh - 64px)); max-width: none; max-height: none; padding: 0; overflow: visible; border: 1px solid rgba(153, 226, 247, .32); color: var(--ink); background: #03131d; box-shadow: 0 32px 100px rgba(0, 0, 0, .68); }
     .creature-dialog::backdrop { background: rgba(0, 5, 9, .82); backdrop-filter: blur(7px); }
     .creature-dialog__shell { position: relative; display: grid; height: 100%; grid-template-columns: minmax(0, 1.05fr) 92px minmax(340px, .95fr); overflow: visible; }
-    .creature-dialog__close { position: absolute; top: 18px; right: 18px; z-index: 4; display: grid; width: 42px; height: 42px; padding: 0; place-items: center; border: 1px solid rgba(223, 247, 255, .52); border-radius: 50%; color: var(--ink); background: rgba(1, 11, 17, .82); font: 300 28px/1 sans-serif; cursor: pointer; }
+    .creature-dialog__close { position: absolute; top: 18px; right: 18px; z-index: 6; display: grid; width: 42px; height: 42px; padding: 0; place-items: center; border: 1px solid rgba(223, 247, 255, .52); border-radius: 50%; color: var(--ink); background: rgba(1, 11, 17, .82); font: 300 28px/1 sans-serif; cursor: pointer; }
     .creature-dialog__close:hover, .creature-dialog__close:focus-visible { color: #03131c; background: #fff; outline: none; }
     .creature-dialog__visual { position: relative; z-index: 1; min-width: 0; overflow: visible; background: radial-gradient(circle at 52% 48%, rgba(25, 121, 153, .34), transparent 55%), linear-gradient(145deg, #07506a, #02131e 72%); }
     .creature-dialog__visual::after { position: absolute; inset: 9%; border: 1px solid rgba(162, 230, 248, .12); border-radius: 50%; content: ""; }
