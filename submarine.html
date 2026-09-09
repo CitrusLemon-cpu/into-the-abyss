@@ -239,6 +239,13 @@
       .sea-creature__image { animation: none; }
       .sea-creature__image, .surface-creature__image { transition: none; }
     }
+    .manatee-rive { display: block; aspect-ratio: 800 / 550; }
+    .manatee-rive canvas { display: block; width: 106.25%; height: 100%; }
+    .sea-creature__image.manatee-rive { animation: none; }
+    .creature-dialog__image[hidden] { display: none; }
+    @media (max-width: 760px) {
+      .creature-dialog[data-bleed="true"] .manatee-rive { width: 88%; transform: translate(-53.125%, -50%); }
+    }
   </style>
 </head>
 <body>
@@ -357,7 +364,10 @@
     </div>
   </dialog>
 
+  <script src="ocean-assets/rive/rive.js"></script>
+  <script src="manatee-rive.js"></script>
   <script>
+    rive.RuntimeLoader.setWasmUrl("ocean-assets/rive/rive.wasm");
     const BOTTOM = 10971;
     const STORAGE_KEY = "abyss-submarine-progress";
     const milestones = [
@@ -370,7 +380,7 @@
     ];
     const manOWarInfo = { name: "Portuguese man-o'-war", scientificName: "Physalia physalis", status: "Not evaluated", image: "Submarine pngs Placeholders/Epipelagic/man o war.png", bleed: true, popupWidth: "72%", popupX: "-5%", popupY: "8%" };
     const creatures = [
-      { name: "Manatee", scientificName: "Trichechus manatus", status: "Vulnerable", depth: 10, x: "24%", tilt: -3, sourceWidth: 800, sourceHeight: 550, image: "Submarine pngs Placeholders/Epipelagic/Manatee.png", driftX: 7, driftY: -3, driftRotation: 1.2, driftSpeed: 5.8, driftDelay: -1.7, bleed: true, popupWidth: "116%", popupX: "-12%", popupY: "7%" },
+      { name: "Manatee", scientificName: "Trichechus manatus", status: "Vulnerable", depth: 10, x: "24%", tilt: -3, sourceWidth: 800, sourceHeight: 550, rive: true, driftX: 7, driftY: -3, driftRotation: 1.2, driftSpeed: 5.8, driftDelay: -1.7, bleed: true, popupWidth: "116%", popupX: "-12%", popupY: "7%" },
       { name: "Sea otter", scientificName: "Enhydra lutris", status: "Endangered", depth: 40, x: "76%", tilt: 4, sourceWidth: 400, sourceHeight: 250, image: "Submarine pngs Placeholders/Epipelagic/sea otters.png", driftX: -8, driftY: 4, driftRotation: -1.5, driftSpeed: 4.9, driftDelay: -3.1, bleed: true, popupWidth: "108%", popupX: "-8%", popupY: "6%" },
       { name: "Atlantic puffin", scientificName: "Fratercula arctica", status: "Vulnerable", depth: 60, x: "32%", tilt: -5, sourceWidth: 100, sourceHeight: 100, image: "Submarine pngs Placeholders/Epipelagic/puffin.png", driftX: 10, driftY: -5, driftRotation: 2, driftSpeed: 4.2, driftDelay: -2.3, popupWidth: "78%", popupX: "0%", popupY: "3%" },
       { name: "Mahi-mahi", scientificName: "Coryphaena hippurus", status: "Least concern", depth: 85, x: "70%", tilt: 2, sourceWidth: 450, sourceHeight: 175, image: "Submarine pngs Placeholders/Epipelagic/mahi-mahi.png", driftX: -12, driftY: 3, driftRotation: -1, driftSpeed: 5.2, driftDelay: -.8, popupWidth: "98%", popupX: "-3%", popupY: "0%" },
@@ -461,9 +471,9 @@
       element.style.setProperty("--creature-drift-speed", `${creature.driftSpeed}s`);
       element.style.setProperty("--creature-drift-delay", `${creature.driftDelay}s`);
 
-      const image = document.createElement("img");
-      image.className = "sea-creature__image";
-      image.src = creature.image;
+      const image = creature.rive ? createManateeRive("sea-creature__image") : document.createElement("img");
+      if (!creature.rive) image.className = "sea-creature__image";
+      if (!creature.rive) image.src = creature.image;
       image.alt = "";
       image.draggable = false;
       element.append(image);
@@ -496,7 +506,12 @@
       creatureDialogScientific.textContent = creature.scientificName;
       creatureDialogStatus.textContent = creature.status;
       creatureDialogFacts.textContent = `Placeholder: Add a short paragraph with general facts about ${creature.name}.`;
-      creatureDialogImage.src = creature.image;
+      creatureDialogImage.hidden = Boolean(creature.rive);
+      if (creature.rive) {
+        creatureDialogImage.after(createManateeRive("creature-dialog__image"));
+      } else {
+        creatureDialogImage.src = creature.image;
+      }
       creatureDialogImage.alt = creature.name;
       creatureDialog.dataset.bleed = String(Boolean(creature.bleed));
       creatureDialog.style.setProperty("--popup-image-width", creature.popupWidth || "82%");
@@ -823,6 +838,9 @@
     document.getElementById("close-sandbox").addEventListener("click", () => { depth = missionDepth; sandboxMode = false; sandbox.hidden = true; render(); });
     document.getElementById("creature-dialog-close").addEventListener("click", () => creatureDialog.close());
     creatureDialog.addEventListener("close", () => {
+      const animation = creatureDialog.querySelector(".manatee-rive");
+      animation?.cleanupRive();
+      animation?.remove();
       if (resumeAfterCreatureDialog) paused = false;
       resumeAfterCreatureDialog = false;
       lastFrame = performance.now();
