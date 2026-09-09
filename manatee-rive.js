@@ -23,7 +23,6 @@ window.createManateeRive = (className) => {
   let loaded = false;
   let visible = false;
   let playing = false;
-  let loading = false;
   let disposed = false;
   const sync = () => {
     if (!loaded) return;
@@ -33,18 +32,9 @@ window.createManateeRive = (className) => {
     if (next) player.play("Bobbing");
     else player.pause();
   };
-  const observer = new IntersectionObserver(async ([entry]) => {
-    visible = entry.isIntersecting;
-    if (visible && !player && !loading) {
-      loading = true;
-      let source;
-      try {
-        source = await manateeSourceReady;
-      } catch (error) {
-        console.error(error);
-        return;
-      }
-      if (disposed) return;
+  let preparation;
+  wrapper.prepareRive = () => preparation || (preparation = manateeSourceReady.then(source => new Promise((resolve, reject) => {
+      if (disposed) { reject(new Error("Animation disposed")); return; }
       player = new rive.Rive({
         ...source,
         canvas,
@@ -56,10 +46,14 @@ window.createManateeRive = (className) => {
           loaded = true;
           player.resizeDrawingSurfaceToCanvas(Math.min(window.devicePixelRatio || 1, 1.5));
           sync();
+          resolve();
         },
-        onLoadError: (event) => console.error("Unable to load manatee animation", event),
+        onLoadError: () => reject(new Error("Unable to load manatee animation")),
       });
-    }
+  })));
+  const observer = new IntersectionObserver(([entry]) => {
+    visible = entry.isIntersecting;
+    if (visible) wrapper.prepareRive().catch(console.error);
     sync();
   });
   observer.observe(canvas);

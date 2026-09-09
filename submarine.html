@@ -27,6 +27,27 @@
     }
 
     button, input { font: inherit; }
+    .dive-loading { position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px; text-align: center; background: radial-gradient(ellipse at 50% 35%, #092d3b, #020b12 65%); opacity: 1; transition: opacity 450ms ease; }
+    .dive-loading__mark { width: 64px; height: 64px; margin-bottom: 36px; border: 1px solid rgba(98,224,255,.2); border-radius: 50%; display: grid; place-items: center; color: var(--accent); font: 28px Georgia, serif; }
+    .dive-loading__eyebrow { margin-bottom: 16px; color: var(--accent); font: 10px ui-monospace, monospace; letter-spacing: .3em; text-transform: uppercase; }
+    .dive-loading h1 { margin: 0; color: var(--ink); font: 400 clamp(38px, 7vw, 76px)/1.1 Georgia, serif; letter-spacing: -.03em; }
+    .dive-loading p { max-width: 320px; margin: 28px 0 0; color: var(--muted); font: 12px/1.7 ui-monospace, monospace; letter-spacing: .04em; }
+    .dive-loading__indicator { width: 80px; height: 2px; margin-top: 24px; background: rgba(98,224,255,.15); overflow: hidden; }
+    .dive-loading__indicator::after { content: ""; display: block; height: 100%; width: 40%; background: var(--accent); animation: loading-scan 1.6s ease-in-out infinite alternate; }
+    @keyframes loading-scan { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+    .dive-loading button { margin-top: 24px; }
+    .dive-loading:has(button:not([hidden])) .dive-loading__indicator { display: none; }
+    @media (prefers-reduced-motion: reduce) { .dive-loading { transition: none; } .dive-loading__indicator::after { animation: none; width: 100%; } }
+    .dive-loading button { pointer-events: auto; }
+    .dive-loading[hidden] { display: none; }
+    body[data-loading="false"] .dive-loading { opacity: 0; pointer-events: none; }
+    body[data-loading="true"] .depth-console,
+    body[data-loading="true"] .depth-ruler,
+    body[data-loading="true"] .mission-status,
+    body[data-loading="true"] .travel-indicator,
+    body[data-loading="true"] .discovery,
+    body[data-loading="true"] .surface-scale,
+    body[data-loading="true"] .ui-toggle { opacity: 0; pointer-events: none; }
 
     .mission {
       min-height: 100vh;
@@ -248,8 +269,16 @@
     }
   </style>
 </head>
-<body>
-  <main class="mission" id="mission" data-zone="surface" data-ui-visible="true">
+<body data-loading="true">
+  <div class="dive-loading" id="dive-loading">
+    <div class="dive-loading__mark" aria-hidden="true">↓</div>
+    <div class="dive-loading__eyebrow">An ocean expedition</div>
+    <h1>Into the Abyss</h1>
+    <p id="dive-loading-message" role="status">Preparing your dive…</p>
+    <div class="dive-loading__indicator" aria-hidden="true"></div>
+    <button id="dive-loading-retry" class="control-button" hidden onclick="location.reload()">Try again</button>
+  </div>
+  <main class="mission" id="mission" data-zone="surface" data-ui-visible="true" inert aria-busy="true">
     <div class="mission-status" id="mission-status"><div class="label">Current zone</div><strong id="zone-name">Surface</strong></div>
     <button class="ui-toggle" id="ui-toggle" type="button" aria-controls="mission-status depth-console travel-indicator discovery surface-scale" aria-expanded="true">Hide UI</button>
 
@@ -426,7 +455,9 @@
     const creatureDialogStatus = document.getElementById("creature-dialog-status");
     const creatureDialogFacts = document.getElementById("creature-dialog-facts");
     let saved = Number(localStorage.getItem(STORAGE_KEY));
-    let depth = Number.isFinite(saved) ? Math.min(BOTTOM, Math.max(0, saved)) : 0;
+    const arrivalDepth = Number.isFinite(saved) ? Math.min(BOTTOM, Math.max(0, saved)) : 0;
+    let preparingDive = true;
+    let depth = 0;
     let direction = 1;
     let paused = true;
     let sandboxMode = false;
@@ -732,7 +763,7 @@
       document.getElementById("discovery-title").textContent = current.zone;
       document.getElementById("discovery-copy").textContent = current.copy;
       document.querySelectorAll(".map-stop").forEach((button) => button.setAttribute("aria-current", button.dataset.depth === String(current.depth) ? "true" : "false"));
-      if (!sandboxMode && Math.abs(depth - lastSaved) > 2) {
+      if (!preparingDive && !sandboxMode && Math.abs(depth - lastSaved) > 2) {
         localStorage.setItem(STORAGE_KEY, String(Math.round(depth * 10) / 10));
         lastSaved = depth;
         missionDepth = depth;
@@ -816,6 +847,7 @@
     });
     pauseButton.addEventListener("click", togglePause);
     window.addEventListener("wheel", (event) => {
+      if (preparingDive) return;
       if (creatureDialog.open) return;
       if ((depth === 0 && event.deltaY < 0) || (depth === BOTTOM && event.deltaY >= 0)) return;
       direction = event.deltaY >= 0 ? 1 : -1;
@@ -823,6 +855,7 @@
       render();
     }, { passive: true });
     window.addEventListener("keydown", (event) => {
+      if (preparingDive) return;
       const target = event.target instanceof Element ? event.target : null;
       const isInteractive = target?.matches("button, input, textarea, select, a[href], [contenteditable='true']");
 
@@ -874,6 +907,34 @@
     buildMilestones();
     render();
     requestAnimationFrame(frame);
+    const prepareDive = async () => {
+      let timeout;
+      try {
+        const images = [document.querySelector(".submarine__image"), manOWar.querySelector("img")];
+        await Promise.race([
+          Promise.all([
+            ...images.map(image => image.decode()),
+            creatures.find(creature => creature.rive).imageElement.prepareRive(),
+          ]),
+          new Promise((_, reject) => { timeout = setTimeout(() => reject(new Error("Loading timed out")), 20000); }),
+        ]);
+        document.getElementById("dive-loading-message").textContent = "Ready to dive";
+        depth = arrivalDepth;
+        render();
+        preparingDive = false;
+        missionDepth = depth;
+        lastSaved = depth;
+        mission.inert = false;
+        mission.setAttribute("aria-busy", "false");
+        document.body.dataset.loading = "false";
+        setTimeout(() => { document.getElementById("dive-loading").hidden = true; }, reducedMotion.matches ? 0 : 450);
+      } catch (error) {
+        console.error("Dive preparation failed", error);
+        document.getElementById("dive-loading-message").textContent = "The dive couldn’t finish loading. Please try again.";
+        document.getElementById("dive-loading-retry").hidden = false;
+      } finally { clearTimeout(timeout); }
+    };
+    prepareDive();
   </script>
 </body>
 </html>
