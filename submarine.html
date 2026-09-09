@@ -476,6 +476,7 @@
       if (!creature.rive) image.src = creature.image;
       image.alt = "";
       image.draggable = false;
+      if (creature.rive) element.style.aspectRatio = "800 / 550";
       element.append(image);
       creatureField.append(element);
       creature.element = element;
@@ -508,7 +509,9 @@
       creatureDialogFacts.textContent = `Placeholder: Add a short paragraph with general facts about ${creature.name}.`;
       creatureDialogImage.hidden = Boolean(creature.rive);
       if (creature.rive) {
-        creatureDialogImage.after(createManateeRive("creature-dialog__image"));
+        const animation = creature.imageElement;
+        animation.className = "creature-dialog__image manatee-rive";
+        creatureDialogImage.after(animation);
       } else {
         creatureDialogImage.src = creature.image;
       }
@@ -652,21 +655,37 @@
       const firstTick = Math.max(0, Math.ceil((depth - tickReferencePosition / pixelsPerMetre) * unitsPerMetre));
       const lastTick = Math.min(BOTTOM * unitsPerMetre, Math.floor((depth + (bounds.height - tickReferencePosition) / pixelsPerMetre) * unitsPerMetre));
 
-      track.replaceChildren(reference);
+      // Reuse tick nodes while moving instead of rebuilding the DOM each frame.
+      const ticks = track.rulerTicks || (track.rulerTicks = new Map());
+      for (const [value, nodes] of ticks) {
+        if (value < firstTick || value > lastTick) {
+          nodes.tick.remove();
+          nodes.label?.remove();
+          ticks.delete(value);
+        }
+      }
       track.style.setProperty("--reference-position", `${referencePosition}px`);
       for (let tickDepth = firstTick; tickDepth <= lastTick; tickDepth += 1) {
         const markerDepth = tickDepth / unitsPerMetre;
         const tickPosition = tickReferencePosition + (markerDepth - depth) * pixelsPerMetre;
-        const tick = document.createElement("span");
+        let nodes = ticks.get(tickDepth);
+        if (!nodes) {
+          nodes = { tick: document.createElement("span") };
+          track.append(nodes.tick);
+          if (tickDepth % labelInterval === 0) {
+            nodes.label = document.createElement("span");
+            nodes.label.textContent = `${markerDepth.toLocaleString(undefined, { minimumFractionDigits: unitsPerMetre === 10 ? 1 : 0, maximumFractionDigits: 1 })} m`;
+            track.append(nodes.label);
+          }
+          ticks.set(tickDepth, nodes);
+        }
+        const tick = nodes.tick;
         tick.className = `depth-ruler__tick${tickDepth % labelInterval === 0 ? " depth-ruler__tick--major" : ""}`;
         tick.style.setProperty("--tick-position", `${tickPosition}px`);
-        track.append(tick);
         if (tickDepth % labelInterval === 0) {
-          const label = document.createElement("span");
+          const label = nodes.label;
           label.className = "depth-ruler__tick-label";
           label.style.setProperty("--tick-position", `${tickPosition}px`);
-          label.textContent = `${markerDepth.toLocaleString(undefined, { minimumFractionDigits: unitsPerMetre === 10 ? 1 : 0, maximumFractionDigits: 1 })} m`;
-          track.append(label);
         }
       }
     };
@@ -724,11 +743,15 @@
       const elapsed = Math.min(0.1, (now - lastFrame) / 1000);
       lastFrame = now;
       visualTime = now;
-      if (!paused) {
+      const wasMoving = !paused;
+      if (!paused && !document.hidden) {
         depth = Math.min(BOTTOM, Math.max(0, depth + direction * speed * elapsed));
         if (depth === BOTTOM || depth === 0) paused = true;
       }
-      render();
+      if (!document.hidden && !creatureDialog.open && sandbox.hidden) {
+        if (wasMoving) render();
+        else if (!reducedMotion.matches) updateSurface();
+      }
       requestAnimationFrame(frame);
     };
 
@@ -839,8 +862,10 @@
     document.getElementById("creature-dialog-close").addEventListener("click", () => creatureDialog.close());
     creatureDialog.addEventListener("close", () => {
       const animation = creatureDialog.querySelector(".manatee-rive");
-      animation?.cleanupRive();
-      animation?.remove();
+      if (animation) {
+        animation.className = "sea-creature__image manatee-rive";
+        creatures.find(creature => creature.rive).element.append(animation);
+      }
       if (resumeAfterCreatureDialog) paused = false;
       resumeAfterCreatureDialog = false;
       lastFrame = performance.now();

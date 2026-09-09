@@ -54,7 +54,7 @@ window.createManateeRive = (className) => {
         layout: new rive.Layout({ fit: rive.Fit.Contain, alignment: rive.Alignment.Center }),
         onLoad: () => {
           loaded = true;
-          player.resizeDrawingSurfaceToCanvas();
+          player.resizeDrawingSurfaceToCanvas(Math.min(window.devicePixelRatio || 1, 1.5));
           sync();
         },
         onLoadError: (event) => console.error("Unable to load manatee animation", event),
@@ -64,7 +64,7 @@ window.createManateeRive = (className) => {
   });
   observer.observe(canvas);
   const resize = new ResizeObserver(() => {
-    if (loaded) player.resizeDrawingSurfaceToCanvas();
+    if (loaded) player.resizeDrawingSurfaceToCanvas(Math.min(window.devicePixelRatio || 1, 1.5));
   });
   resize.observe(canvas);
   document.addEventListener("visibilitychange", sync);
@@ -77,5 +77,3 @@ window.createManateeRive = (className) => {
   };
   return wrapper;
 };
-
-
