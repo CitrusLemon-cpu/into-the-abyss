@@ -3,700 +3,122 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ocean Depth</title>
-
-  <script>
-    // Keep this page available at /index.html, but make the site root open
-    // the submarine mission by default.
-    if (window.location.pathname.endsWith('/')) {
-      window.location.replace('submarine.html');
-    }
-  </script>
-
+  <meta name="description" content="Sources for the marine life field notes in Into the Abyss.">
+  <title>Sources &amp; Citations · Into the Abyss</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: #00111a;
-      overflow-x: hidden;
-      scroll-behavior: smooth;
-    }
-
-    #intro {
-      position: relative;
-      display: grid;
-      width: 100%;
-      height: 1080px;
-      place-items: center;
-      overflow: hidden;
-      color: #e5f8ff;
-      background:
-        radial-gradient(circle at 77% 18%, rgba(96, 214, 255, 0.34), transparent 27%),
-        linear-gradient(145deg, #36aee6 0%, #117eaf 46%, #07527a 100%);
-    }
-
-    #intro::before,
-    #intro::after {
-      position: absolute;
-      border: 1px solid rgba(229, 248, 255, 0.16);
-      border-radius: 50%;
-      content: "";
-    }
-
-    #intro::before {
-      width: 1050px;
-      height: 1050px;
-      right: -350px;
-      bottom: -540px;
-    }
-
-    #intro::after {
-      width: 700px;
-      height: 700px;
-      right: -175px;
-      bottom: -365px;
-    }
-
-    .intro__content {
-      position: relative;
-      width: min(860px, calc(100% - 48px));
-      margin-right: min(380px, 20vw);
-      z-index: 1;
-    }
-
-    .intro__eyebrow {
-      margin: 0 0 26px;
-      color: rgba(229, 248, 255, 0.76);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-    }
-
-    .intro__title {
-      max-width: 720px;
-      margin: 0;
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: 104px;
-      font-weight: 400;
-      letter-spacing: -0.06em;
-      line-height: 0.92;
-    }
-
-    .intro__description {
-      max-width: 610px;
-      margin: 42px 0 0;
-      color: rgba(229, 248, 255, 0.88);
-      font-size: 24px;
-      line-height: 1.55;
-    }
-
-    .intro__scale {
-      display: flex;
-      gap: 38px;
-      margin: 48px 0 0;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    }
-
-    .intro__stat {
-      display: grid;
-      gap: 6px;
-    }
-
-    .intro__stat-value {
-      font-size: 25px;
-      font-weight: 700;
-    }
-
-    .intro__stat-label {
-      color: rgba(229, 248, 255, 0.7);
-      font-size: 13px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .intro__start {
-      display: inline-flex;
-      align-items: center;
-      gap: 14px;
-      margin-top: 62px;
-      color: #e5f8ff;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-decoration: none;
-      text-transform: uppercase;
-    }
-
-    .intro__start::after {
-      width: 54px;
-      height: 1px;
-      background: currentColor;
-      content: "";
-    }
-
-    /* The ocean coordinate system uses 20 pixels for every metre. */
-    #ocean {
-      position: relative;
-
-      width: 100%;
-      height: 218700px;
-
-      overflow: hidden;
-
-      background: linear-gradient(
-        to bottom,
-        #168dcc 0px,
-        #07527a 10000px,
-        #022b43 40000px,
-        #00131f 100000px,
-        #00060a 200000px,
-        #000000 218700px
-      );
-    }
-
-    .zone-marker {
-      position: absolute;
-      right: 0;
-      left: 0;
-      border-top: 2px dotted rgba(204, 241, 255, 0.72);
-      color: rgba(226, 247, 255, 0.94);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 14px;
-      letter-spacing: 0.04em;
-      pointer-events: none;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
-      z-index: 1;
-    }
-
-    .zone-marker__label {
-      position: absolute;
-      top: -11px;
-      left: 220px;
-      padding: 2px 6px;
-      border-radius: 2px;
-      background: rgba(0, 17, 26, 0.62);
-      white-space: nowrap;
-    }
-
-    .zone-marker--surface .zone-marker__label {
-      top: 8px;
-    }
-
-    .depth-ruler {
-      --meter: 20px;
-      --ten-meters: 200px;
-      --hundred-meters: 2000px;
-      position: absolute;
-      inset: 0 auto 0 32px;
-      width: 190px;
-      color: rgba(226, 247, 255, 0.9);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 13px;
-      letter-spacing: 0.02em;
-      cursor: crosshair;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-      z-index: 2;
-    }
-
-    .depth-ruler::before {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 132px;
-      width: 1px;
-      background: rgba(226, 247, 255, 0.72);
-      content: "";
-    }
-
-    .depth-ruler__ticks {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      right: 57px;
-      width: 14px;
-      background: repeating-linear-gradient(
-        to bottom,
-        transparent 0 calc(var(--meter) - 1px),
-        rgba(226, 247, 255, 0.46) calc(var(--meter) - 1px) var(--meter)
-      );
-    }
-
-    .depth-ruler__ticks--ten {
-      width: 25px;
-      background: repeating-linear-gradient(
-        to bottom,
-        transparent 0 calc(var(--ten-meters) - 1px),
-        rgba(226, 247, 255, 0.65) calc(var(--ten-meters) - 1px) var(--ten-meters)
-      );
-    }
-
-    .depth-ruler__ticks--hundred {
-      width: 37px;
-      background: repeating-linear-gradient(
-        to bottom,
-        transparent 0 calc(var(--hundred-meters) - 2px),
-        rgba(226, 247, 255, 0.9) calc(var(--hundred-meters) - 2px) var(--hundred-meters)
-      );
-    }
-
-    .depth-ruler__label {
-      position: absolute;
-      right: 69px;
-      padding: 2px 5px;
-      border-radius: 2px;
-      background: rgba(0, 17, 26, 0.56);
-      white-space: nowrap;
-    }
-
-    .depth-ruler__label--surface {
-      top: 8px;
-      font-weight: 700;
-    }
-
-    .depth-ruler__label--bottom {
-      bottom: 0;
-      right: auto;
-      left: 144px;
-      font-weight: 700;
-      color: #fff2c2;
-    }
-
-    .depth-ruler__readout {
-      position: absolute;
-      left: 144px;
-      padding: 4px 7px;
-      border: 1px solid rgba(226, 247, 255, 0.58);
-      border-radius: 3px;
-      color: #ffffff;
-      background: rgba(0, 17, 26, 0.9);
-      font-weight: 700;
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(-50%);
-      transition: opacity 100ms ease-out;
-      white-space: nowrap;
-    }
-
-    .depth-ruler__readout--visible {
-      opacity: 1;
-    }
-
-    .fact-marker {
-      position: absolute;
-      display: grid;
-      justify-items: center;
-      gap: 9px;
-      padding: 0;
-      border: 0;
-      color: #e5f8ff;
-      background: transparent;
-      cursor: pointer;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      text-align: center;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
-      transform: translate(-50%, -50%) rotate(var(--marker-tilt));
-      transition: transform 150ms ease-out;
-      z-index: 3;
-    }
-
-    .fact-marker:hover,
-    .fact-marker:focus-visible {
-      transform: translate(-50%, calc(-50% - 5px)) rotate(var(--marker-tilt));
-    }
-
-    .fact-marker:focus-visible {
-      outline: 2px solid #ffffff;
-      outline-offset: 8px;
-    }
-
-    .fact-marker__image {
-      display: grid;
-      width: 82px;
-      height: 82px;
-      border: 1px dashed rgba(229, 248, 255, 0.76);
-      border-radius: 50%;
-      place-items: center;
-      background: rgba(0, 17, 26, 0.26);
-      box-shadow: 0 0 0 7px rgba(229, 248, 255, 0.08);
-      font-size: 36px;
-      line-height: 1;
-    }
-
-    .fact-marker__image--asset {
-      border-style: solid;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: cover;
-      font-size: 0;
-    }
-
-    .fact-marker__label {
-      padding: 3px 6px;
-      background: rgba(0, 17, 26, 0.58);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
-    .fact-dialog {
-      width: min(460px, calc(100vw - 48px));
-      padding: 0;
-      border: 1px solid rgba(169, 227, 255, 0.56);
-      border-radius: 8px;
-      color: #e5f8ff;
-      background: #022b43;
-      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.56);
-    }
-
-    .fact-dialog::backdrop {
-      background: rgba(0, 6, 10, 0.68);
-    }
-
-    .fact-dialog__content {
-      position: relative;
-      padding: 40px;
-    }
-
-    .fact-dialog__close {
-      position: absolute;
-      top: 13px;
-      right: 13px;
-      display: grid;
-      width: 34px;
-      height: 34px;
-      padding: 0;
-      border: 1px solid rgba(229, 248, 255, 0.4);
-      border-radius: 50%;
-      color: #e5f8ff;
-      background: transparent;
-      cursor: pointer;
-      font-size: 22px;
-      line-height: 1;
-      place-items: center;
-    }
-
-    .fact-dialog__depth {
-      margin: 0 0 12px;
-      color: #8edfff;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .fact-dialog__title {
-      margin: 0;
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: 38px;
-      font-weight: 400;
-    }
-
-    .fact-dialog__text {
-      margin: 20px 0 0;
-      color: rgba(229, 248, 255, 0.86);
-      font-size: 17px;
-      line-height: 1.58;
-    }
-
-    .resurface-button {
-      position: fixed;
-      right: 32px;
-      bottom: 32px;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 13px 17px;
-      border: 1px solid rgba(229, 248, 255, 0.62);
-      border-radius: 999px;
-      color: #e5f8ff;
-      background: rgba(0, 17, 26, 0.88);
-      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
-      cursor: pointer;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      transition: background 150ms ease-out, transform 150ms ease-out;
-      z-index: 10;
-    }
-
-    .resurface-button:hover,
-    .resurface-button:focus-visible {
-      background: #07527a;
-      transform: translateY(-3px);
-    }
-
-    .resurface-button:focus-visible {
-      outline: 2px solid #ffffff;
-      outline-offset: 3px;
-    }
-
-    .resurface-button[hidden] {
-      display: none;
-    }
+    :root { color-scheme: dark; --ink: #dff7ff; --muted: #9dbfc9; --accent: #62e0ff; --line: #23404d; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: radial-gradient(ellipse at top right, #0b3443, transparent 55%), #020c13; font: 16px/1.7 system-ui, sans-serif; }
+    a { color: var(--accent); text-underline-offset: 5px; }
+    a:hover { color: white; }
+    a:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+    .wrap { width: min(100% - 40px, 1040px); margin: auto; }
+    header { padding: 28px 0; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    .brand, .eyebrow { font: 12px/1.5 ui-monospace, monospace; letter-spacing: .15em; text-transform: uppercase; }
+    .brand { align-self: center; }
+    .intro { padding: 70px 0 36px; max-width: 760px; }
+    .eyebrow { color: var(--accent); }
+    h1 { font: 400 clamp(40px, 7vw, 72px)/1.1 Georgia, serif; margin: 20px 0; }
+    .intro p, footer, .publisher { color: var(--muted); }
+    nav { display: flex; flex-wrap: wrap; gap: 10px 22px; padding-bottom: 35px; }
+    nav a { font-size: 14px; }
+    .sources { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    article { padding: 28px; border: 1px solid var(--line); border-radius: 8px; background: rgba(5, 24, 34, .8); scroll-margin-top: 24px; }
+    article:target { border-color: var(--accent); background: #0a2b3a; }
+    h2 { font: 400 28px/1.2 Georgia, serif; margin: 0 0 18px; }
+    article p { margin: 12px 0; }
+    .publisher { font-size: 13px; }
+    .source-title { font-weight: 600; }
+    .scope { border-left: 2px solid var(--accent); padding-left: 20px; margin-top: 32px; }
+    footer { padding: 40px 0; font-size: 13px; }
+    @media (max-width: 680px) { .sources { grid-template-columns: 1fr; } .intro { padding-top: 40px; } article { padding: 22px; } }
   </style>
 </head>
-
 <body>
-
-  <header id="intro">
-    <div class="intro__content">
-      <p class="intro__eyebrow">A one-to-one descent</p>
-      <h1 class="intro__title">Into the Abyss</h1>
-      <p class="intro__description">Scroll from the ocean surface to Challenger Deep on a true vertical scale. Every 20 pixels represent one metre of depth.</p>
-      <div class="intro__scale" aria-label="Scale and total depth">
-        <div class="intro__stat">
-          <span class="intro__stat-value">20 px</span>
-          <span class="intro__stat-label">equals 1 metre</span>
-        </div>
-        <div class="intro__stat">
-          <span class="intro__stat-value">10,935 m</span>
-          <span class="intro__stat-label">total descent</span>
-        </div>
+  <div class="wrap">
+    <header><span class="brand">Into the Abyss / Research log</span><a href="submarine.html">Return to the submarine →</a></header>
+    <main>
+      <section class="intro">
+        <div class="eyebrow">Behind the encounters</div>
+        <h1>Sources &amp;<br>citations.</h1>
+        <p>Explore the research behind the creatures you meet on your descent. Each entry connects a popup’s field notes to the reference used to write them.</p>
+        <p class="publisher">9 encounters · References accessed 9 September 2026</p>
+      </section>
+      <nav aria-label="Find a creature’s sources"><a href="#man-o-war">Portuguese man-o'-war</a>
+<a href="#manatee">Manatee</a>
+<a href="#sea-otter">Sea otter</a>
+<a href="#atlantic-puffin">Atlantic puffin</a>
+<a href="#mahi-mahi">Mahi-mahi</a>
+<a href="#phytoplankton">Phytoplankton</a>
+<a href="#green-sea-turtle">Green sea turtle</a></nav>
+      <div class="sources">
+        <article id="freediver" aria-labelledby="freediver-title">
+          <p class="eyebrow">Reference 08 · Human diving</p>
+          <h2 id="freediver-title">Freediver · 253 m</h2>
+          <a class="source-title" href="https://www.guinnessworldrecords.com/world-records/673884-deepest-no-limit-freedive-male">Deepest no-limit freedive (male)</a>
+          <p class="publisher">Guinness World Records · Accessed 9 September 2026</p>
+          <p>Herbert Nitsch reached 253 metres in Santorini, Greece, on 6 June 2012. This is the no-limit discipline, which allows assistance for descent and ascent, rather than a swimming-only record. The illustration marks the Guinness-listed depth.</p>
+        </article>
+        <article id="scuba-diver" aria-labelledby="scuba-diver-title">
+          <p class="eyebrow">Reference 09 · Human diving</p>
+          <h2 id="scuba-diver-title">Scuba diver · 332.35 m</h2>
+          <a class="source-title" href="https://www.guinnessworldrecords.com/world-records/deepest-scuba-dive-male">Deepest scuba dive (male)</a>
+          <p class="publisher">Guinness World Records · Accessed 9 September 2026</p>
+          <p>Ahmed Gabr reached 332.35 metres off Dahab, Egypt, in the Red Sea on 18 September 2014. The illustration marks the record depth; it does not depict the equipment used on the actual dive.</p>
+        </article>
+        <article id="man-o-war" aria-labelledby="man-o-war-title">
+          <p class="eyebrow">Reference 01</p>
+          <h2 id="man-o-war-title">Portuguese man-o'-war</h2>
+          <a class="source-title" href="https://oceanservice.noaa.gov/facts/portuguese-man-o-war.html">What is a Portuguese Man o’ War?</a>
+          <p class="publisher">NOAA National Ocean Service · Accessed 9 September 2026</p>
+          <p>A Portuguese man-o’-war is a colony of specialised animals working together. Its gas-filled float stays at the surface, while tentacles trail below. Winds and ocean currents carry the colony through tropical and subtropical seas.</p>
+        </article>
+        <article id="manatee" aria-labelledby="manatee-title">
+          <p class="eyebrow">Reference 02</p>
+          <h2 id="manatee-title">Manatee</h2>
+          <a class="source-title" href="https://www.fws.gov/species/florida-manatee-trichechus-manatus-latirostris">Florida Manatee</a>
+          <p class="publisher">U.S. Fish &amp; Wildlife Service · Accessed 9 September 2026</p>
+          <p>The Florida manatee, a subspecies of the West Indian manatee shown here, grazes on seagrasses and other aquatic plants. Its molars are replaced throughout its life as abrasive food wears them down. In cooler months, Florida manatees gather at warm-water refuges such as natural springs.</p>
+        </article>
+        <article id="sea-otter" aria-labelledby="sea-otter-title">
+          <p class="eyebrow">Reference 03</p>
+          <h2 id="sea-otter-title">Sea otter</h2>
+          <a class="source-title" href="https://www.mmc.gov/priority-topics/species-of-concern/southern-sea-otter/">Southern Sea Otter</a>
+          <p class="publisher">Marine Mammal Commission · Accessed 9 September 2026</p>
+          <p>Sea otters have the densest fur of any animal, with roughly 250,000 to one million hairs per square inch. This thick coat helps insulate them in cold water. The southern sea otter is the subspecies found along the California coast.</p>
+        </article>
+        <article id="atlantic-puffin" aria-labelledby="atlantic-puffin-title">
+          <p class="eyebrow">Reference 04</p>
+          <h2 id="atlantic-puffin-title">Atlantic puffin</h2>
+          <a class="source-title" href="https://www.audubon.org/field-guide/bird/atlantic-puffin">Atlantic Puffin — Field Guide</a>
+          <p class="publisher">National Audubon Society · Accessed 9 September 2026</p>
+          <p>Atlantic puffins hunt by swimming underwater and can return to their nests carrying several small fish in their bills at once. They nest around the North Atlantic. Outside the breeding season, they spend the winter far from land on the open ocean.</p>
+        </article>
+        <article id="mahi-mahi" aria-labelledby="mahi-mahi-title">
+          <p class="eyebrow">Reference 05</p>
+          <h2 id="mahi-mahi-title">Mahi-mahi</h2>
+          <a class="source-title" href="https://www.fisheries.noaa.gov/species/pacific-mahimahi">Pacific Mahimahi</a>
+          <p class="publisher">NOAA Fisheries · Accessed 9 September 2026</p>
+          <p>Mahi-mahi are among the ocean’s fastest-growing fish: they can exceed 1.2 metres in their first year. Also called dolphinfish or dorado, they hunt near the surface during the day, feeding on small fish and invertebrates. They can begin reproducing at just four to five months old.</p>
+        </article>
+        <article id="phytoplankton" aria-labelledby="phytoplankton-title">
+          <p class="eyebrow">Reference 06</p>
+          <h2 id="phytoplankton-title">Phytoplankton</h2>
+          <a class="source-title" href="https://oceanservice.noaa.gov/facts/plankton.html">What are plankton?</a>
+          <p class="publisher">NOAA National Ocean Service · Accessed 9 September 2026</p>
+          <p>Phytoplankton are tiny drifting organisms that use sunlight to make food through photosynthesis, taking in carbon dioxide and releasing oxygen. They live near the sunlit surface and help support marine food webs. Phytoplankton is a group of organisms, rather than a single species.</p>
+        </article>
+        <article id="green-sea-turtle" aria-labelledby="green-sea-turtle-title">
+          <p class="eyebrow">Reference 07</p>
+          <h2 id="green-sea-turtle-title">Green sea turtle</h2>
+          <a class="source-title" href="https://www.fisheries.noaa.gov/species/green-turtle">Green Turtle</a>
+          <p class="publisher">NOAA Fisheries · Accessed 9 September 2026</p>
+          <p>Young green turtles spend part of their lives in the open ocean, feeding on plant and animal life in floating communities such as Sargassum. Later, they move into nearshore feeding areas. Their diet and habitat change as they grow.</p>
+        </article>
       </div>
-      <a class="intro__start" href="#ocean">Begin the descent</a>
-    </div>
-  </header>
-
-  <main id="ocean">
-    <!-- Depth positions inside this section use the same linear scale. -->
-    <aside class="depth-ruler" aria-label="Depth ruler: 20 pixels equals 1 metre">
-      <div class="depth-ruler__ticks" aria-hidden="true"></div>
-      <div class="depth-ruler__ticks depth-ruler__ticks--ten" aria-hidden="true"></div>
-      <div class="depth-ruler__ticks depth-ruler__ticks--hundred" aria-hidden="true"></div>
-      <output class="depth-ruler__readout" aria-live="polite"></output>
-      <span class="depth-ruler__label depth-ruler__label--surface">0 m · surface</span>
-      <span class="depth-ruler__label depth-ruler__label--bottom">10,935 m · Challenger Deep</span>
-    </aside>
-  </main>
-
-  <dialog class="fact-dialog" id="fact-dialog" aria-labelledby="fact-dialog-title">
-    <div class="fact-dialog__content">
-      <button class="fact-dialog__close" type="button" aria-label="Close fact">×</button>
-      <p class="fact-dialog__depth" id="fact-dialog-depth"></p>
-      <h2 class="fact-dialog__title" id="fact-dialog-title"></h2>
-      <p class="fact-dialog__text" id="fact-dialog-text"></p>
-    </div>
-  </dialog>
-
-  <button class="resurface-button" id="resurface-button" type="button" hidden>
-    ↑ Resurface · 0 m
-  </button>
-
-  <script>
-    const ocean = document.getElementById("ocean");
-    const ruler = ocean.querySelector(".depth-ruler");
-    const rulerReadout = ruler.querySelector(".depth-ruler__readout");
-    const factDialog = document.getElementById("fact-dialog");
-    const factDialogDepth = document.getElementById("fact-dialog-depth");
-    const factDialogTitle = document.getElementById("fact-dialog-title");
-    const factDialogText = document.getElementById("fact-dialog-text");
-    const resurfaceButton = document.getElementById("resurface-button");
-    const pixelsPerMeter = 20;
-    const depthAtBottom = ocean.offsetHeight / pixelsPerMeter;
-    const oceanZones = [
-      [0, "Epipelagic"],
-      [200, "Mesopelagic"],
-      [1000, "Bathypelagic"],
-      [4000, "Abyssopelagic"],
-      [6000, "Hadalpelagic"],
-    ];
-    const oceanFacts = [
-      {
-        depth: 120,
-        left: "62%",
-        tilt: "-7deg",
-        icon: "✦",
-        image: "ocean-assets/png place holders/epipelagic/phytoplankton.png",
-        label: "Phytoplankton",
-        text: "Phytoplankton carry out roughly 40% of the planet’s photosynthesis. They need sunlight, so this work is confined to the ocean’s top 200 metres—the photic zone.",
-      },
-      {
-        depth: 40,
-        left: "78%",
-        tilt: "5deg",
-        icon: "🦦",
-        image: "ocean-assets/png place holders/epipelagic/seaotter.jpg",
-        label: "Sea otter",
-        text: "Sea otters usually forage in coastal water shallower than 40 metres. Exceptional dives can reach 100 metres, but most of their lives unfold much closer to the surface.",
-      },
-      {
-        depth: 253.2,
-        left: "43%",
-        tilt: "-4deg",
-        icon: "🤿",
-        image: "ocean-assets/png place holders/mesopelagic/Herbert_Nitsch.jpg",
-        label: "Freediver",
-        text: "In 2012, Austrian freediver Herbert Nitsch descended to 253.2 metres on a single breath—a world record for the deepest free dive.",
-      },
-      {
-        depth: 644,
-        left: "72%",
-        tilt: "6deg",
-        icon: "🐟",
-        image: "ocean-assets/png place holders/mesopelagic/Molamola.jpg",
-        label: "Mola mola",
-        text: "Ocean sunfish, or Mola mola, regularly dive below 200 metres to hunt jellyfish. Near the Galápagos, one was documented at a remarkable 644 metres.",
-      },
-      { depth: 0, left: "24%", tilt: "-4deg", icon: "🪼", image: "ocean-assets/png place holders/epipelagic/manowar.jpg", label: "Man-o-war", text: "The Portuguese man-o-war floats at the surface, using its sail to drift with wind and currents." },
-      { depth: 10, left: "14%", tilt: "4deg", icon: "🦭", image: "ocean-assets/png place holders/epipelagic/manatee.png", label: "Manatee", text: "Manatees feed on aquatic plants in shallow coastal and freshwater environments." },
-      { depth: 5, left: "38%", tilt: "5deg", icon: "🌿", image: "ocean-assets/png place holders/epipelagic/Sargassum.jpg", label: "Sargassum", text: "Sargassum is a floating seaweed that shelters fish and other small ocean animals near the surface." },
-      { depth: 5, left: "56%", tilt: "-6deg", icon: "🐠", image: "ocean-assets/png place holders/epipelagic/sargassumfish.jpg", label: "Sargassum fish", text: "Sargassum fish camouflage themselves among floating seaweed." },
-      { depth: 10, left: "75%", tilt: "4deg", icon: "🦆", image: "ocean-assets/png place holders/epipelagic/Dugong.jpg", label: "Dugong", text: "Dugongs graze on seagrass and usually feed in shallow coastal water." },
-      { depth: 10, left: "88%", tilt: "-5deg", icon: "🐋", image: "ocean-assets/png place holders/epipelagic/whale shark.jpg", label: "Whale shark", text: "Whale sharks spend much of their time in the epipelagic zone, although they can dive far deeper." },
-      { depth: 15, left: "30%", tilt: "6deg", icon: "🌱", image: "ocean-assets/png place holders/epipelagic/seagrass.jpg", label: "Seagrass", text: "Seagrass meadows provide food and shelter for many coastal sea creatures." },
-      { depth: 30, left: "68%", tilt: "-3deg", icon: "🪸", image: "ocean-assets/png place holders/epipelagic/coral.jpg", label: "Coral reef", text: "Tropical coral reefs generally do not grow deeper than about 50 metres because they need sunlight." },
-      { depth: 180, left: "20%", tilt: "5deg", icon: "🐋", image: "ocean-assets/png place holders/epipelagic/greenseaturtle.jpg", label: "Green sea turtle", text: "Green sea turtles forage in shallow water, where seagrass and algae are plentiful." },
-      { depth: 300, left: "34%", tilt: "-6deg", icon: "🐬", image: "ocean-assets/png place holders/mesopelagic/dolphin.jpg", label: "Dolphin dive", text: "Dolphins can make repeated dives below the surface while hunting and traveling." },
-      { depth: 332, left: "58%", tilt: "5deg", icon: "🤿", image: "ocean-assets/png place holders/mesopelagic/AhmedGabr.jpg", label: "Ahmed Gabr", text: "Ahmed Gabr set the deepest scuba dive record at 332 metres in 2014." },
-      { depth: 400, left: "88%", tilt: "-4deg", icon: "✨", image: "ocean-assets/png place holders/mesopelagic/zooaplankton.jpg", label: "Zooplankton", text: "Zooplankton drift with currents and form an important link between microscopic plants and larger ocean animals." },
-      { depth: 530, left: "52%", tilt: "4deg", icon: "🐧", image: "ocean-assets/png place holders/mesopelagic/emperorpenguin.jpg", label: "Emperor penguin", text: "Emperor penguins can dive hundreds of metres below the surface in search of prey." },
-      { depth: 650, left: "82%", tilt: "-4deg", icon: "🦑", image: "ocean-assets/png place holders/mesopelagic/giantsquid.jpg", label: "Giant squid", text: "Giant squid live in the deep ocean and are rarely seen alive at the surface." },
-      { depth: 800, left: "26%", tilt: "5deg", icon: "🐟", image: "ocean-assets/png place holders/mesopelagic/lanternfish.jpg", label: "Lanternfish", text: "Lanternfish are among the most abundant deep-sea fish and use bioluminescence to communicate and hunt." },
-      { depth: 900, left: "66%", tilt: "-5deg", icon: "🐋", image: "ocean-assets/png place holders/mesopelagic/spermwhale.jpg", label: "Sperm whale dive", text: "Sperm whales can dive deep into the twilight zone to hunt squid." },
-      { depth: 1000, left: "42%", tilt: "3deg", icon: "🪽", image: "ocean-assets/png place holders/mesopelagic/Seaangel.jpg", label: "Sea angel", text: "Sea angels are small swimming sea slugs that use wing-like appendages to move through the water." },
-      { depth: 1100, left: "74%", tilt: "-3deg", icon: "🦭", image: "ocean-assets/png place holders/mesopelagic/Leatherbackseaturtle.jpg", label: "Leatherback turtle", text: "Leatherback sea turtles can travel through deep water while searching for jellyfish." },
-    ];
-
-    for (const [depth, zone] of oceanZones) {
-      const marker = document.createElement("div");
-      marker.className = `zone-marker${depth === 0 ? " zone-marker--surface" : ""}`;
-      marker.style.top = `${depth * pixelsPerMeter}px`;
-      marker.setAttribute("aria-label", `${zone} zone begins at ${depth.toLocaleString()} metres`);
-      const label = document.createElement("span");
-      label.className = "zone-marker__label";
-      label.textContent = `${zone} · ${depth.toLocaleString()} m`;
-      marker.append(label);
-      ocean.append(marker);
-    }
-
-    for (const fact of oceanFacts) {
-      const marker = document.createElement("button");
-      marker.className = "fact-marker";
-      marker.type = "button";
-      marker.style.top = `${fact.depth * pixelsPerMeter}px`;
-      marker.style.left = fact.left;
-      marker.style.setProperty("--marker-tilt", fact.tilt);
-      marker.setAttribute("aria-label", `Open fact about ${fact.label}`);
-
-      const image = document.createElement("span");
-      image.className = "fact-marker__image";
-      image.setAttribute("aria-hidden", "true");
-      image.textContent = fact.icon;
-      if (fact.image) {
-        image.classList.add("fact-marker__image--asset");
-        image.style.backgroundImage = `url("${fact.image}")`;
-      }
-
-      const label = document.createElement("span");
-      label.className = "fact-marker__label";
-      label.textContent = fact.label;
-
-      marker.append(image, label);
-      marker.addEventListener("click", () => {
-        factDialogDepth.textContent = `${fact.depth.toLocaleString()} m`;
-        factDialogTitle.textContent = fact.label;
-        factDialogText.textContent = fact.text;
-        factDialog.showModal();
-      });
-      ocean.append(marker);
-    }
-
-    for (let depth = 1000; depth < depthAtBottom; depth += 1000) {
-      const label = document.createElement("span");
-      label.className = "depth-ruler__label";
-      label.style.top = `${depth * pixelsPerMeter}px`;
-      label.textContent = `${depth.toLocaleString()} m`;
-      ruler.append(label);
-    }
-
-    ruler.addEventListener("pointermove", (event) => {
-      const rulerBounds = ruler.getBoundingClientRect();
-      const cursorPosition = event.clientY - rulerBounds.top;
-      const depth = Math.min(
-        depthAtBottom,
-        Math.max(0, Math.round((cursorPosition / pixelsPerMeter) * 100) / 100)
-      );
-      const readoutPosition = Math.min(
-        rulerBounds.height - 18,
-        Math.max(18, cursorPosition)
-      );
-
-      rulerReadout.style.top = `${readoutPosition}px`;
-      rulerReadout.textContent = `${depth.toLocaleString(undefined, { maximumFractionDigits: 2 })} m`;
-      rulerReadout.classList.add("depth-ruler__readout--visible");
-    });
-
-    ruler.addEventListener("pointerleave", () => {
-      rulerReadout.classList.remove("depth-ruler__readout--visible");
-    });
-
-    factDialog.querySelector(".fact-dialog__close").addEventListener("click", () => {
-      factDialog.close();
-    });
-
-    factDialog.addEventListener("click", (event) => {
-      if (event.target === factDialog) {
-        factDialog.close();
-      }
-    });
-
-    const updateResurfaceButton = () => {
-      resurfaceButton.hidden = window.scrollY <= ocean.offsetTop + 200;
-    };
-
-    let isResurfacing = false;
-
-    resurfaceButton.addEventListener("click", () => {
-      if (isResurfacing) {
-        return;
-      }
-
-      isResurfacing = true;
-      const startingPosition = window.scrollY;
-      const surfacePosition = ocean.offsetTop;
-      const animationDuration = 700;
-      const startedAt = performance.now();
-
-      document.documentElement.style.scrollBehavior = "auto";
-
-      const resurface = (now) => {
-        const progress = Math.min(1, (now - startedAt) / animationDuration);
-        const easedProgress = 1 - Math.pow(1 - progress, 4);
-        const currentPosition = startingPosition + (surfacePosition - startingPosition) * easedProgress;
-
-        window.scrollTo({ top: currentPosition });
-
-        if (progress < 1) {
-          requestAnimationFrame(resurface);
-          return;
-        }
-
-        document.documentElement.style.scrollBehavior = "";
-        isResurfacing = false;
-      };
-
-      requestAnimationFrame(resurface);
-    });
-
-    window.addEventListener("scroll", updateResurfaceButton, { passive: true });
-    updateResurfaceButton();
-
-    console.log("Ocean dimensions:");
-    console.log(ocean.offsetWidth + " × " + ocean.offsetHeight);
-    console.log(`Depth at bottom: ${depthAtBottom.toLocaleString()} m`);
-  </script>
-
+      <p class="scope">These references support the popup field notes. The two diver positions mark Guinness-listed record depths. Wildlife encounter positions are illustrative, not verified depth ranges. Wildlife depth-range graphics remain placeholders; existing conservation labels still need a separate citation review.</p>
+    </main>
+    <footer>Field notes are paraphrased from the linked references. Sources covering a subspecies or region are identified in the notes.<br><a href="submarine.html">Continue exploring →</a></footer>
+  </div>
 </body>
 </html>

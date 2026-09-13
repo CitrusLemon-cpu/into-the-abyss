@@ -219,6 +219,7 @@
     .depth-range__value { grid-column: 2 / 4; grid-row: 3; justify-self: center; margin-top: 8px; white-space: nowrap; }
     .depth-range__track { position: relative; grid-column: 2; grid-row: 2; width: 3px; min-height: 0; margin: 0; background: rgba(181, 231, 246, .6); }
     .depth-range__placeholder { position: absolute; inset: 20% -5px; border: 1px dashed rgba(255, 211, 123, .9); background: repeating-linear-gradient(45deg, rgba(255,211,123,.2) 0 5px, transparent 5px 10px); }
+    .creature-dialog[data-record="true"] .depth-range__placeholder { inset: var(--record-position) -6px auto; height: 3px; border: 0; background: var(--warning); }
     .depth-range__ticks { display: grid; grid-column: 3; grid-row: 2; grid-template-rows: repeat(5, 1fr); min-height: 0; margin: 0; color: var(--muted); font: 10px/1 ui-monospace, monospace; }
     .depth-range__ticks span { align-self: center; }
     .depth-range__ticks span:first-child { align-self: start; }
@@ -327,6 +328,7 @@
     <div class="depth-console" id="depth-console">
       <aside class="depth-panel" aria-label="Depth, speed, and mission controls">
         <button class="control-button sandbox-launch" id="sandbox-button" type="button">Open sandbox</button>
+        <a href="index.html" target="_blank" rel="noopener" style="display: block; margin-top: 12px; color: var(--accent); font-size: 12px; text-align: center" aria-label="Sources and citations (opens in a new tab)">Sources &amp; citations ↗</a>
         <div class="label">Depth gauge</div>
         <div class="depth-value"><span id="depth-value">0</span> <span>m</span></div>
         <div class="depth-track"><div class="depth-arrow" id="depth-arrow"></div></div>
@@ -359,7 +361,7 @@
       <p>Sandbox mode lets you inspect milestones without waiting for the full descent. Your main mission progress stays safe.</p>
       <form class="sandbox__jump" id="specific-depth-form">
         <label class="label" for="specific-depth">Specific depth · 0–10,971 m</label>
-        <input id="specific-depth" name="depth" type="number" min="0" max="10971" step="0.1" inputmode="decimal" placeholder="e.g. 85" required>
+        <input id="specific-depth" name="depth" type="number" min="0" max="10971" step="0.01" inputmode="decimal" placeholder="e.g. 332.35" required>
         <button class="control-button" type="submit">Jump to depth</button>
       </form>
       <div class="sandbox__grid" id="sandbox-grid"></div>
@@ -379,14 +381,15 @@
         <div class="depth-range__ticks" aria-hidden="true"><span>0 m</span><span>50 m</span><span>100 m</span><span>150 m</span><span>200 m</span></div>
       </section>
       <article class="creature-dialog__info">
-        <div class="label">Epipelagic encounter</div>
+        <div class="label" id="creature-dialog-zone">Epipelagic encounter</div>
         <h2 class="creature-dialog__title" id="creature-dialog-title"></h2>
         <p class="creature-dialog__scientific" id="creature-dialog-scientific"></p>
-        <div class="creature-dialog__status"><span>Conservation</span><strong id="creature-dialog-status"></strong></div>
+        <div class="creature-dialog__status"><span id="creature-dialog-status-label">Conservation</span><strong id="creature-dialog-status"></strong></div>
 
         <section class="creature-dialog__section">
-          <h3>About this animal</h3>
+          <h3>Field notes</h3>
           <p id="creature-dialog-facts"></p>
+          <p style="margin-top: 16px"><a id="creature-dialog-citation" style="color: var(--accent)" target="_blank" rel="noopener"></a></p>
         </section>
 
       </article>
@@ -395,6 +398,7 @@
 
   <script src="ocean-assets/rive/rive.js"></script>
   <script src="manatee-rive.js"></script>
+  <script src="creature-facts.js"></script>
   <script>
     rive.RuntimeLoader.setWasmUrl("ocean-assets/rive/rive.wasm");
     const BOTTOM = 10971;
@@ -409,6 +413,8 @@
     ];
     const manOWarInfo = { name: "Portuguese man-o'-war", scientificName: "Physalia physalis", status: "Not evaluated", image: "Submarine pngs Placeholders/Epipelagic/man o war.png", bleed: true, popupWidth: "72%", popupX: "-5%", popupY: "8%" };
     const creatures = [
+      { name: "Freediver", scientificName: "No-limit freediving", status: "Herbert Nitsch", record: true, depth: 253, x: "28%", tilt: 0, sourceWidth: 430, sourceHeight: 645, image: "Submarine pngs Placeholders/Mesopelagic/freediver.png", driftX: 3, driftY: 0, driftRotation: 0, driftSpeed: 6, driftDelay: -1, popupWidth: "54%" },
+      { name: "Scuba diver", scientificName: "Scuba diving", status: "Ahmed Gabr", record: true, depth: 332.35, x: "70%", tilt: 0, sourceWidth: 650, sourceHeight: 433, image: "Submarine pngs Placeholders/Mesopelagic/scubadiver.png", driftX: -3, driftY: 0, driftRotation: 0, driftSpeed: 6, driftDelay: -3, popupWidth: "94%" },
       { name: "Manatee", scientificName: "Trichechus manatus", status: "Vulnerable", depth: 10, x: "24%", tilt: -3, sourceWidth: 800, sourceHeight: 550, rive: true, driftX: 7, driftY: -3, driftRotation: 1.2, driftSpeed: 5.8, driftDelay: -1.7, bleed: true, popupWidth: "116%", popupX: "-12%", popupY: "7%" },
       { name: "Sea otter", scientificName: "Enhydra lutris", status: "Endangered", depth: 40, x: "76%", tilt: 4, sourceWidth: 400, sourceHeight: 250, image: "Submarine pngs Placeholders/Epipelagic/sea otters.png", driftX: -8, driftY: 4, driftRotation: -1.5, driftSpeed: 4.9, driftDelay: -3.1, bleed: true, popupWidth: "108%", popupX: "-8%", popupY: "6%" },
       { name: "Atlantic puffin", scientificName: "Fratercula arctica", status: "Vulnerable", depth: 60, x: "32%", tilt: -5, sourceWidth: 100, sourceHeight: 100, image: "Submarine pngs Placeholders/Epipelagic/puffin.png", driftX: 10, driftY: -5, driftRotation: 2, driftSpeed: 4.2, driftDelay: -2.3, popupWidth: "78%", popupX: "0%", popupY: "3%" },
@@ -537,7 +543,22 @@
       creatureDialogTitle.textContent = creature.name;
       creatureDialogScientific.textContent = creature.scientificName;
       creatureDialogStatus.textContent = creature.status;
-      creatureDialogFacts.textContent = `Placeholder: Add a short paragraph with general facts about ${creature.name}.`;
+      document.getElementById("creature-dialog-zone").textContent = creature.record ? "Mesopelagic · Human diving record" : "Epipelagic encounter";
+      document.getElementById("creature-dialog-status-label").textContent = creature.record ? "Record holder" : "Conservation";
+      creatureDialog.dataset.record = String(Boolean(creature.record));
+      document.getElementById("depth-range-title").textContent = creature.record ? "Record depth" : "Depth range";
+      creatureDialog.querySelector(".depth-range__value").textContent = creature.record ? `${creature.depth} m` : "— m to — m";
+      creatureDialog.style.setProperty("--record-position", `${creature.depth / 400 * 100}%`);
+      creatureDialog.querySelector(".depth-range__track").setAttribute("aria-label", creature.record ? `Record depth: ${creature.depth} metres on a 0 to 400 metre scale` : "Placeholder depth range within the Epipelagic zone from 0 to 200 metres");
+      creatureDialog.querySelectorAll(".depth-range__ticks span").forEach((tick, index) => {
+        tick.textContent = `${index * (creature.record ? 100 : 50)} m`;
+      });
+      const notes = CREATURE_FACTS[creature.name];
+      creatureDialogFacts.textContent = notes.facts;
+      const citation = document.getElementById("creature-dialog-citation");
+      citation.href = `index.html#${notes.id}`;
+      citation.textContent = `Source: ${notes.publisher} ↗`;
+      citation.setAttribute("aria-label", `Source for ${creature.name}: ${notes.publisher} (opens in a new tab)`);
       creatureDialogImage.hidden = Boolean(creature.rive);
       if (creature.rive) {
         const animation = creature.imageElement;
