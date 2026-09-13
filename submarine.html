@@ -84,6 +84,14 @@
     .mission[data-ui-visible="false"] .surface-scale { opacity: 0; pointer-events: none; }
 
     .scene { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; }
+    .seafloor { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; transform: translateY(var(--seafloor-y, 120vh)); background: linear-gradient(to bottom, transparent 0 160px, #08131d 160px); }
+    .seafloor svg { display: block; width: 100%; height: 180px; }
+    .landing-contact { position: absolute; z-index: 3; left: 50%; top: var(--contact-y, 120vh); width: min(180px, 42vw); height: 12px; transform: translate(-50%, -3px); pointer-events: none; opacity: var(--contact-opacity, 0); background: radial-gradient(ellipse at center, #18303d66 0%, #18303d26 35%, transparent 70%) left center / 38% 100% no-repeat, radial-gradient(ellipse at center, #18303d66 0%, #18303d26 35%, transparent 70%) right center / 38% 100% no-repeat; }
+    .bottom-arrival { position: absolute; z-index: 4; top: calc(var(--ground-y, 120vh) + 62px); left: 50%; width: min(380px, 72vw); transform: translateX(-50%); text-align: center; pointer-events: none; text-shadow: 0 2px 18px #020c13; }
+    .bottom-arrival:empty { display: none; }
+    .bottom-arrival strong { display: block; color: var(--ink); font: 400 clamp(24px, 4vw, 34px)/1.2 Georgia, serif; }
+    .bottom-arrival span { display: block; margin-top: 10px; color: var(--accent); font: 12px/1.6 ui-monospace, monospace; }
+    @media (max-height: 560px) { .bottom-arrival { top: calc(var(--ground-y, 120vh) + 32px); } .bottom-arrival strong { font-size: 18px; } .bottom-arrival span { margin-top: 5px; font-size: 11px; } }
     .surface-sky { position: absolute; top: 0; right: 0; left: 0; z-index: 1; height: calc(50vh + 70px); overflow: hidden; background: linear-gradient(180deg, #74cff3 0%, #9bdcf5 64%, #c2ebfa 100%); transform: translateY(calc(var(--surface-offset, 0) * -1px)); will-change: clip-path, transform; }
     .cloud { position: absolute; width: 150px; height: 34px; border-radius: 999px; background: rgba(255, 255, 255, .8); box-shadow: 0 8px 24px rgba(48, 139, 174, .12); }
     .cloud::before, .cloud::after { position: absolute; bottom: 0; border-radius: 50%; background: inherit; content: ""; }
@@ -304,6 +312,37 @@
       </svg>
       <div class="creature-field" id="creature-field"></div>
       <div class="sonar" aria-hidden="true"></div>
+      <div class="seafloor" id="seafloor" aria-hidden="true">
+        <svg viewBox="0 0 1200 180" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="sediment-shade" x2="0" y2="1">
+              <stop stop-color="#203747"/><stop offset="0.45" stop-color="#102331"/><stop offset="1" stop-color="#08131d"/>
+            </linearGradient>
+            <radialGradient id="sediment-light" cx="50%" cy="0%" rx="50%" ry="50%">
+              <stop stop-color="#75c6ce" stop-opacity=".3"/><stop offset="1" stop-color="#75c6ce" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <path d="M0 24 H1200 V180 H0Z" fill="url(#sediment-shade)"/>
+          <path d="M0 24 H1200" fill="none" stroke="#385260" stroke-width="2"/>
+          <ellipse cx="600" cy="55" rx="250" ry="32" fill="url(#sediment-light)"/>
+          <g fill="none" stroke="#4b6977" stroke-opacity=".25" stroke-linecap="round" stroke-width="2">
+            <path d="M70 62 Q130 53 185 60 M270 88 Q330 80 390 86 M470 48 Q515 44 549 49 M655 69 Q715 61 775 68 M900 53 Q958 48 1000 53 M1030 102 Q1080 95 1140 102"/>
+            <path d="M160 123 Q230 114 283 121 M455 114 Q510 106 562 112 M725 134 Q805 123 869 132"/>
+          </g>
+          <g fill="#718593" opacity=".24">
+            <ellipse cx="420" cy="62" rx="3" ry="1.4"/><ellipse cx="575" cy="79" rx="2" ry="1"/>
+            <ellipse cx="690" cy="46" rx="3" ry="1"/><ellipse cx="840" cy="94" rx="2" ry="1.3"/>
+            <ellipse cx="220" cy="49" rx="2" ry="1"/><ellipse cx="960" cy="118" rx="3" ry="1"/>
+          </g>
+        </svg>
+      </div>
+      <div class="landing-contact" aria-hidden="true">
+        <svg viewBox="0 0 700 60" style="position: absolute; top: 0; left: 0; width: 100%; height: auto; overflow: visible" fill="none" stroke="#4b6977" stroke-opacity=".5" stroke-width="3" stroke-linecap="round">
+          <path d="M44 17 Q76 8 103 14 M124 14 Q158 8 185 18 M64 32 Q110 23 160 32 M89 46 Q118 41 141 46"/>
+          <path d="M515 18 Q546 8 575 14 M594 14 Q625 8 656 17 M540 32 Q588 23 636 32 M559 46 Q588 41 611 46"/>
+        </svg>
+      </div>
+      <div class="bottom-arrival" id="bottom-arrival" role="status" aria-live="polite" aria-atomic="true"></div>
       <div class="submarine" id="submarine">
         <div class="submarine__visual" id="submarine-visual">
           <img class="submarine__image" src="ocean-assets/submarine.svg" alt="Submarine">
@@ -641,12 +680,24 @@
       const centreX = width / 2;
       const centreWave = waveHeightAt(centreX, time);
       const waveSlope = (waveHeightAt(centreX + 18, time) - waveHeightAt(centreX - 18, time)) / 36;
-      const idleSway = paused && depth > fullySubmergedDepth && !reducedMotion.matches ? 1 : 0;
-      const bobY = centreWave * bobStrength + Math.sin(time * 0.9 + 0.6) * 1.5 * idleSway;
+      // Settle the artwork's hull bottom onto the ruler's bottom-depth line.
+      const landingBlend = Math.max(0, Math.min(1, 1 - (BOTTOM - depth) / 2));
+      const sedimentSink = (87.5 / SUBMARINE_SVG_SIZE) * submarineSize; // Slightly lower than the pontoon midpoint.
+      const landingOffset = ((FLOAT_LINE_RATIO - SUBMARINE_ART_BOTTOM) * submarineSize + sedimentSink) * landingBlend;
+      const idleSway = paused && depth > fullySubmergedDepth && !reducedMotion.matches ? 1 - landingBlend : 0;
+      const bobY = landingOffset + centreWave * bobStrength + Math.sin(time * 0.9 + 0.6) * 1.5 * idleSway;
       const bobRotation = Math.max(-1.2, Math.min(1.2, Math.atan(waveSlope) * 180 / Math.PI * 0.32)) * bobStrength + Math.sin(time * 0.72) * 0.7 * idleSway;
 
       submarineVisual.style.setProperty("--bob-y", `${bobY.toFixed(2)}px`);
       submarineVisual.style.setProperty("--bob-rotation", `${bobRotation.toFixed(2)}deg`);
+      // Let the pontoons overlap the seabed, concealing only their bottom fifth at rest.
+      const groundY = height / 2 + waterlineDrop + (BOTTOM - depth) * pixelsPerMetre;
+      const visualBottomY = height / 2 + submarineSize / 2 + bobY;
+      const buriedFifth = (159 / 5 / SUBMARINE_SVG_SIZE) * submarineSize;
+      const sedimentEdgeY = groundY + (sedimentSink - buriedFifth) * landingBlend;
+      submarineVisual.style.clipPath = `inset(0 0 ${Math.max(0, visualBottomY - sedimentEdgeY)}px 0)`;
+      scene.style.setProperty("--contact-y", `${sedimentEdgeY}px`);
+      scene.style.setProperty("--contact-opacity", String(Math.max(0, 1 - (BOTTOM - depth) / .3)));
 
       const manOWarX = width * MAN_O_WAR_X_RATIO;
       const manOWarWidth = submarineSize * (MAN_O_WAR_SOURCE_WIDTH / SUBMARINE_SVG_SIZE) * getCreatureCompression();
@@ -771,13 +822,30 @@
       speedOutput.textContent = `${speed.toFixed(2)} m/s`;
       speedDown.disabled = speed <= MIN_SPEED;
       speedUp.disabled = speed >= MAX_SPEED;
-      pauseButton.textContent = paused ? depth === 0 ? "Begin Descent" : "Resume" : "Pause";
+      pauseButton.textContent = paused ? depth === 0 ? "Begin Descent" : depth === BOTTOM ? "Begin ascent" : "Resume" : "Pause";
       travelArrow.textContent = paused ? "Ⅱ" : direction > 0 ? "↓" : "↑";
       travelLabel.textContent = paused ? "Paused" : direction > 0 ? "Descending" : "Ascending";
       updateSurface();
       updateCreatures();
       updateActiveRuler();
-      discovery.dataset.visible = visible;
+      // Match updateActiveRuler's tick offset; the SVG surface is at local y=24.
+      const floorY = scene.clientHeight / 2 + (FLOAT_LINE_RATIO - 0.5) * submarine.offsetHeight + (BOTTOM - depth) * getWorldPixelsPerMetre() - 24;
+      document.getElementById("seafloor").style.setProperty("--seafloor-y", `${floorY}px`);
+      scene.style.setProperty("--ground-y", `${floorY + 24}px`);
+      const bottomArrival = document.getElementById("bottom-arrival");
+      const atBottom = depth >= BOTTOM;
+      if (bottomArrival.dataset.arrived !== String(atBottom)) {
+        bottomArrival.dataset.arrived = String(atBottom);
+        bottomArrival.replaceChildren();
+        if (atBottom) {
+          const title = document.createElement("strong");
+          title.textContent = "Challenger Deep";
+          const detail = document.createElement("span");
+          detail.textContent = `You've reached the bottom of the abyss · ${BOTTOM.toLocaleString()} m`;
+          bottomArrival.append(title, detail);
+        }
+      }
+      discovery.dataset.visible = visible && current.depth !== BOTTOM;
       discovery.style.setProperty("--discovery-direction", direction);
       discovery.style.transitionDuration = `${Math.max(180, 900 / speed)}ms`;
       document.getElementById("discovery-icon").textContent = current.icon;
@@ -791,13 +859,27 @@
       }
     };
 
+    const sedimentDescentSpeed = (remaining, selectedSpeed) => {
+      const progress = Math.max(0, Math.min(1, remaining / 0.35));
+      const easing = progress * progress * (3 - 2 * progress);
+      const settlingSpeed = Math.min(selectedSpeed * 0.15, 0.04);
+      return settlingSpeed + (selectedSpeed - settlingSpeed) * easing;
+    };
+
     const frame = (now) => {
       const elapsed = Math.min(0.1, (now - lastFrame) / 1000);
       lastFrame = now;
       visualTime = now;
       const wasMoving = !paused;
       if (!paused && !document.hidden) {
-        depth = Math.min(BOTTOM, Math.max(0, depth + direction * speed * elapsed));
+        // Small steps keep sediment resistance consistent even at low frame rates.
+        let timeLeft = elapsed;
+        while (timeLeft > 0) {
+          const step = Math.min(timeLeft, 0.01);
+          const travelSpeed = direction > 0 ? sedimentDescentSpeed(BOTTOM - depth, speed) : speed;
+          depth = Math.min(BOTTOM, Math.max(0, depth + direction * travelSpeed * step));
+          timeLeft -= step;
+        }
         if (depth === BOTTOM || depth === 0) paused = true;
       }
       if (!document.hidden && !creatureDialog.open && sandbox.hidden) {
