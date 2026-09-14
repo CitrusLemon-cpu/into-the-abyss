@@ -62,18 +62,19 @@
     .depth-panel, .depth-ruler, .mission-status, .mission-controls, .eta {
       position: fixed;
       z-index: 5;
-      border: 1px solid var(--line);
-      background: var(--panel);
-      box-shadow: 0 14px 50px rgba(0, 0, 0, 0.24);
-      backdrop-filter: blur(14px);
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      backdrop-filter: none;
+      text-shadow: 0 2px 8px rgba(0, 8, 13, .9), 0 0 16px rgba(0, 8, 13, .65);
     }
 
     .eyebrow, .label { color: var(--muted); font: 700 11px/1.2 ui-monospace, monospace; letter-spacing: .16em; text-transform: uppercase; }
     .mission-status { top: 22px; left: 50%; z-index: 6; padding: 11px 16px; color: var(--ink); transform: translateX(-50%); text-align: center; cursor: pointer; appearance: none; }
     .mission-status strong { display: block; color: var(--accent); font: 700 16px ui-monospace, monospace; }
-    .mission-status:hover { border-color: rgba(98,224,255,.55); background: rgba(7, 38, 52, .9); }
-    .mission-status:focus-visible { border-color: var(--accent); outline: 2px solid rgba(98,224,255,.45); outline-offset: 3px; }
-    .mission-status:active { background: rgba(10, 50, 66, .94); }
+    .mission-status:hover { color: var(--accent); }
+    .mission-status:focus-visible { outline: 2px solid rgba(98,224,255,.8); outline-offset: 3px; }
+    .mission-status:active { color: var(--ink); }
     .ui-toggle { position: fixed; bottom: 24px; left: 50%; z-index: 8; padding: 10px 9px; border: 1px solid rgba(98,224,255,.5); color: var(--ink); background: rgba(3,19,29,.9); font: 700 10px/1.2 ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; transform: translateX(-50%); transition: background 180ms ease; cursor: pointer; }
     .ui-toggle:hover, .ui-toggle:focus-visible { color: #03131c; background: var(--accent); outline: none; }
 
@@ -140,7 +141,7 @@
     .surface-scale { position: absolute; top: 50%; left: calc(50% + min(90px, 21vw) + 6px); z-index: 4; width: 28px; height: var(--scale-size, min(159px, 37.1vw)); color: rgba(223, 247, 255, .9); filter: drop-shadow(0 0 7px rgba(98, 224, 255, .35)); opacity: 0; transform: translateY(calc(-50% + var(--scale-centre-offset, 0px) - var(--surface-offset, 0px))); transition: opacity 160ms ease; pointer-events: none; will-change: transform, opacity; }
     .surface-scale[data-visible="true"] { opacity: 1; }
     .surface-scale__bracket { position: absolute; inset: 0; border-top: 2px solid currentColor; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; }
-    .surface-scale__label { position: absolute; top: 50%; right: 0; padding: 4px 3px; color: var(--accent); background: rgba(3, 19, 29, .88); font: 700 11px/1 ui-monospace, monospace; letter-spacing: .05em; transform: translate(50%, -50%); white-space: nowrap; }
+    .surface-scale__label { position: absolute; top: 50%; right: 0; padding: 4px 3px; color: var(--accent); font: 700 11px/1 ui-monospace, monospace; letter-spacing: .05em; text-shadow: 0 2px 8px rgba(0, 8, 13, .9), 0 0 16px rgba(0, 8, 13, .65); transform: translate(50%, -50%); white-space: nowrap; }
     .travel-indicator { position: absolute; top: 50%; left: calc(50% + 170px); z-index: 4; display: grid; gap: 2px; color: var(--warning); text-shadow: 0 0 12px rgba(255, 211, 123, .7); text-align: center; transform: translateY(-50%); }
     .travel-indicator__arrow { font: 700 28px/1 ui-monospace, monospace; }
     .travel-indicator__label { color: var(--muted); font: 700 10px/1.2 ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; }
@@ -158,7 +159,7 @@
     .depth-track { position: relative; width: 100%; height: clamp(190px, 42vh, 360px); margin: 9px 0 4px; }
     .depth-track::before { position: absolute; top: 0; bottom: 0; left: 50%; width: 3px; background: linear-gradient(to bottom, #4dc9f0, #122f3d 45%, #020508); box-shadow: 0 0 0 1px rgba(204,241,255,.24); content: ""; transform: translateX(-50%); }
     .depth-arrow { position: absolute; left: 50%; width: 12px; height: 12px; border: 2px solid #fff1c9; border-radius: 50%; background: var(--warning); box-shadow: 0 0 12px var(--warning); transform: translate(-50%, -50%); transition: top 180ms linear; }
-    .depth-endpoint { position: absolute; right: calc(50% + 7px); padding: 2px 3px; color: var(--muted); background: rgba(3,19,29,.92); font: 8px/1 ui-monospace, monospace; white-space: nowrap; }
+    .depth-endpoint { position: absolute; right: calc(50% + 7px); padding: 2px 3px; color: var(--muted); font: 8px/1 ui-monospace, monospace; white-space: nowrap; }
     .depth-endpoint--surface { top: 0; transform: translateY(-50%); }
     .depth-endpoint--bottom { bottom: 0; transform: translateY(50%); }
     .depth-console .eta { position: relative; padding: 9px 7px; color: var(--muted); font-size: 10px; line-height: 1.3; text-align: center; }
@@ -183,7 +184,7 @@
     .depth-ruler__reference { position: absolute; top: var(--reference-position); right: 0; left: -1px; z-index: 1; border-top: 2px solid var(--warning); filter: drop-shadow(0 0 5px rgba(255, 211, 123, .8)); pointer-events: none; }
     .depth-ruler__reference::after { position: absolute; top: -5px; right: 0; border-top: 4px solid transparent; border-right: 6px solid var(--warning); border-bottom: 4px solid transparent; content: ""; }
     .depth-ruler__reference-value { position: absolute; top: 0; left: 24px; padding: 3px 5px; color: var(--warning); background: #061720; font: 700 10px/1 ui-monospace, monospace; transform: translateY(-50%); white-space: nowrap; }
-    .depth-ruler--third-person { top: 0; bottom: 0; left: clamp(12px, 2vw, 24px); z-index: 4; width: 122px; padding: 0; overflow: visible; border: 0; background: transparent; box-shadow: none; backdrop-filter: none; pointer-events: none; }
+    .depth-ruler--third-person { top: 0; bottom: 0; left: clamp(12px, 2vw, 24px); z-index: 4; width: 122px; padding: 0; overflow: visible; pointer-events: none; }
     .depth-ruler--third-person .depth-ruler__title { position: absolute; bottom: 32px; left: 88px; width: 118px; margin: 0; color: var(--accent); text-shadow: 0 1px 8px rgba(0, 8, 13, .9); }
     .depth-ruler--third-person .depth-ruler__track { position: absolute; inset: 0 auto 0 0; width: 122px; height: 100%; margin: 0; border-left: 3px double rgba(98,224,255,.72); }
     .depth-ruler--third-person .depth-ruler__tick { width: 17px; border-color: rgba(98,224,255,.52); }
