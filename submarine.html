@@ -89,6 +89,13 @@
     .mission[data-ui-visible="false"] .travel-indicator,
     .mission[data-ui-visible="false"] .zone-boundaries,
     .mission[data-ui-visible="false"] .surface-scale { opacity: 0; pointer-events: none; }
+    .mission[data-depth-state="underwater"] .depth-console,
+    .mission[data-depth-state="underwater"] .mission-controls,
+    .mission[data-depth-state="underwater"] .depth-ruler,
+    .mission[data-depth-state="underwater"] .mission-status,
+    .mission[data-depth-state="underwater"] .travel-indicator,
+    .mission[data-depth-state="underwater"] .zone-boundaries,
+    .mission[data-depth-state="underwater"] .surface-scale { opacity: 0; pointer-events: none; }
 
     .scene { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; }
     .seafloor { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; transform: translateY(var(--seafloor-y, 120vh)); background: linear-gradient(to bottom, transparent 0 160px, #08131d 160px); }
@@ -860,9 +867,12 @@
 
     const render = () => {
       const current = getCurrentZone(getGaugeDepth(depth));
+      const submarineSize = submarine.offsetHeight || Math.min(180, window.innerWidth * 0.42);
+      const fullySubmergedDepth = ((FLOAT_LINE_RATIO - SUBMARINE_ART_TOP) * submarineSize + 7) / getWorldPixelsPerMetre();
       depthValue.textContent = Math.round(getGaugeDepth(depth)).toLocaleString();
       zoneName.textContent = depth === 0 ? "Surface" : current.zone;
       mission.dataset.zone = depth >= 6000 ? "hadal" : depth >= 4000 ? "deep" : "surface";
+      mission.dataset.depthState = depth > fullySubmergedDepth ? "underwater" : "surface";
       depthArrow.style.top = `${(depth / BOTTOM) * 100}%`;
       etaValue.textContent = depth >= BOTTOM ? "Arrived" : formatTime((BOTTOM - depth) / speed);
       speedOutput.textContent = `${speed.toFixed(2)} m/s`;
