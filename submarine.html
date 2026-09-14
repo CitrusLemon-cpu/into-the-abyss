@@ -12,7 +12,8 @@
       --line: rgba(181, 231, 246, 0.2);
       --panel: rgba(3, 19, 29, 0.78);
       --accent: #62e0ff;
-      --warning: #ffd37b;
+      --warning: #62e0ff;
+      --instrument-width: 88px;
     }
 
     * { box-sizing: border-box; }
@@ -45,7 +46,6 @@
     body[data-loading="true"] .depth-ruler,
     body[data-loading="true"] .mission-status,
     body[data-loading="true"] .mission-controls,
-    body[data-loading="true"] .travel-indicator,
     body[data-loading="true"] .zone-boundaries,
     body[data-loading="true"] .surface-scale,
     body[data-loading="true"] .ui-toggle { opacity: 0; pointer-events: none; }
@@ -77,7 +77,7 @@
     .ui-toggle { position: fixed; bottom: 24px; left: 50%; z-index: 8; padding: 10px 9px; border: 1px solid rgba(98,224,255,.5); color: var(--ink); background: rgba(3,19,29,.9); font: 700 10px/1.2 ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; transform: translateX(-50%); transition: background 180ms ease; cursor: pointer; }
     .ui-toggle:hover, .ui-toggle:focus-visible { color: #03131c; background: var(--accent); outline: none; }
 
-    .depth-console, .mission-controls, .depth-ruler--third-person, .mission-status, .travel-indicator, .zone-boundaries, .surface-scale { transition-duration: 320ms; transition-timing-function: ease; }
+    .depth-console, .mission-controls, .depth-ruler--third-person, .mission-status, .zone-boundaries, .surface-scale { transition-duration: 320ms; transition-timing-function: ease; }
     .depth-console { transition-property: transform, opacity; }
     .mission-controls { transition-property: transform, opacity; }
     .depth-ruler--third-person { transition-property: transform, opacity; }
@@ -85,31 +85,8 @@
     .mission[data-ui-visible="false"] .depth-console { opacity: 0; transform: translateX(calc(100% + 32px)); pointer-events: none; }
     .mission[data-ui-visible="false"] .mission-controls { opacity: 0; transform: translateX(calc(100% + 32px)); pointer-events: none; }
     .mission[data-ui-visible="false"] .mission-status { opacity: 0; transform: translate(-50%, calc(-100% - 36px)); pointer-events: none; }
-    .mission[data-ui-visible="false"] .travel-indicator,
     .mission[data-ui-visible="false"] .zone-boundaries,
     .mission[data-ui-visible="false"] .surface-scale { opacity: 0; pointer-events: none; }
-    .mission[data-depth-state="underwater"] .depth-panel,
-    .mission[data-depth-state="underwater"] .eta,
-    .mission[data-depth-state="underwater"] .mission-controls,
-    .mission[data-depth-state="underwater"] .depth-ruler,
-    .mission[data-depth-state="underwater"] .mission-status,
-    .mission[data-depth-state="underwater"] .ui-toggle,
-    .mission[data-depth-state="underwater"] .depth-endpoint,
-    .mission[data-depth-state="underwater"] .surface-scale__label,
-    .mission[data-depth-state="underwater"] .control-button,
-    .mission[data-depth-state="underwater"] .speed-button {
-      border-color: transparent;
-      background: transparent;
-      box-shadow: none;
-      backdrop-filter: none;
-    }
-    .mission[data-depth-state="underwater"] .ui-toggle:hover,
-    .mission[data-depth-state="underwater"] .ui-toggle:focus-visible {
-      color: var(--ink);
-      background: transparent;
-      outline-color: var(--accent);
-    }
-
     .scene { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; }
     .seafloor { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; transform: translateY(var(--seafloor-y, 120vh)); background: linear-gradient(to bottom, transparent 0 160px, #08131d 160px); }
     .seafloor svg { display: block; width: 100%; height: 180px; }
@@ -158,41 +135,66 @@
     .submarine__visual { position: absolute; inset: 0; transform: translateY(var(--bob-y, 0px)) rotate(var(--bob-rotation, 0deg)); transform-origin: 50% 82%; will-change: transform; }
     .submarine__image { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; }
     .submarine__water-tint { position: absolute; inset: 0; background: rgba(7, 104, 184, .15); clip-path: inset(82% 0 0); -webkit-mask: url("ocean-assets/submarine.svg") center / contain no-repeat; mask: url("ocean-assets/submarine.svg") center / contain no-repeat; will-change: clip-path; }
-    .surface-scale { position: absolute; top: 50%; left: calc(50% + min(90px, 21vw) + 6px); z-index: 4; width: 28px; height: var(--scale-size, min(159px, 37.1vw)); color: rgba(223, 247, 255, .9); filter: drop-shadow(0 0 7px rgba(98, 224, 255, .35)); opacity: 0; transform: translateY(calc(-50% + var(--scale-centre-offset, 0px) - var(--surface-offset, 0px))); transition: opacity 160ms ease; pointer-events: none; will-change: transform, opacity; }
+    .surface-scale { position: absolute; top: 50%; right: calc(50% + min(90px, 21vw) + 6px); z-index: 4; width: 28px; height: var(--scale-size, min(159px, 37.1vw)); color: rgba(223, 247, 255, .9); filter: drop-shadow(0 0 7px rgba(98, 224, 255, .35)); opacity: 0; transform: translateY(calc(-50% + var(--scale-centre-offset, 0px) - var(--surface-offset, 0px))); transition: opacity 160ms ease; pointer-events: none; will-change: transform, opacity; }
     .surface-scale[data-visible="true"] { opacity: 1; }
-    .surface-scale__bracket { position: absolute; inset: 0; border-top: 2px solid currentColor; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; }
-    .surface-scale__label { position: absolute; top: 50%; right: 0; padding: 4px 3px; color: var(--accent); background: rgba(3, 19, 29, .88); font: 700 11px/1 ui-monospace, monospace; letter-spacing: .05em; transform: translate(50%, -50%); white-space: nowrap; }
-    .travel-indicator { position: absolute; top: 50%; left: calc(50% + 170px); z-index: 4; display: grid; gap: 2px; color: var(--warning); text-shadow: 0 0 12px rgba(255, 211, 123, .7); text-align: center; transform: translateY(-50%); }
-    .travel-indicator__arrow { font: 700 28px/1 ui-monospace, monospace; }
-    .travel-indicator__label { color: var(--muted); font: 700 10px/1.2 ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; }
-
+    .surface-scale__bracket { position: absolute; inset: 0; border-top: 2px solid currentColor; border-bottom: 2px solid currentColor; border-left: 2px solid currentColor; }
+    .surface-scale__label { position: absolute; top: 50%; left: 0; padding: 4px 3px; color: var(--accent); background: rgba(3, 19, 29, .88); font: 700 11px/1 ui-monospace, monospace; letter-spacing: .05em; transform: translate(-50%, -50%); white-space: nowrap; }
     .zone-boundaries { position: absolute; inset: 0; z-index: 1; pointer-events: none; transition: opacity 320ms ease; }
     .zone-boundary { position: absolute; top: 0; left: var(--boundary-start, 140px); right: 0; height: 2px; background: radial-gradient(circle at 1px 1px, var(--accent) 1px, transparent 1px) 0 0 / 12px 2px repeat-x; transform: translateY(var(--boundary-y)); }
     .zone-boundary[hidden] { display: none; }
     .zone-boundaries { --boundary-label-font-size: clamp(9px, calc(var(--boundary-label-width, 96px) / 8), 12px); }
     .zone-boundary__label { position: absolute; bottom: 10px; left: calc(var(--boundary-label-x) - var(--boundary-start, 140px)); width: max-content; max-width: var(--boundary-label-width); transform: translateX(-50%); overflow-wrap: anywhere; color: var(--ink); font: 600 var(--boundary-label-font-size)/1.5 ui-monospace, monospace; text-align: center; text-shadow: 0 2px 6px #020c13, 0 0 12px #020c13; }
-    .depth-console { position: fixed; top: 16px; right: 24px; z-index: 5; display: grid; width: 88px; gap: 8px; }
-    .depth-console .depth-panel { position: relative; top: auto; right: auto; display: grid; width: 100%; justify-items: center; padding: 11px 8px 10px; }
+    .depth-console { position: fixed; right: 24px; bottom: 16px; z-index: 5; display: grid; width: var(--instrument-width); gap: 8px; }
+    .depth-console::before { position: absolute; inset: 0; z-index: 0; border: 1px solid var(--line); background: var(--panel); box-shadow: 0 14px 50px rgba(0, 0, 0, 0.24); backdrop-filter: blur(14px); clip-path: var(--depth-console-chrome-clip, inset(0)); content: ""; pointer-events: none; will-change: clip-path; }
+    .depth-console .depth-panel, .depth-console .eta { z-index: 1; border-color: transparent; background: transparent; box-shadow: none; backdrop-filter: none; }
+    .depth-console .depth-panel { position: relative; top: auto; right: auto; display: grid; width: 100%; height: 100%; grid-template-rows: auto auto minmax(0, 1fr); justify-items: center; padding: 11px 8px 10px; }
     .depth-console .label { font-size: 9px; letter-spacing: .1em; text-align: center; }
     .depth-value { margin: 5px 0 3px; font: 700 19px ui-monospace, monospace; white-space: nowrap; }
     .depth-value span { color: var(--muted); font-size: 10px; font-weight: 400; }
-    .depth-track { position: relative; width: 100%; height: clamp(190px, 42vh, 360px); margin: 9px 0 4px; }
+    .depth-track { position: relative; width: 100%; height: auto; min-height: 0; margin: 9px 0 4px; }
     .depth-track::before { position: absolute; top: 0; bottom: 0; left: 50%; width: 3px; background: linear-gradient(to bottom, #4dc9f0, #122f3d 45%, #020508); box-shadow: 0 0 0 1px rgba(204,241,255,.24); content: ""; transform: translateX(-50%); }
-    .depth-arrow { position: absolute; left: 50%; width: 12px; height: 12px; border: 2px solid #fff1c9; border-radius: 50%; background: var(--warning); box-shadow: 0 0 12px var(--warning); transform: translate(-50%, -50%); transition: top 180ms linear; }
+    .depth-arrow { position: absolute; left: 50%; width: 12px; height: 12px; border: 2px solid var(--ink); border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); transform: translate(-50%, -50%); transition: top 180ms linear; }
     .depth-endpoint { position: absolute; right: calc(50% + 7px); padding: 2px 3px; color: var(--muted); background: rgba(3,19,29,.92); font: 8px/1 ui-monospace, monospace; white-space: nowrap; }
-    .depth-endpoint--surface { top: 0; transform: translateY(-50%); }
     .depth-endpoint--bottom { bottom: 0; transform: translateY(50%); }
+    .depth-zone-marker { position: absolute; top: var(--zone-position); right: 50%; width: calc(50% - 1px); border-top: 1px solid rgba(98,224,255,.7); transform: translateY(-50%); }
+    .depth-zone-marker__value { position: absolute; top: 0; right: 6px; padding: 2px; color: var(--muted); background: rgba(3,19,29,.92); font: 7px/1 ui-monospace, monospace; transform: translateY(-50%); white-space: nowrap; }
     .depth-console .eta { position: relative; padding: 9px 7px; color: var(--muted); font-size: 10px; line-height: 1.3; text-align: center; }
     .eta strong { display: block; margin-top: 4px; color: var(--ink); font: 700 12px ui-monospace, monospace; }
-    .mission-controls { position: fixed; right: 24px; bottom: 16px; z-index: 5; display: grid; width: 158px; gap: 9px; padding: 12px; }
-    .speed-control { display: grid; gap: 8px; }
-    .speed-control__readout { display: block; margin-top: 4px; color: var(--accent); font: 700 14px ui-monospace, monospace; letter-spacing: normal; text-transform: none; }
-    .speed-stepper { display: grid; grid-template-columns: 36px minmax(0, 1fr) 36px; gap: 5px; align-items: center; }
-    .speed-button { display: grid; width: 36px; height: 36px; padding: 0; place-items: center; border: 1px solid rgba(98,224,255,.5); color: var(--ink); background: rgba(98,224,255,.08); font: 700 20px/1 ui-monospace, monospace; cursor: pointer; user-select: none; touch-action: none; }
-    .speed-button:hover, .speed-button:focus-visible { background: rgba(98,224,255,.2); }
+    .mission-controls { position: fixed; top: 22px; right: 24px; z-index: 5; display: grid; width: var(--instrument-width); gap: 7px; padding: 8px; overflow: hidden; border: 1px solid rgba(98,224,255,.5); border-radius: 0; background: rgba(3,19,29,.9); box-shadow: none; }
+    .panel-screw { display: none; }
+    .panel-screw::after { position: absolute; top: 3px; left: 1px; width: 4px; height: 1px; background: rgba(204,241,255,.55); content: ""; transform: rotate(-18deg); }
+    .panel-screw--tl { top: 5px; left: 5px; }
+    .panel-screw--tr { top: 5px; right: 5px; }
+    .panel-screw--bl { bottom: 5px; left: 5px; }
+    .panel-screw--br { right: 5px; bottom: 5px; }
+    .speed-control { position: relative; z-index: 1; display: grid; min-width: 0; gap: 6px; }
+    .speed-control__title { color: var(--muted); font: 700 8px/1 ui-monospace, monospace; letter-spacing: .14em; text-align: center; }
+    .pressure-screen { display: flex; width: 100%; min-width: 0; flex-direction: column; align-items: center; gap: 4px; padding: 5px 3px 6px; border: 1px solid rgba(98,224,255,.5); color: var(--accent); background: rgba(3,19,29,.9); box-shadow: none; text-align: center; }
+    .pressure-screen__label { display: block; max-width: 100%; font: 700 6px/1 ui-monospace, monospace; letter-spacing: .02em; text-align: center; text-transform: uppercase; white-space: nowrap; }
+    .pressure-screen__value { position: relative; display: block; width: 100%; color: var(--ink); font: 700 13px/1 ui-monospace, monospace; font-variant-numeric: tabular-nums; letter-spacing: .04em; text-align: center; text-shadow: none; white-space: nowrap; }
+    .pressure-screen__unit { position: absolute; top: 50%; right: 2px; margin: 0; color: var(--accent); font: 700 6px/1 ui-monospace, monospace; letter-spacing: .05em; transform: translateY(-50%); }
+    .speed-dial { position: relative; width: 100%; min-width: 0; max-width: 100%; aspect-ratio: 1; justify-self: center; margin-top: -3px; overflow: visible; border: 0; border-radius: 0; background: transparent; box-shadow: none; isolation: isolate; }
+    .speed-dial::before, .speed-dial::after { display: none; }
+    .speed-dial__bezel { position: absolute; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; pointer-events: none; }
+    .speed-dial__bezel circle { fill: rgba(3,19,29,.9); stroke: rgba(98,224,255,.72); stroke-width: 1.5; vector-effect: non-scaling-stroke; shape-rendering: geometricPrecision; }
+    .speed-dial__scale { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; overflow: visible; color: var(--accent); filter: none; }
+    .speed-dial__arc { fill: none; stroke: currentColor; stroke-width: 1.5; vector-effect: non-scaling-stroke; shape-rendering: geometricPrecision; }
+    .speed-dial__tick { stroke: currentColor; stroke-width: 1.5; vector-effect: non-scaling-stroke; shape-rendering: geometricPrecision; }
+    .speed-dial__tick--major { stroke-width: 2.6; }
+    .speed-dial__readout { position: absolute; right: 0; bottom: 12%; left: 0; z-index: 2; color: var(--ink); font: 700 13px/1 ui-monospace, monospace; font-variant-numeric: tabular-nums; letter-spacing: .04em; text-align: center; text-shadow: none; white-space: nowrap; }
+    .speed-dial__unit { position: absolute; right: 0; bottom: 3%; left: 0; z-index: 2; color: var(--accent); font: 700 6px/1 ui-monospace, monospace; letter-spacing: .16em; text-align: center; }
+    .speed-dial__needle { position: absolute; bottom: 37%; left: 50%; z-index: 2; width: 42%; height: 2px; border-radius: 0; background: var(--accent); box-shadow: none; transform: rotate(var(--speed-needle-angle, -95deg)); transform-origin: 0 50%; transition: transform 180ms ease-out; }
+    .speed-dial__needle::before { position: absolute; top: 50%; left: -4px; width: 8px; height: 8px; border: 1px solid var(--ink); border-radius: 50%; background: #061d28; box-shadow: none; content: ""; transform: translateY(-50%); }
+    .speed-stepper { display: grid; grid-template-columns: 21px minmax(0, 1fr) 21px; gap: 3px; align-items: center; }
+    .speed-button { display: grid; width: 21px; height: 24px; padding: 0; place-items: center; border: 1px solid rgba(98,224,255,.5); border-radius: 0; color: var(--ink); background: rgba(3,19,29,.9); box-shadow: none; font: 800 15px/1 ui-monospace, monospace; text-shadow: none; cursor: pointer; user-select: none; touch-action: none; }
+    .speed-button:hover, .speed-button:focus-visible { color: #03131c; background: var(--accent); outline: none; text-shadow: none; }
+    .speed-button:active { color: #03131c; background: var(--ink); box-shadow: none; transform: translateY(1px); }
     .speed-button:disabled { opacity: .35; cursor: default; }
-    .speed-stepper__range { color: var(--muted); font: 9px/1.25 ui-monospace, monospace; text-align: center; }
-    .pause-button { width: 100%; }
+    .speed-stepper__range { padding: 4px 0; border: 0; color: var(--muted); background: transparent; box-shadow: none; font: 6px/1.2 ui-monospace, monospace; letter-spacing: .04em; text-align: center; }
+    .pause-button { position: relative; z-index: 1; width: 100%; height: 42px; border: 1px solid rgba(98,224,255,.5); border-radius: 0; color: var(--ink); background: rgba(3,19,29,.9); box-shadow: none; font: 700 9px/1.25 ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; }
+    .pause-button:hover, .pause-button:focus-visible { border-color: var(--accent); color: #03131c; background: var(--accent); outline: none; }
+    .mission-controls .eta { position: relative; z-index: 1; padding: 7px 0 0; border: 0; border-top: 1px solid rgba(98,224,255,.3); color: var(--muted); background: transparent; box-shadow: none; backdrop-filter: none; font: 6px/1.35 ui-monospace, monospace; text-align: center; }
+    .mission-controls .eta strong { margin-top: 3px; font-size: 9px; }
 
     .depth-ruler { top: 105px; bottom: 105px; left: 24px; width: 104px; padding: 15px 12px; overflow: hidden; }
     .depth-ruler__title { margin-bottom: 10px; }
@@ -201,8 +203,8 @@
     .depth-ruler__tick { position: absolute; top: var(--tick-position); left: -1px; width: 10px; border-top: 1px solid rgba(204,241,255,.38); pointer-events: none; }
     .depth-ruler__tick--major { width: 19px; border-color: rgba(204,241,255,.8); }
     .depth-ruler__tick-label { position: absolute; top: var(--tick-position); left: 25px; color: var(--muted); font: 10px ui-monospace, monospace; transform: translateY(-50%); }
-    .depth-ruler__reference { position: absolute; top: var(--reference-position); right: 0; left: -1px; z-index: 1; border-top: 2px solid var(--warning); filter: drop-shadow(0 0 5px rgba(255, 211, 123, .8)); pointer-events: none; }
-    .depth-ruler__reference::after { position: absolute; top: -5px; right: 0; border-top: 4px solid transparent; border-right: 6px solid var(--warning); border-bottom: 4px solid transparent; content: ""; }
+    .depth-ruler__reference { position: absolute; top: var(--reference-position); right: 0; left: -1px; z-index: 1; border-top: 2px solid #ffd37b; filter: drop-shadow(0 0 5px rgba(255,211,123,.8)); pointer-events: none; }
+    .depth-ruler__reference::after { position: absolute; top: -5px; right: 0; border-top: 4px solid transparent; border-right: 6px solid #ffd37b; border-bottom: 4px solid transparent; content: ""; }
     .depth-ruler__reference-value { position: absolute; top: 0; left: 24px; padding: 3px 5px; color: var(--warning); background: #061720; font: 700 10px/1 ui-monospace, monospace; transform: translateY(-50%); white-space: nowrap; }
     .depth-ruler--third-person { top: 0; bottom: 0; left: clamp(12px, 2vw, 24px); z-index: 4; width: 122px; padding: 0; overflow: visible; border: 0; background: transparent; box-shadow: none; backdrop-filter: none; pointer-events: none; }
     .depth-ruler--third-person .depth-ruler__title { position: absolute; bottom: 32px; left: 88px; width: 118px; margin: 0; color: var(--accent); text-shadow: 0 1px 8px rgba(0, 8, 13, .9); }
@@ -257,7 +259,7 @@
     .depth-range__value { color: var(--warning); font: 700 11px/1.35 ui-monospace, monospace; }
     .depth-range__value { grid-column: 2 / 4; grid-row: 3; justify-self: center; margin-top: 8px; white-space: nowrap; }
     .depth-range__track { position: relative; grid-column: 2; grid-row: 2; width: 3px; min-height: 0; margin: 0; background: rgba(181, 231, 246, .6); }
-    .depth-range__placeholder { position: absolute; inset: 20% -5px; border: 1px dashed rgba(255, 211, 123, .9); background: repeating-linear-gradient(45deg, rgba(255,211,123,.2) 0 5px, transparent 5px 10px); }
+    .depth-range__placeholder { position: absolute; inset: 20% -5px; border: 1px dashed rgba(98,224,255,.9); background: repeating-linear-gradient(45deg, rgba(98,224,255,.2) 0 5px, transparent 5px 10px); }
     .creature-dialog[data-record="true"] .depth-range__placeholder { inset: var(--record-position) -6px auto; height: 3px; border: 0; background: var(--warning); }
     .depth-range__ticks { display: grid; grid-column: 3; grid-row: 2; grid-template-rows: repeat(5, 1fr); min-height: 0; margin: 0; color: var(--muted); font: 10px/1 ui-monospace, monospace; }
     .depth-range__ticks span { align-self: center; }
@@ -266,8 +268,14 @@
 
     @media (max-width: 760px) {
       .mission-status { top: 16px; }
-      .depth-console { top: 12px; right: 12px; width: 84px; }
-      .mission-controls { right: 12px; bottom: 12px; width: 150px; }
+      :root { --instrument-width: 84px; }
+      .depth-console { right: 12px; bottom: 12px; }
+      .mission-controls { top: 16px; right: 12px; }
+      .speed-control { gap: 7px; }
+      .speed-control__title { font-size: 8px; }
+      .speed-stepper { grid-template-columns: 20px minmax(0, 1fr) 20px; gap: 3px; }
+      .speed-button { width: 20px; height: 23px; font-size: 14px; }
+      .pause-button { padding: 7px 5px; font-size: 8px; }
       .ui-toggle { bottom: 20px; }
       .depth-ruler { top: 105px; bottom: 155px; left: 12px; width: 112px; }
       .depth-ruler--third-person { top: 0; bottom: 0; left: 12px; width: 108px; }
@@ -287,9 +295,23 @@
 
     @media (max-width: 520px) {
       .mission-status { top: 12px; }
-      .depth-console { top: 7px; right: 7px; width: 78px; }
-      .depth-track { height: clamp(170px, 36svh, 270px); }
-      .mission-controls { right: 7px; bottom: 7px; width: 142px; padding: 10px; }
+      :root { --instrument-width: 78px; }
+      .depth-console { right: 7px; bottom: 7px; }
+      .mission-controls { top: 12px; right: 7px; gap: 5px; padding: 6px; }
+      .panel-screw { width: 6px; height: 6px; }
+      .panel-screw::after { top: 2px; width: 3px; }
+      .panel-screw--tl, .panel-screw--tr { top: 3px; }
+      .panel-screw--tl, .panel-screw--bl { left: 3px; }
+      .panel-screw--tr, .panel-screw--br { right: 3px; }
+      .panel-screw--bl, .panel-screw--br { bottom: 3px; }
+      .speed-control { gap: 5px; }
+      .speed-control__title { font-size: 7px; letter-spacing: .16em; }
+      .speed-dial__readout { font-size: 11px; }
+      .speed-dial__unit { font-size: 6px; }
+      .speed-stepper { grid-template-columns: 19px minmax(0, 1fr) 19px; gap: 2px; }
+      .speed-button { width: 19px; height: 22px; font-size: 13px; }
+      .speed-stepper__range { padding: 3px 1px; font-size: 6px; }
+      .pause-button { padding: 6px 3px; font-size: 7px; letter-spacing: .04em; }
       .ui-toggle { bottom: 15px; }
       .depth-ruler { top: 0; }
       .depth-ruler--third-person { top: 0; bottom: 0; left: 7px; width: 94px; }
@@ -322,7 +344,7 @@
   </div>
   <main class="mission" id="mission" data-zone="surface" data-ui-visible="true" inert aria-busy="true">
     <button class="mission-status" id="mission-status" type="button" aria-controls="sandbox" aria-expanded="false"><span class="label">Current zone</span><strong id="zone-name">Surface</strong></button>
-    <button class="ui-toggle" id="ui-toggle" type="button" aria-controls="mission-status depth-console mission-controls travel-indicator zone-boundaries surface-scale" aria-expanded="true">Hide UI</button>
+    <button class="ui-toggle" id="ui-toggle" type="button" aria-controls="mission-status depth-console mission-controls zone-boundaries surface-scale" aria-expanded="true">Hide UI</button>
 
     <section class="scene" id="scene" aria-label="Third-person submarine descent scene">
       <svg class="visual-filters" aria-hidden="true" focusable="false">
@@ -389,7 +411,6 @@
         <span class="surface-scale__bracket" aria-hidden="true"></span>
         <span class="surface-scale__label" aria-hidden="true">2 m</span>
       </div>
-      <div class="travel-indicator" id="travel-indicator" aria-live="polite"><div class="travel-indicator__arrow" id="travel-arrow">↓</div><div class="travel-indicator__label" id="travel-label">Descending</div></div>
       <div class="zone-boundaries" id="zone-boundaries" aria-label="Ocean zone boundaries"></div>
     </section>
 
@@ -397,21 +418,54 @@
       <aside class="depth-panel" aria-label="Overall expedition depth">
         <div class="label">Depth gauge</div>
         <div class="depth-value"><span id="depth-value">0</span> <span>m</span></div>
-        <div class="depth-track"><span class="depth-endpoint depth-endpoint--surface">0 m</span><div class="depth-arrow" id="depth-arrow"></div><span class="depth-endpoint depth-endpoint--bottom">10,971 m</span></div>
+        <div class="depth-track">
+          <span class="depth-zone-marker" style="--zone-position: 1.823%;"><span class="depth-zone-marker__value">200 m</span></span>
+          <span class="depth-zone-marker" style="--zone-position: 9.115%;"><span class="depth-zone-marker__value">1,000 m</span></span>
+          <span class="depth-zone-marker" style="--zone-position: 36.460%;"><span class="depth-zone-marker__value">4,000 m</span></span>
+          <span class="depth-zone-marker" style="--zone-position: 54.690%;"><span class="depth-zone-marker__value">6,000 m</span></span>
+          <div class="depth-arrow" id="depth-arrow"></div>
+          <span class="depth-endpoint depth-endpoint--bottom">10,971 m</span>
+        </div>
       </aside>
-      <div class="eta">Estimated time to bottom<strong id="eta-value">1 h 59 min</strong></div>
     </div>
 
     <aside class="mission-controls" aria-label="Descent controls">
+      <span class="panel-screw panel-screw--tl" aria-hidden="true"></span>
+      <span class="panel-screw panel-screw--tr" aria-hidden="true"></span>
+      <span class="panel-screw panel-screw--bl" aria-hidden="true"></span>
+      <span class="panel-screw panel-screw--br" aria-hidden="true"></span>
       <div class="speed-control">
-        <div class="label">Descent speed<output class="speed-control__readout" id="speed-output">1.50 m/s</output></div>
+        <div class="speed-control__title">Descent rate</div>
+        <div class="pressure-screen" role="status" aria-live="off">
+          <span class="pressure-screen__label">External pressure</span>
+          <output class="pressure-screen__value" id="pressure-output"><span id="pressure-value">1.01</span><span class="pressure-screen__unit">BAR</span></output>
+        </div>
+        <div class="speed-dial" id="speed-dial" role="img" aria-label="Descent speed 1.50 metres per second">
+          <svg class="speed-dial__bezel" viewBox="0 0 100 100" aria-hidden="true">
+            <circle cx="50" cy="50" r="48.5"></circle>
+          </svg>
+          <svg class="speed-dial__scale" viewBox="0 0 200 145" aria-hidden="true">
+            <path class="speed-dial__arc" d="M24.8 77.6 A80 80 0 0 1 175.2 77.6"></path>
+            <g>
+              <line class="speed-dial__tick speed-dial__tick--major" x1="100" y1="25" x2="100" y2="38" transform="rotate(-70 100 105)"></line>
+              <line class="speed-dial__tick speed-dial__tick--major" x1="100" y1="25" x2="100" y2="38" transform="rotate(-30 100 105)"></line>
+              <line class="speed-dial__tick speed-dial__tick--major" x1="100" y1="25" x2="100" y2="38"></line>
+              <line class="speed-dial__tick speed-dial__tick--major" x1="100" y1="25" x2="100" y2="38" transform="rotate(30 100 105)"></line>
+              <line class="speed-dial__tick speed-dial__tick--major" x1="100" y1="25" x2="100" y2="38" transform="rotate(70 100 105)"></line>
+            </g>
+          </svg>
+          <output class="speed-dial__readout" id="speed-output">1.50</output>
+          <span class="speed-dial__unit" aria-hidden="true">M/S</span>
+          <span class="speed-dial__needle" aria-hidden="true"></span>
+        </div>
         <div class="speed-stepper" role="group" aria-label="Adjust descent speed">
           <button class="speed-button" id="speed-down" type="button" aria-label="Decrease speed">−</button>
-          <span class="speed-stepper__range">0.20–3.00<br>m/s</span>
+          <span class="speed-stepper__range">RATE<br>ADJUST</span>
           <button class="speed-button" id="speed-up" type="button" aria-label="Increase speed">+</button>
         </div>
       </div>
       <button class="control-button pause-button" id="pause-button" type="button">Begin Descent</button>
+      <div class="eta"><span id="eta-label">Time to bottom</span><strong id="eta-value">1 h 59 min</strong></div>
     </aside>
 
     <aside class="depth-ruler depth-ruler--third-person" id="third-person-ruler" aria-label="Five metre navigation scale with half metre markers">
@@ -495,8 +549,11 @@
     ];
 
     const mission = document.getElementById("mission");
+    const missionControls = document.querySelector(".mission-controls");
+    const depthConsole = document.getElementById("depth-console");
     const depthValue = document.getElementById("depth-value");
     const depthArrow = document.getElementById("depth-arrow");
+    const etaLabel = document.getElementById("eta-label");
     const etaValue = document.getElementById("eta-value");
     const zoneName = document.getElementById("zone-name");
     const zoneBoundaries = document.getElementById("zone-boundaries");
@@ -511,6 +568,8 @@
       return { depth: item.depth, element };
     });
     const speedOutput = document.getElementById("speed-output");
+    const pressureValue = document.getElementById("pressure-value");
+    const speedDial = document.getElementById("speed-dial");
     const speedDown = document.getElementById("speed-down");
     const speedUp = document.getElementById("speed-up");
     const pauseButton = document.getElementById("pause-button");
@@ -519,8 +578,6 @@
     const thirdPersonRuler = document.getElementById("third-person-ruler");
     const thirdPersonRulerTrack = document.getElementById("third-person-ruler-track");
     const thirdPersonRulerReference = document.getElementById("third-person-ruler-reference");
-    const travelArrow = document.getElementById("travel-arrow");
-    const travelLabel = document.getElementById("travel-label");
     const surfaceSky = document.getElementById("surface-sky");
     const surfaceWave = document.getElementById("surface-wave");
     const surfaceWaveDepth = document.getElementById("surface-wave-depth");
@@ -561,6 +618,8 @@
     const MIN_SPEED = 0.2;
     const MAX_SPEED = 3;
     const SPEED_STEP = 0.1;
+    const SURFACE_PRESSURE_BAR = 1.01325;
+    const SEAWATER_PRESSURE_BAR_PER_METRE = 0.1006;
     const SUBMARINE_METRES = 2;
     const SUBMARINE_SVG_SIZE = 700;
     const SUBMARINE_ART_TOP = 37.5 / SUBMARINE_SVG_SIZE;
@@ -732,7 +791,24 @@
       surfaceWaveDepth.setAttribute("d", wavePath);
       surfaceWaveHighlight.setAttribute("d", wavePath);
 
-      const scaleX = width / 2 + submarineSize / 2 + 32;
+      // Clip the depth gauge chrome to the animated waterline while leaving
+      // its reading visible above the water.
+      const consoleLeft = depthConsole.offsetLeft;
+      const consoleTop = depthConsole.offsetTop;
+      const consoleWidth = depthConsole.offsetWidth;
+      const consoleHeight = depthConsole.offsetHeight;
+      const consoleSurfacePoints = [];
+      const consoleSurfaceSamples = 8;
+      for (let sample = consoleSurfaceSamples; sample >= 0; sample -= 1) {
+        const ratio = sample / consoleSurfaceSamples;
+        const x = consoleLeft + ratio * consoleWidth;
+        const surfaceY = height / 2 + waterlineDrop - surfaceOffset + waveHeightAt(x, time);
+        const localY = Math.max(0, Math.min(consoleHeight, surfaceY - consoleTop));
+        consoleSurfacePoints.push(`${(ratio * 100).toFixed(1)}% ${localY.toFixed(1)}px`);
+      }
+      depthConsole.style.setProperty("--depth-console-chrome-clip", `polygon(0 0, 100% 0, ${consoleSurfacePoints.join(", ")})`);
+
+      const scaleX = width / 2 - submarineSize / 2 - 32;
       const scaleWaterlineY = height / 2 + waterlineDrop - surfaceOffset + waveHeightAt(scaleX, time);
       const surfaceIsVisible = scaleWaterlineY >= 0 && scaleWaterlineY <= height;
       surfaceScale.style.setProperty("--scale-size", `${submarineSize * SUBMARINE_ART_HEIGHT}px`);
@@ -875,10 +951,21 @@
       return `${Math.floor(minutes / 60)} h ${String(minutes % 60).padStart(2, "0")} min`;
     };
 
+    const positionDepthConsole = () => {
+      const compact = window.innerWidth <= 520;
+      const tablet = window.innerWidth <= 760;
+      const gap = compact ? 7 : tablet ? 10 : 12;
+      const bottomInset = compact ? 7 : tablet ? 12 : 16;
+      const desiredTop = missionControls.getBoundingClientRect().bottom + gap;
+      const maximumTop = window.innerHeight - bottomInset - 190;
+      depthConsole.style.top = `${Math.min(desiredTop, maximumTop)}px`;
+    };
+
     const getCurrentZone = (centreDepth) => milestones.reduce((current, item) =>
       item.depth < BOTTOM && centreDepth + 1e-8 >= item.depth ? item : current, milestones[0]);
 
     const render = () => {
+      positionDepthConsole();
       const current = getCurrentZone(getGaugeDepth(depth));
       const submarineSize = submarine.offsetHeight || Math.min(180, window.innerWidth * 0.42);
       const fullySubmergedDepth = ((FLOAT_LINE_RATIO - SUBMARINE_ART_TOP) * submarineSize + 7) / getWorldPixelsPerMetre();
@@ -887,13 +974,20 @@
       mission.dataset.zone = depth >= 6000 ? "hadal" : depth >= 4000 ? "deep" : "surface";
       mission.dataset.depthState = depth > fullySubmergedDepth ? "underwater" : "surface";
       depthArrow.style.top = `${(depth / BOTTOM) * 100}%`;
-      etaValue.textContent = depth >= BOTTOM ? "Arrived" : formatTime((BOTTOM - depth) / speed);
-      speedOutput.textContent = `${speed.toFixed(2)} m/s`;
+      const ascending = direction < 0;
+      const remainingDistance = ascending ? depth : BOTTOM - depth;
+      const arrivedAtDestination = ascending ? depth <= 0 : depth >= BOTTOM;
+      etaLabel.textContent = ascending ? "Time to surface" : "Time to bottom";
+      etaValue.textContent = arrivedAtDestination ? "Arrived" : formatTime(remainingDistance / speed);
+      const pressureBar = SURFACE_PRESSURE_BAR + Math.max(0, getGaugeDepth(depth)) * SEAWATER_PRESSURE_BAR_PER_METRE;
+      pressureValue.textContent = pressureBar < 100 ? pressureBar.toFixed(2) : Math.round(pressureBar).toLocaleString();
+      speedOutput.textContent = speed.toFixed(2);
+      const speedRatio = (speed - MIN_SPEED) / (MAX_SPEED - MIN_SPEED);
+      speedDial.style.setProperty("--speed-needle-angle", `${-160 + speedRatio * 140}deg`);
+      speedDial.setAttribute("aria-label", `Descent speed ${speed.toFixed(2)} metres per second`);
       speedDown.disabled = speed <= MIN_SPEED;
       speedUp.disabled = speed >= MAX_SPEED;
       pauseButton.textContent = paused ? depth === 0 ? "Begin Descent" : depth === BOTTOM ? "Begin ascent" : "Resume" : "Pause";
-      travelArrow.textContent = paused ? "Ⅱ" : direction > 0 ? "↓" : "↑";
-      travelLabel.textContent = paused ? "Paused" : direction > 0 ? "Descending" : "Ascending";
       updateSurface();
       updateCreatures();
       updateActiveRuler();
