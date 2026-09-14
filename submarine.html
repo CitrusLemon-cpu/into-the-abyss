@@ -44,6 +44,7 @@
     body[data-loading="true"] .depth-console,
     body[data-loading="true"] .depth-ruler,
     body[data-loading="true"] .mission-status,
+    body[data-loading="true"] .mission-controls,
     body[data-loading="true"] .travel-indicator,
     body[data-loading="true"] .zone-boundaries,
     body[data-loading="true"] .surface-scale,
@@ -58,7 +59,7 @@
     .mission[data-zone="deep"] { background: radial-gradient(circle at 50% 48%, rgba(17, 57, 71, 0.25), transparent 44%), linear-gradient(#073a50 0%, #02121d 56%, #000204 100%); }
     .mission[data-zone="hadal"] { background: radial-gradient(circle at 50% 48%, rgba(38, 28, 57, 0.18), transparent 40%), linear-gradient(#062633 0%, #01080e 58%, #000 100%); }
 
-    .depth-panel, .depth-ruler, .mission-status {
+    .depth-panel, .depth-ruler, .mission-status, .mission-controls, .eta {
       position: fixed;
       z-index: 5;
       border: 1px solid var(--line);
@@ -68,16 +69,21 @@
     }
 
     .eyebrow, .label { color: var(--muted); font: 700 11px/1.2 ui-monospace, monospace; letter-spacing: .16em; text-transform: uppercase; }
-    .mission-status { top: 22px; left: 50%; z-index: 6; padding: 11px 16px; transform: translateX(-50%); text-align: center; }
+    .mission-status { top: 22px; left: 50%; z-index: 6; padding: 11px 16px; color: var(--ink); transform: translateX(-50%); text-align: center; cursor: pointer; appearance: none; }
     .mission-status strong { display: block; color: var(--accent); font: 700 16px ui-monospace, monospace; }
+    .mission-status:hover { border-color: rgba(98,224,255,.55); background: rgba(7, 38, 52, .9); }
+    .mission-status:focus-visible { border-color: var(--accent); outline: 2px solid rgba(98,224,255,.45); outline-offset: 3px; }
+    .mission-status:active { background: rgba(10, 50, 66, .94); }
     .ui-toggle { position: fixed; bottom: 24px; left: 50%; z-index: 8; padding: 10px 9px; border: 1px solid rgba(98,224,255,.5); color: var(--ink); background: rgba(3,19,29,.9); font: 700 10px/1.2 ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; transform: translateX(-50%); transition: background 180ms ease; cursor: pointer; }
     .ui-toggle:hover, .ui-toggle:focus-visible { color: #03131c; background: var(--accent); outline: none; }
 
-    .depth-console, .depth-ruler--third-person, .mission-status, .travel-indicator, .zone-boundaries, .surface-scale { transition-duration: 320ms; transition-timing-function: ease; }
+    .depth-console, .mission-controls, .depth-ruler--third-person, .mission-status, .travel-indicator, .zone-boundaries, .surface-scale { transition-duration: 320ms; transition-timing-function: ease; }
     .depth-console { transition-property: transform, opacity; }
+    .mission-controls { transition-property: transform, opacity; }
     .depth-ruler--third-person { transition-property: transform, opacity; }
     .mission-status { transition-property: transform, opacity; }
     .mission[data-ui-visible="false"] .depth-console { opacity: 0; transform: translateX(calc(100% + 32px)); pointer-events: none; }
+    .mission[data-ui-visible="false"] .mission-controls { opacity: 0; transform: translateX(calc(100% + 32px)); pointer-events: none; }
     .mission[data-ui-visible="false"] .mission-status { opacity: 0; transform: translate(-50%, calc(-100% - 36px)); pointer-events: none; }
     .mission[data-ui-visible="false"] .travel-indicator,
     .mission[data-ui-visible="false"] .zone-boundaries,
@@ -144,26 +150,28 @@
     .zone-boundary[hidden] { display: none; }
     .zone-boundaries { --boundary-label-font-size: clamp(9px, calc(var(--boundary-label-width, 96px) / 8), 12px); }
     .zone-boundary__label { position: absolute; bottom: 10px; left: calc(var(--boundary-label-x) - var(--boundary-start, 140px)); width: max-content; max-width: var(--boundary-label-width); transform: translateX(-50%); overflow-wrap: anywhere; color: var(--ink); font: 600 var(--boundary-label-font-size)/1.5 ui-monospace, monospace; text-align: center; text-shadow: 0 2px 6px #020c13, 0 0 12px #020c13; }
-    .depth-console { position: fixed; top: 16px; right: 24px; bottom: 16px; z-index: 5; width: 158px; }
-    .sandbox-launch { flex: 0 0 auto; width: 100%; margin-bottom: 14px; }
-    .depth-console .depth-panel { position: relative; top: auto; right: auto; display: flex; width: 100%; height: 100%; min-height: 0; flex-direction: column; padding: 13px 12px; }
-    .depth-value { margin: 7px 0 2px; font: 700 25px ui-monospace, monospace; }
-    .depth-value span { color: var(--muted); font-size: 12px; font-weight: 400; }
-    .depth-track { position: relative; min-height: 120px; flex: 1 1 auto; margin: 14px 22px 10px; border-left: 2px solid rgba(204,241,255,.65); background: repeating-linear-gradient(to bottom, transparent 0 24px, rgba(204,241,255,.3) 25px 26px); }
-    .depth-track::before { position: absolute; top: 0; bottom: 0; left: -6px; width: 10px; background: linear-gradient(to bottom, #4dc9f0, #122f3d 45%, #020508); content: ""; opacity: .45; }
-    .depth-arrow { position: absolute; left: -13px; width: 26px; height: 3px; background: var(--warning); box-shadow: 0 0 12px var(--warning); transition: top 180ms linear; }
-    .depth-arrow::after { position: absolute; right: -1px; top: -4px; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-right: 7px solid var(--warning); content: ""; }
-    .depth-marker { display: flex; justify-content: space-between; margin: 0 -9px 0 14px; color: var(--muted); font: 11px ui-monospace, monospace; }
-    .eta { margin-top: 13px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
-    .eta strong { display: block; margin-top: 3px; color: var(--ink); font: 700 14px ui-monospace, monospace; }
-    .speed-control { display: grid; gap: 8px; margin-top: 13px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .depth-console { position: fixed; top: 16px; right: 24px; z-index: 5; display: grid; width: 88px; gap: 8px; }
+    .depth-console .depth-panel { position: relative; top: auto; right: auto; display: grid; width: 100%; justify-items: center; padding: 11px 8px 10px; }
+    .depth-console .label { font-size: 9px; letter-spacing: .1em; text-align: center; }
+    .depth-value { margin: 5px 0 3px; font: 700 19px ui-monospace, monospace; white-space: nowrap; }
+    .depth-value span { color: var(--muted); font-size: 10px; font-weight: 400; }
+    .depth-track { position: relative; width: 100%; height: clamp(190px, 42vh, 360px); margin: 9px 0 4px; }
+    .depth-track::before { position: absolute; top: 0; bottom: 0; left: 50%; width: 3px; background: linear-gradient(to bottom, #4dc9f0, #122f3d 45%, #020508); box-shadow: 0 0 0 1px rgba(204,241,255,.24); content: ""; transform: translateX(-50%); }
+    .depth-arrow { position: absolute; left: 50%; width: 12px; height: 12px; border: 2px solid #fff1c9; border-radius: 50%; background: var(--warning); box-shadow: 0 0 12px var(--warning); transform: translate(-50%, -50%); transition: top 180ms linear; }
+    .depth-endpoint { position: absolute; right: calc(50% + 7px); padding: 2px 3px; color: var(--muted); background: rgba(3,19,29,.92); font: 8px/1 ui-monospace, monospace; white-space: nowrap; }
+    .depth-endpoint--surface { top: 0; transform: translateY(-50%); }
+    .depth-endpoint--bottom { bottom: 0; transform: translateY(50%); }
+    .depth-console .eta { position: relative; padding: 9px 7px; color: var(--muted); font-size: 10px; line-height: 1.3; text-align: center; }
+    .eta strong { display: block; margin-top: 4px; color: var(--ink); font: 700 12px ui-monospace, monospace; }
+    .mission-controls { position: fixed; right: 24px; bottom: 16px; z-index: 5; display: grid; width: 158px; gap: 9px; padding: 12px; }
+    .speed-control { display: grid; gap: 8px; }
     .speed-control__readout { display: block; margin-top: 4px; color: var(--accent); font: 700 14px ui-monospace, monospace; letter-spacing: normal; text-transform: none; }
     .speed-stepper { display: grid; grid-template-columns: 36px minmax(0, 1fr) 36px; gap: 5px; align-items: center; }
     .speed-button { display: grid; width: 36px; height: 36px; padding: 0; place-items: center; border: 1px solid rgba(98,224,255,.5); color: var(--ink); background: rgba(98,224,255,.08); font: 700 20px/1 ui-monospace, monospace; cursor: pointer; user-select: none; touch-action: none; }
     .speed-button:hover, .speed-button:focus-visible { background: rgba(98,224,255,.2); }
     .speed-button:disabled { opacity: .35; cursor: default; }
     .speed-stepper__range { color: var(--muted); font: 9px/1.25 ui-monospace, monospace; text-align: center; }
-    .pause-button { width: 100%; margin-top: 9px; }
+    .pause-button { width: 100%; }
 
     .depth-ruler { top: 105px; bottom: 105px; left: 24px; width: 104px; padding: 15px 12px; overflow: hidden; }
     .depth-ruler__title { margin-bottom: 10px; }
@@ -201,6 +209,9 @@
     .sandbox__jump input { min-width: 0; width: 100%; padding: 9px 11px; border: 1px solid var(--line); color: var(--ink); background: #031019; outline: none; }
     .sandbox__jump input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(98, 224, 255, .12); }
     .sandbox__grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 12px 0 20px; }
+    .sandbox__actions { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+    .sandbox__citations { color: var(--accent); font-size: 12px; }
+    .sandbox__citations:hover, .sandbox__citations:focus-visible { color: var(--ink); }
 
     .creature-dialog { width: min(1120px, calc(100vw - 64px)); height: min(760px, calc(100vh - 64px)); height: min(760px, calc(100svh - 64px)); max-width: none; max-height: none; padding: 0; overflow: visible; border: 1px solid rgba(153, 226, 247, .32); color: var(--ink); background: #03131d; box-shadow: 0 32px 100px rgba(0, 0, 0, .68); }
     .creature-dialog::backdrop { background: rgba(0, 5, 9, .82); backdrop-filter: blur(7px); }
@@ -234,7 +245,8 @@
 
     @media (max-width: 760px) {
       .mission-status { top: 16px; }
-      .depth-console { top: 12px; right: 12px; bottom: 12px; width: 150px; }
+      .depth-console { top: 12px; right: 12px; width: 84px; }
+      .mission-controls { right: 12px; bottom: 12px; width: 150px; }
       .ui-toggle { bottom: 20px; }
       .depth-ruler { top: 105px; bottom: 155px; left: 12px; width: 112px; }
       .depth-ruler--third-person { top: 0; bottom: 0; left: 12px; width: 108px; }
@@ -254,7 +266,9 @@
 
     @media (max-width: 520px) {
       .mission-status { top: 12px; }
-      .depth-console { top: 7px; right: 7px; bottom: 7px; width: 142px; }
+      .depth-console { top: 7px; right: 7px; width: 78px; }
+      .depth-track { height: clamp(170px, 36svh, 270px); }
+      .mission-controls { right: 7px; bottom: 7px; width: 142px; padding: 10px; }
       .ui-toggle { bottom: 15px; }
       .depth-ruler { top: 0; }
       .depth-ruler--third-person { top: 0; bottom: 0; left: 7px; width: 94px; }
@@ -286,8 +300,8 @@
     <button id="dive-loading-retry" class="control-button" hidden onclick="location.reload()">Try again</button>
   </div>
   <main class="mission" id="mission" data-zone="surface" data-ui-visible="true" inert aria-busy="true">
-    <div class="mission-status" id="mission-status"><div class="label">Current zone</div><strong id="zone-name">Surface</strong></div>
-    <button class="ui-toggle" id="ui-toggle" type="button" aria-controls="mission-status depth-console travel-indicator zone-boundaries surface-scale" aria-expanded="true">Hide UI</button>
+    <button class="mission-status" id="mission-status" type="button" aria-controls="sandbox" aria-expanded="false"><span class="label">Current zone</span><strong id="zone-name">Surface</strong></button>
+    <button class="ui-toggle" id="ui-toggle" type="button" aria-controls="mission-status depth-console mission-controls travel-indicator zone-boundaries surface-scale" aria-expanded="true">Hide UI</button>
 
     <section class="scene" id="scene" aria-label="Third-person submarine descent scene">
       <svg class="visual-filters" aria-hidden="true" focusable="false">
@@ -359,25 +373,25 @@
     </section>
 
     <div class="depth-console" id="depth-console">
-      <aside class="depth-panel" aria-label="Depth, speed, and mission controls">
-        <button class="control-button sandbox-launch" id="sandbox-button" type="button">Open sandbox</button>
-        <a href="index.html" target="_blank" rel="noopener" style="display: block; margin-top: 12px; color: var(--accent); font-size: 12px; text-align: center" aria-label="Sources and citations (opens in a new tab)">Sources &amp; citations ↗</a>
+      <aside class="depth-panel" aria-label="Overall expedition depth">
         <div class="label">Depth gauge</div>
         <div class="depth-value"><span id="depth-value">0</span> <span>m</span></div>
-        <div class="depth-track"><div class="depth-arrow" id="depth-arrow"></div></div>
-        <div class="depth-marker"><span>surface</span><span>10,971 m</span></div>
-        <div class="eta">Estimated time to bottom<strong id="eta-value">1 h 59 min</strong></div>
-        <div class="speed-control">
-          <div class="label">Descent speed<output class="speed-control__readout" id="speed-output">1.50 m/s</output></div>
-          <div class="speed-stepper" role="group" aria-label="Adjust descent speed">
-            <button class="speed-button" id="speed-down" type="button" aria-label="Decrease speed">−</button>
-            <span class="speed-stepper__range">0.20–3.00<br>m/s</span>
-            <button class="speed-button" id="speed-up" type="button" aria-label="Increase speed">+</button>
-          </div>
-        </div>
-        <button class="control-button pause-button" id="pause-button" type="button">Begin Descent</button>
+        <div class="depth-track"><span class="depth-endpoint depth-endpoint--surface">0 m</span><div class="depth-arrow" id="depth-arrow"></div><span class="depth-endpoint depth-endpoint--bottom">10,971 m</span></div>
       </aside>
+      <div class="eta">Estimated time to bottom<strong id="eta-value">1 h 59 min</strong></div>
     </div>
+
+    <aside class="mission-controls" aria-label="Descent controls">
+      <div class="speed-control">
+        <div class="label">Descent speed<output class="speed-control__readout" id="speed-output">1.50 m/s</output></div>
+        <div class="speed-stepper" role="group" aria-label="Adjust descent speed">
+          <button class="speed-button" id="speed-down" type="button" aria-label="Decrease speed">−</button>
+          <span class="speed-stepper__range">0.20–3.00<br>m/s</span>
+          <button class="speed-button" id="speed-up" type="button" aria-label="Increase speed">+</button>
+        </div>
+      </div>
+      <button class="control-button pause-button" id="pause-button" type="button">Begin Descent</button>
+    </aside>
 
     <aside class="depth-ruler depth-ruler--third-person" id="third-person-ruler" aria-label="Five metre navigation scale with half metre markers">
       <div class="depth-ruler__title label">Navigation scale<span class="depth-ruler__scale" id="third-person-scale">12.0 m view</span></div>
@@ -388,7 +402,7 @@
 
   </main>
 
-  <section class="sandbox" id="sandbox" hidden aria-labelledby="sandbox-title">
+  <section class="sandbox" id="sandbox" role="dialog" aria-modal="true" hidden aria-labelledby="sandbox-title">
     <div class="sandbox__card">
       <div class="label">Free navigation</div><h2 id="sandbox-title">Jump anywhere on the map</h2>
       <p>Sandbox mode lets you inspect milestones without waiting for the full descent. Your main mission progress stays safe.</p>
@@ -398,7 +412,10 @@
         <button class="control-button" type="submit">Jump to depth</button>
       </form>
       <div class="sandbox__grid" id="sandbox-grid"></div>
-      <button class="control-button" id="close-sandbox" type="button">Return to mission</button>
+      <div class="sandbox__actions">
+        <a class="sandbox__citations" href="index.html" target="_blank" rel="noopener" aria-label="Sources and citations (opens in a new tab)">Sources &amp; citations ↗</a>
+        <button class="control-button" id="close-sandbox" type="button">Return to mission</button>
+      </div>
     </div>
   </section>
 
@@ -933,6 +950,7 @@
       paused = true;
       sandboxMode = true;
       sandbox.hidden = true;
+      document.getElementById("mission-status").setAttribute("aria-expanded", "false");
       render();
     };
 
@@ -1027,13 +1045,15 @@
       if (!specificDepthForm.reportValidity()) return;
       jumpToSandboxDepth(specificDepthInput.valueAsNumber);
     });
-    document.getElementById("sandbox-button").addEventListener("click", () => {
+    const missionStatus = document.getElementById("mission-status");
+    missionStatus.addEventListener("click", () => {
       if (!sandboxMode) missionDepth = depth;
       specificDepthInput.value = String(Math.round(getGaugeDepth(depth) * 10) / 10);
       sandbox.hidden = false;
+      missionStatus.setAttribute("aria-expanded", "true");
       requestAnimationFrame(() => specificDepthInput.select());
     });
-    document.getElementById("close-sandbox").addEventListener("click", () => { depth = missionDepth; sandboxMode = false; sandbox.hidden = true; render(); });
+    document.getElementById("close-sandbox").addEventListener("click", () => { depth = missionDepth; sandboxMode = false; sandbox.hidden = true; missionStatus.setAttribute("aria-expanded", "false"); missionStatus.focus(); render(); });
     document.getElementById("creature-dialog-close").addEventListener("click", () => creatureDialog.close());
     creatureDialog.addEventListener("close", () => {
       const animation = creatureDialog.querySelector(".manatee-rive");
