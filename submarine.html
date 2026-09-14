@@ -42,10 +42,9 @@
     .dive-loading button { pointer-events: auto; }
     .dive-loading[hidden] { display: none; }
     body[data-loading="false"] .dive-loading { opacity: 0; pointer-events: none; }
-    body[data-loading="true"] .depth-console,
+    body[data-loading="true"] .instrument-console,
     body[data-loading="true"] .depth-ruler,
     body[data-loading="true"] .mission-status,
-    body[data-loading="true"] .mission-controls,
     body[data-loading="true"] .zone-boundaries,
     body[data-loading="true"] .surface-scale,
     body[data-loading="true"] .ui-toggle { opacity: 0; pointer-events: none; }
@@ -77,13 +76,11 @@
     .ui-toggle { position: fixed; bottom: 24px; left: 50%; z-index: 8; padding: 10px 9px; border: 1px solid rgba(98,224,255,.5); color: var(--ink); background: rgba(3,19,29,.9); font: 700 10px/1.2 ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; transform: translateX(-50%); transition: background 180ms ease; cursor: pointer; }
     .ui-toggle:hover, .ui-toggle:focus-visible { color: #03131c; background: var(--accent); outline: none; }
 
-    .depth-console, .mission-controls, .depth-ruler--third-person, .mission-status, .zone-boundaries, .surface-scale { transition-duration: 320ms; transition-timing-function: ease; }
-    .depth-console { transition-property: transform, opacity; }
-    .mission-controls { transition-property: transform, opacity; }
+    .instrument-console, .depth-ruler--third-person, .mission-status, .zone-boundaries, .surface-scale { transition-duration: 320ms; transition-timing-function: ease; }
+    .instrument-console { transition-property: transform, opacity; }
     .depth-ruler--third-person { transition-property: transform, opacity; }
     .mission-status { transition-property: transform, opacity; }
-    .mission[data-ui-visible="false"] .depth-console { opacity: 0; transform: translateX(calc(100% + 32px)); pointer-events: none; }
-    .mission[data-ui-visible="false"] .mission-controls { opacity: 0; transform: translateX(calc(100% + 32px)); pointer-events: none; }
+    .mission[data-ui-visible="false"] .instrument-console { opacity: 0; transform: translateX(calc(100% + 32px)); pointer-events: none; }
     .mission[data-ui-visible="false"] .mission-status { opacity: 0; transform: translate(-50%, calc(-100% - 36px)); pointer-events: none; }
     .mission[data-ui-visible="false"] .zone-boundaries,
     .mission[data-ui-visible="false"] .surface-scale { opacity: 0; pointer-events: none; }
@@ -127,6 +124,9 @@
     .sea-creature:focus-visible .sea-creature__image,
     .surface-creature:hover .surface-creature__image,
     .surface-creature:focus-visible .surface-creature__image { scale: 1.07; filter: url("#creature-outline"); }
+    .sea-creature--blue-whale:hover .sea-creature__image,
+    .sea-creature--blue-whale:focus-visible .sea-creature__image { scale: 1; filter: drop-shadow(0 10px 16px rgba(0, 8, 14, .3)); }
+    .sea-creature--blue-whale .sea-creature__image { animation: none; }
     .sea-creature:focus-visible, .surface-creature:focus-visible { outline: none; }
 
     .visual-filters { position: absolute; width: 0; height: 0; overflow: hidden; }
@@ -144,9 +144,10 @@
     .zone-boundary[hidden] { display: none; }
     .zone-boundaries { --boundary-label-font-size: clamp(9px, calc(var(--boundary-label-width, 96px) / 8), 12px); }
     .zone-boundary__label { position: absolute; bottom: 10px; left: calc(var(--boundary-label-x) - var(--boundary-start, 140px)); width: max-content; max-width: var(--boundary-label-width); transform: translateX(-50%); overflow-wrap: anywhere; color: var(--ink); font: 600 var(--boundary-label-font-size)/1.5 ui-monospace, monospace; text-align: center; text-shadow: 0 2px 6px #020c13, 0 0 12px #020c13; }
-    .depth-console { position: fixed; right: 24px; bottom: 16px; z-index: 5; display: grid; width: var(--instrument-width); gap: 8px; }
-    .depth-console::before { position: absolute; inset: 0; z-index: 0; border: 1px solid var(--line); background: var(--panel); box-shadow: 0 14px 50px rgba(0, 0, 0, 0.24); backdrop-filter: blur(14px); clip-path: var(--depth-console-chrome-clip, inset(0)); content: ""; pointer-events: none; will-change: clip-path; }
-    .depth-console .depth-panel, .depth-console .eta { z-index: 1; border-color: transparent; background: transparent; box-shadow: none; backdrop-filter: none; }
+    .instrument-console { position: fixed; top: 22px; right: 24px; bottom: 16px; z-index: 5; display: grid; width: var(--instrument-width); min-height: 0; grid-template-rows: auto minmax(0, 1fr); }
+    .instrument-console::before { position: absolute; inset: 0; z-index: 0; border: 1px solid var(--line); background: var(--panel); box-shadow: 0 14px 50px rgba(0,0,0,.24); backdrop-filter: blur(14px); clip-path: var(--instrument-console-chrome-clip, inset(0)); content: ""; pointer-events: none; will-change: clip-path; }
+    .depth-console { position: relative; z-index: 1; display: grid; width: 100%; min-height: 0; grid-row: 2; }
+    .depth-console .depth-panel { z-index: 1; border-color: transparent; background: transparent; box-shadow: none; backdrop-filter: none; }
     .depth-console .depth-panel { position: relative; top: auto; right: auto; display: grid; width: 100%; height: 100%; grid-template-rows: auto auto minmax(0, 1fr); justify-items: center; padding: 11px 8px 10px; }
     .depth-console .label { font-size: 9px; letter-spacing: .1em; text-align: center; }
     .depth-value { margin: 5px 0 3px; font: 700 19px ui-monospace, monospace; white-space: nowrap; }
@@ -160,8 +161,7 @@
     .depth-zone-marker__value { position: absolute; top: 0; right: 6px; padding: 2px; color: var(--muted); background: rgba(3,19,29,.92); font: 7px/1 ui-monospace, monospace; transform: translateY(-50%); white-space: nowrap; }
     .depth-console .eta { position: relative; padding: 9px 7px; color: var(--muted); font-size: 10px; line-height: 1.3; text-align: center; }
     .eta strong { display: block; margin-top: 4px; color: var(--ink); font: 700 12px ui-monospace, monospace; }
-    .mission-controls { position: fixed; top: 22px; right: 24px; z-index: 5; display: grid; width: var(--instrument-width); gap: 7px; padding: 8px; overflow: hidden; border: 1px solid transparent; border-radius: 0; background: transparent; box-shadow: none; backdrop-filter: none; }
-    .mission-controls::before { position: absolute; inset: -1px; z-index: 0; border: 1px solid var(--line); background: var(--panel); box-shadow: 0 14px 50px rgba(0,0,0,.24); backdrop-filter: blur(14px); clip-path: var(--mission-controls-chrome-clip, inset(0)); content: ""; pointer-events: none; will-change: clip-path; }
+    .mission-controls { position: relative; top: auto; right: auto; z-index: 1; display: grid; width: 100%; grid-row: 1; gap: 7px; padding: 8px; overflow: hidden; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; box-shadow: none; backdrop-filter: none; }
     .panel-screw { display: none; }
     .panel-screw::after { position: absolute; top: 3px; left: 1px; width: 4px; height: 1px; background: rgba(204,241,255,.55); content: ""; transform: rotate(-18deg); }
     .panel-screw--tl { top: 5px; left: 5px; }
@@ -270,8 +270,7 @@
     @media (max-width: 760px) {
       .mission-status { top: 16px; }
       :root { --instrument-width: 84px; }
-      .depth-console { right: 12px; bottom: 12px; }
-      .mission-controls { top: 16px; right: 12px; }
+      .instrument-console { top: 16px; right: 12px; bottom: 12px; }
       .speed-control { gap: 7px; }
       .speed-control__title { font-size: 8px; }
       .speed-stepper { grid-template-columns: 20px minmax(0, 1fr) 20px; gap: 3px; }
@@ -297,8 +296,8 @@
     @media (max-width: 520px) {
       .mission-status { top: 12px; }
       :root { --instrument-width: 78px; }
-      .depth-console { right: 7px; bottom: 7px; }
-      .mission-controls { top: 12px; right: 7px; gap: 5px; padding: 6px; }
+      .instrument-console { top: 12px; right: 7px; bottom: 7px; }
+      .mission-controls { gap: 5px; padding: 6px; }
       .panel-screw { width: 6px; height: 6px; }
       .panel-screw::after { top: 2px; width: 3px; }
       .panel-screw--tl, .panel-screw--tr { top: 3px; }
@@ -345,7 +344,7 @@
   </div>
   <main class="mission" id="mission" data-zone="surface" data-ui-visible="true" inert aria-busy="true">
     <button class="mission-status" id="mission-status" type="button" aria-controls="sandbox" aria-expanded="false"><span class="label">Current zone</span><strong id="zone-name">Surface</strong></button>
-    <button class="ui-toggle" id="ui-toggle" type="button" aria-controls="mission-status depth-console mission-controls zone-boundaries surface-scale" aria-expanded="true">Hide UI</button>
+    <button class="ui-toggle" id="ui-toggle" type="button" aria-controls="mission-status instrument-console zone-boundaries surface-scale" aria-expanded="true">Hide UI</button>
 
     <section class="scene" id="scene" aria-label="Third-person submarine descent scene">
       <svg class="visual-filters" aria-hidden="true" focusable="false">
@@ -415,6 +414,7 @@
       <div class="zone-boundaries" id="zone-boundaries" aria-label="Ocean zone boundaries"></div>
     </section>
 
+    <div class="instrument-console" id="instrument-console" role="group" aria-label="Submarine instruments">
     <div class="depth-console" id="depth-console">
       <aside class="depth-panel" aria-label="Overall expedition depth">
         <div class="label">Depth gauge</div>
@@ -468,6 +468,7 @@
       <button class="control-button pause-button" id="pause-button" type="button">Begin Descent</button>
       <div class="eta"><span id="eta-label">Time to bottom</span><strong id="eta-value">1 h 59 min</strong></div>
     </aside>
+    </div>
 
     <aside class="depth-ruler depth-ruler--third-person" id="third-person-ruler" aria-label="Five metre navigation scale with half metre markers">
       <div class="depth-ruler__title label">Navigation scale<span class="depth-ruler__scale" id="third-person-scale">12.0 m view</span></div>
@@ -541,6 +542,7 @@
     const creatures = [
       { name: "Freediver", scientificName: "No-limit freediving", status: "Herbert Nitsch", record: true, depth: 253, x: "28%", tilt: 0, sourceWidth: 430, sourceHeight: 645, image: "Submarine pngs Placeholders/Mesopelagic/freediver.png", driftX: 3, driftY: 0, driftRotation: 0, driftSpeed: 6, driftDelay: -1, popupWidth: "54%" },
       { name: "Scuba diver", scientificName: "Scuba diving", status: "Ahmed Gabr", record: true, depth: 332.35, x: "70%", tilt: 0, sourceWidth: 650, sourceHeight: 433, image: "Submarine pngs Placeholders/Mesopelagic/scubadiver.png", driftX: -3, driftY: 0, driftRotation: 0, driftSpeed: 6, driftDelay: -3, popupWidth: "94%" },
+      { name: "Blue whale", scientificName: "Balaenoptera musculus", status: "Endangered", record: true, recordZone: "Mesopelagic · Whale dive record", recordStatusLabel: "Deepest recorded dive", recordScaleMax: 600, depth: 506, depthAnchorY: .955, x: "43%", tilt: 0, sourceWidth: 5100, sourceHeight: 6800, scaleByHeight: true, image: "Submarine pngs Placeholders/Mesopelagic/blue whale.png", alphaHitTest: true, driftX: 0, driftY: 0, driftRotation: 0, driftSpeed: 0, driftDelay: 0, className: "sea-creature--blue-whale", bleed: true, popupWidth: "68%", popupX: "-2%", popupY: "1%" },
       { name: "Manatee", scientificName: "Trichechus manatus", status: "Vulnerable", depth: 10, x: "24%", tilt: -3, sourceWidth: 800, sourceHeight: 550, rive: true, driftX: 7, driftY: -3, driftRotation: 1.2, driftSpeed: 5.8, driftDelay: -1.7, bleed: true, popupWidth: "116%", popupX: "-12%", popupY: "7%" },
       { name: "Sea otter", scientificName: "Enhydra lutris", status: "Endangered", depth: 40, x: "76%", tilt: 4, sourceWidth: 400, sourceHeight: 250, image: "Submarine pngs Placeholders/Epipelagic/sea otters.png", driftX: -8, driftY: 4, driftRotation: -1.5, driftSpeed: 4.9, driftDelay: -3.1, bleed: true, popupWidth: "108%", popupX: "-8%", popupY: "6%" },
       { name: "Atlantic puffin", scientificName: "Fratercula arctica", status: "Vulnerable", depth: 60, x: "32%", tilt: -5, sourceWidth: 100, sourceHeight: 100, image: "Submarine pngs Placeholders/Epipelagic/puffin.png", driftX: 10, driftY: -5, driftRotation: 2, driftSpeed: 4.2, driftDelay: -2.3, popupWidth: "78%", popupX: "0%", popupY: "3%" },
@@ -550,6 +552,7 @@
     ];
 
     const mission = document.getElementById("mission");
+    const instrumentConsole = document.getElementById("instrument-console");
     const missionControls = document.querySelector(".mission-controls");
     const depthConsole = document.getElementById("depth-console");
     const depthValue = document.getElementById("depth-value");
@@ -661,6 +664,59 @@
       creature.imageElement = image;
     });
 
+    // A compact mask keeps transparent-pixel hit testing reliable even when the
+    // page is opened from file://, where browsers can block canvas pixel reads.
+    const precomputedAlphaMasks = {
+      "Blue whale": { width: 128, height: 171, bits: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADgAwAAAAAAAAAAAAAAAAAA+A8AAAAAAAAAAAAAAAAAAP4fAAAAAAAAAAAAAAAAAID/HwAAAAAAAAAAAAAAAADg/x8AAAAAAAAAAAAAAAAA8P8fAAAAAAAAAAAAAAAAAPz/PwAAAAAAAAAAAAAAAAD+/z8AAAAAAAAAAAAAAACA//8fAAAAAAAAAAAAAAAAwP//HwAAAAAAAAAAAAAAAPD//x8AAAAAAAAAAAAAAAD4//8fAAAAAAAAAAAAAAAA/P//HwAAAAAAAAAAAAAAAP///w8AAAAAAAAAAAAAAID///8PAAAAAAAAAAAAAADA////DwAAAAAAAAAAAAAA4P///wcAAAAAAAAAAAAAAPj///8HAAAAAAAAAAAAAAD8////BwAAAAAAAAAAAAAA/v///wcAAAAAAAAAAAAAAP////8HAAAAAAAAAAAAAID/////AwAAAAAAAAAAAADA/////wMAAAAAAAAAAAAA8P////8DAAAAAAAAAAAAAPj/////AwAAAAAAAAAAAAD8/////wMAAAAAAAAAAAAA/v////8DAAAAAAAAAAAAAP//////AQAAAAAAAAAAAID//////wEAAAAAAAAAAADA//////8BAAAAAAAAAAAA4P//////AQAAAAAAAAAAAPD//////wEAAAAAAAAAAAD4//////8BAAAAAAAAAAAA/P//////AQAAAAAAAAAAAP7//////wAAAAAAAAAAAAD///////8AAAAAAAAAAACA////////AAAAAAAAAAAAwP///////wAAAAAAAAAAAOD///////8AAAAAAAAAAADw//////9/AAAAAAAAAAAA+P//////fwAAAAAAAAAAAPz//////38AAAAAAAAAAAD8//////9/AAAAAAAAAAAA/v//////PwAAAAAAAAAAAP///////z8AAAAAAAAAAID///////8/AAAAAAAAAACA////////PwAAAAAAAAAAwP///////x8AAAAAAAAAAOD///////8fAAAAAAAAAADw////////HwAAAAAAAAAA8P///////w8AAAAAAAAAAPj///////8PAAAAAAAAAAD8////////BwAAAAAAAAAA/P///////wcAAAAAAAAAAP7///////8DAAAAAAAAAAD+////////AwAAAAAAAAAA/////////wEAAAAAAAAAgP////////8BAAAAAAAAAMD/////////AAAAAAAAAADg/////////wAAAAAAAAAA8P///////38AAAAAAAAAAPz///////9/AAAAAAAAAAD+////////PwAAAAAAAACA/////////z8AAAAAAAAAwP////////8/AAAAAAAAAOD/////////fwAAAAAAAADw//////////8AAAAAAAAA+P//////////AQAAAAAAAPz//////////wMAAAAAAAD+//////////8HAAAAAAAA/v//////////DwAAAAAAAPz//////////w8AAAAAAADg//////////8fAAAAAAAA4P//////////PwAAAAAAAOD//////////z8AAAAAAADg//////////9/AAAAAAAA4P//////////fwAAAAAAAOD///////////8AAAAAAADw////////////AAAAAAAA8P////////v//wEAAAAAAPj////////x//8BAAAAAAD4////////4P//AwAAAAAA+P///////8D//wMAAAAAAPz//////3+A//8DAAAAAAD+//////8/AP7/BwAAAAAA/v//////HwD8/wcAAAAAAP///////w8A8P8HAAAAAID///////8HAOD/DwAAAACA////////BwDA/w8AAAAAwP///////wcAAP8PAAAAAMD///////8HAAD+DwAAAADg////////AwAA/g8AAAAA8P///////wMAAPwPAAAAAPD///////8DAAD4DwAAAAD4////////AQAA8A8AAAAA+P///////wEAAPAPAAAAAPz///////8BAADgDwAAAAD8////////AAAA4A8AAAAA/v///////wAAAMAPAAAAAP///////38AAADADwAAAAD//////79/AAAAwAcAAACA//////+fPwAAAIAHAAAAgP//////hz8AAACAAQAAAMD//////4MfAAAAAAAAAADA///////BHwAAAAAAAAAAwP////9/wA8AAAAAAAAAAOD/////P8AHAAAAAAAAAADg/////w/gAwAAAAAAAAAA8P////8D4AEAAAAAAAAAAPD/////AcAAAAAAAAAAAADw////fwAAAAAAAAAAAAAA+P///w8AAAAAAAAAAAAAAPj///8DAAAAAAAAAAAAAAD4//9/AAAAAAAAAAAAAAAA+P//DwAAAAAAAAAAAAAAAPz//wEAAAAAAAAAAAAAAAD8/z8AAAAAAAAAAAAAAAAA/P8PAAAAAAAAAAAAAAAAAPz/AwAAAAAAAAAAAAAAAAD8/wAAAAAAAAAAAAAAAAAA/D8AAAAAAAAAAAAAAAAAAPwfAAAAAAAAAAAAAAAAAAD8DwAAAAAAAAAAAAAAAAAA/AcAAAAAAAAAAAAAAAAAAP4DAAAAAAAAAAAAAAAAAAD+AQAAAAAAAAAAAAAAAACA/wEAAAAAAAAAAAAAAAAAwP8BAAAAAAAAAAAAAAAAAPD/AwAAAAAAAAAAAAAAAAD+/wMAAAAAAAAAAAAAAACA//8HAAAAAAAAAAAAAAAA8P//DwAAAAAAAAAAAAAAAPj//z8AAAAAAAAAAAAAAAD+//9/AAAAAAAAAAAAAAAA/////wEAAAAAAAAAAAAAgP////8HAAAAAAAAAAAAAMD/////DwAAAAAAAAAAAADg/////x8AAAAAAAAAAAAA8P////9/AAAAAAAAAAAAAPD//////wAAAAAAAAAAAAD4//////8BAAAAAAAAAAAA+P//+///AQAAAAAAAAAAAPj///P//wMAAAAAAAAAAAD8///g//8HAAAAAAAAAAAA/P8/4P//BwAAAAAAAAAAADwAAMD//w8AAAAAAAAAAAAIAACA//8PAAAAAAAAAAAAAAAAAP//HwAAAAAAAAAAAAAAAAD8/x8AAAAAAAAAAAAAAAAA8P8fAAAAAAAAAAAAAAAAAID/PwAAAAAAAAAAAAAAAAAA/D8AAAAAAAAAAAAAAAAAAOA/AAAAAAAAAAAAAAAAAADAPwAAAAAAAAAAAAAAAAAAAD8AAAAAAAAAAAAAAAAAAAA+AAAAAAAAAAAAAAAAAAAAPgAAAAAAAAAAAAAAAAAAADwAAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAAAAAAAOAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" }
+    };
+
+    const prepareAlphaHitTest = (creature) => {
+      if (!creature.alphaHitTest || creature.rive) return;
+      const image = creature.imageElement;
+      const precomputed = precomputedAlphaMasks[creature.name];
+      if (precomputed) {
+        const decoded = Uint8Array.from(atob(precomputed.bits), character => character.charCodeAt(0));
+        const bytes = new Uint8Array(Math.ceil(precomputed.width * precomputed.height / 8));
+        bytes.set(decoded.subarray(0, bytes.length));
+        const alpha = new Uint8Array(precomputed.width * precomputed.height);
+        for (let index = 0; index < alpha.length; index += 1) {
+          alpha[index] = bytes[index >> 3] & (1 << (index & 7)) ? 255 : 0;
+        }
+        creature.alphaMask = { alpha, width: precomputed.width, height: precomputed.height };
+        return;
+      }
+      const buildMask = () => {
+        if (!image.naturalWidth || creature.alphaMask) return;
+        try {
+          const canvas = document.createElement("canvas");
+          canvas.width = image.naturalWidth;
+          canvas.height = image.naturalHeight;
+          const context = canvas.getContext("2d", { willReadFrequently: true });
+          context.drawImage(image, 0, 0);
+          const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+          const alpha = new Uint8Array(canvas.width * canvas.height);
+          for (let index = 0; index < alpha.length; index += 1) alpha[index] = pixels[index * 4 + 3];
+          creature.alphaMask = { alpha, width: canvas.width, height: canvas.height };
+        } catch (error) {
+          console.warn(`Pixel hit testing is unavailable for ${creature.name}`, error);
+        }
+      };
+      if (image.complete) buildMask();
+      else image.addEventListener("load", buildMask, { once: true });
+    };
+
+    const isOpaqueCreaturePixel = (creature, event) => {
+      const mask = creature.alphaMask;
+      if (!mask) return true;
+      const bounds = creature.imageElement.getBoundingClientRect();
+      const x = Math.floor((event.clientX - bounds.left) / bounds.width * mask.width);
+      const y = Math.floor((event.clientY - bounds.top) / bounds.height * mask.height);
+      if (x < 0 || x >= mask.width || y < 0 || y >= mask.height) return false;
+      return mask.alpha[y * mask.width + x] > 16;
+    };
+
+    creatures.forEach(prepareAlphaHitTest);
+
     const setUiVisibility = (visible) => {
       uiVisible = visible;
       zoneBoundaries.setAttribute("aria-hidden", String(!visible));
@@ -685,15 +741,16 @@
       creatureDialogTitle.textContent = creature.name;
       creatureDialogScientific.textContent = creature.scientificName;
       creatureDialogStatus.textContent = creature.status;
-      document.getElementById("creature-dialog-zone").textContent = creature.record ? "Mesopelagic · Human diving record" : "Epipelagic encounter";
-      document.getElementById("creature-dialog-status-label").textContent = creature.record ? "Record holder" : "Conservation";
+      document.getElementById("creature-dialog-zone").textContent = creature.record ? creature.recordZone || "Mesopelagic · Human diving record" : "Epipelagic encounter";
+      document.getElementById("creature-dialog-status-label").textContent = creature.record ? creature.recordStatusLabel || "Record holder" : "Conservation";
       creatureDialog.dataset.record = String(Boolean(creature.record));
       document.getElementById("depth-range-title").textContent = creature.record ? "Record depth" : "Depth range";
       creatureDialog.querySelector(".depth-range__value").textContent = creature.record ? `${creature.depth} m` : "— m to — m";
-      creatureDialog.style.setProperty("--record-position", `${creature.depth / 400 * 100}%`);
-      creatureDialog.querySelector(".depth-range__track").setAttribute("aria-label", creature.record ? `Record depth: ${creature.depth} metres on a 0 to 400 metre scale` : "Placeholder depth range within the Epipelagic zone from 0 to 200 metres");
+      const recordScaleMax = creature.recordScaleMax || 400;
+      creatureDialog.style.setProperty("--record-position", `${creature.depth / recordScaleMax * 100}%`);
+      creatureDialog.querySelector(".depth-range__track").setAttribute("aria-label", creature.record ? `Record depth: ${creature.depth} metres on a 0 to ${recordScaleMax} metre scale` : "Placeholder depth range within the Epipelagic zone from 0 to 200 metres");
       creatureDialog.querySelectorAll(".depth-range__ticks span").forEach((tick, index) => {
-        tick.textContent = `${index * (creature.record ? 100 : 50)} m`;
+        tick.textContent = `${index * (creature.record ? recordScaleMax / 4 : 50)} m`;
       });
       const notes = CREATURE_FACTS[creature.name];
       creatureDialogFacts.textContent = notes.facts;
@@ -718,7 +775,28 @@
       render();
     };
 
-    creatures.forEach((creature) => creature.element.addEventListener("click", () => openCreatureDialog(creature)));
+    creatures.forEach((creature) => {
+      creature.element.addEventListener("click", (event) => {
+        // Keyboard-generated clicks have no meaningful pointer coordinates.
+        if (event.detail !== 0 && creature.alphaHitTest && !isOpaqueCreaturePixel(creature, event)) return;
+        openCreatureDialog(creature);
+      });
+    });
+    const alphaHitCreatures = creatures.filter(creature => creature.alphaHitTest);
+    window.addEventListener("pointermove", (event) => {
+      alphaHitCreatures.forEach((creature) => {
+        if (creature.element.dataset.visible !== "true") {
+          creature.element.style.pointerEvents = "";
+          creature.element.style.cursor = "";
+          return;
+        }
+        const isOpaque = isOpaqueCreaturePixel(creature, event);
+        // Removing pointer events over transparent pixels lets clicks reach the
+        // ocean or any smaller creature underneath the whale's large image box.
+        creature.element.style.pointerEvents = isOpaque ? "auto" : "none";
+        creature.element.style.cursor = isOpaque ? "pointer" : "default";
+      });
+    }, { passive: true });
     manOWar.addEventListener("click", () => openCreatureDialog(manOWarInfo));
 
     const getWorldPixelsPerMetre = () => {
@@ -792,7 +870,7 @@
       surfaceWaveDepth.setAttribute("d", wavePath);
       surfaceWaveHighlight.setAttribute("d", wavePath);
 
-      // Give both right-side instrument boxes the same surface-aware chrome.
+      // Clip the shared right-side instrument console to the moving waterline.
       const clipChromeToWaterline = (element, property) => {
         const panelLeft = element.offsetLeft;
         const panelTop = element.offsetTop;
@@ -809,8 +887,7 @@
         }
         element.style.setProperty(property, `polygon(0 0, 100% 0, ${surfacePoints.join(", ")})`);
       };
-      clipChromeToWaterline(depthConsole, "--depth-console-chrome-clip");
-      clipChromeToWaterline(missionControls, "--mission-controls-chrome-clip");
+      clipChromeToWaterline(instrumentConsole, "--instrument-console-chrome-clip");
 
       const scaleX = width / 2 - submarineSize / 2 - 32;
       const scaleWaterlineY = height / 2 + waterlineDrop - surfaceOffset + waveHeightAt(scaleX, time);
@@ -885,13 +962,24 @@
 
       creatures.forEach((creature) => {
         const depthY = (creature.depth - depth) * pixelsPerMetre;
-        const creatureWidth = submarineSize * (creature.sourceWidth / SUBMARINE_SVG_SIZE) * mobileCompression;
         const creatureAspectRatio = creature.imageElement.naturalWidth ? creature.imageElement.naturalHeight / creature.imageElement.naturalWidth : creature.sourceHeight / creature.sourceWidth;
+        // Most creatures are sized by width. Tall, angled artwork can instead use
+        // its long vertical axis so the real-world length is not inflated.
+        const scaleWidth = creature.scaleByHeight ? creature.sourceHeight / creatureAspectRatio : creature.sourceWidth;
+        const creatureWidth = submarineSize * (scaleWidth / SUBMARINE_SVG_SIZE) * mobileCompression;
         const creatureHeight = creatureWidth * creatureAspectRatio;
-        const isVisible = Math.abs(depthY) <= viewportBuffer + creatureHeight / 2;
-        creature.element.style.setProperty("--creature-depth-y", `${depthY.toFixed(2)}px`);
+        // Anchor record-setting animals by the marked body point. The whale's
+        // lowest tail tip, rather than the centre of its large PNG, marks 506 m.
+        const depthAnchorY = Number.isFinite(creature.depthAnchorY) ? creature.depthAnchorY : .5;
+        const creatureCentreY = depthY - (depthAnchorY - .5) * creatureHeight;
+        const isVisible = Math.abs(creatureCentreY) <= viewportBuffer + creatureHeight / 2;
+        creature.element.style.setProperty("--creature-depth-y", `${creatureCentreY.toFixed(2)}px`);
         creature.element.style.setProperty("--creature-width", `${creatureWidth.toFixed(2)}px`);
         creature.element.dataset.visible = String(isVisible);
+        if (creature.alphaHitTest && !isVisible) {
+          creature.element.style.pointerEvents = "none";
+          creature.element.style.cursor = "";
+        }
         creature.element.tabIndex = isVisible ? 0 : -1;
       });
     };
@@ -955,21 +1043,10 @@
       return `${Math.floor(minutes / 60)} h ${String(minutes % 60).padStart(2, "0")} min`;
     };
 
-    const positionDepthConsole = () => {
-      const compact = window.innerWidth <= 520;
-      const tablet = window.innerWidth <= 760;
-      const gap = compact ? 7 : tablet ? 10 : 12;
-      const bottomInset = compact ? 7 : tablet ? 12 : 16;
-      const desiredTop = missionControls.getBoundingClientRect().bottom + gap;
-      const maximumTop = window.innerHeight - bottomInset - 190;
-      depthConsole.style.top = `${Math.min(desiredTop, maximumTop)}px`;
-    };
-
     const getCurrentZone = (centreDepth) => milestones.reduce((current, item) =>
       item.depth < BOTTOM && centreDepth + 1e-8 >= item.depth ? item : current, milestones[0]);
 
     const render = () => {
-      positionDepthConsole();
       const current = getCurrentZone(getGaugeDepth(depth));
       const submarineSize = submarine.offsetHeight || Math.min(180, window.innerWidth * 0.42);
       const fullySubmergedDepth = ((FLOAT_LINE_RATIO - SUBMARINE_ART_TOP) * submarineSize + 7) / getWorldPixelsPerMetre();

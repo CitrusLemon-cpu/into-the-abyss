@@ -14,6 +14,13 @@ const CREATURE_FACTS = {
     "url": "https://www.guinnessworldrecords.com/world-records/deepest-scuba-dive-male",
     "facts": "Ahmed Gabr reached 332.35 metres in the Red Sea off Dahab, Egypt, on 18 September 2014, the deepest scuba dive listed by Guinness World Records. This illustration marks the record depth rather than depicting the equipment used on the actual dive."
   },
+  "Blue whale": {
+    "id": "blue-whale",
+    "publisher": "Comparative Biochemistry and Physiology",
+    "title": "The diving behavior of blue and fin whales",
+    "url": "https://doi.org/10.1016/S1095-6433(01)00348-8",
+    "facts": "The deepest confirmed dive recorded for a pygmy blue whale reached 506 metres. This 24-metre illustration is angled upward, with the lowest tip of its tail marking that record depth; its displayed long-axis scale is reduced slightly to account for the pose."
+  },
   "Portuguese man-o'-war": {
     "id": "man-o-war",
     "publisher": "NOAA National Ocean Service",
